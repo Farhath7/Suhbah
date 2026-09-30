@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="280" height="280" viewBox="0 0 280 280">
+  <rect width="280" height="280" fill="none"/>
+  <g fill="none" stroke="#567C8D" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round" opacity="0.55">
+    <path d="M140 18 166 84 236 114 166 142 140 212 114 142 44 114 114 84Z"/>
+    <path d="M140 54 154 100 198 116 154 132 140 178 126 132 82 116 126 100Z"/>
+    <path d="M0 140c40-26 100-26 140 0s100 26 140 0"/>
+    <path d="M140 0c-26 40-26 100 0 140s26 100 0 140"/>
+    <circle cx="140" cy="140" r="32"/>
+    <circle cx="140" cy="140" r="70"/>
+  </g>
+  <g fill="none" stroke="#C8D9E6" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+    <path d="M0 0h70c0 39-31 70-70 70"/>
+    <path d="M280 0h-70c0 39 31 70 70 70"/>
+    <path d="M0 280h70c0-39-31-70-70-70"/>
+    <path d="M280 280h-70c0-39 31-70 70-70"/>
+    <path d="M70 0c0 38 32 70 70 70S210 38 210 0"/>
+    <path d="M70 280c0-38 32-70 70-70s70 32 70 70"/>
+    <path d="M0 70c38 0 70 32 70 70S38 210 0 210"/>
+    <path d="M280 70c-38 0-70 32-70 70s32 70 70 70"/>
+  </g>
+  <g fill="none" stroke="#2F4156" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.22">
+    <path d="M70 70 98 98M210 70l-28 28M70 210l28-28M210 210l-28-28"/>
+    <path d="M98 98c22-18 62-18 84 0M98 182c22 18 62 18 84 0"/>
+    <path d="M98 98c-18 22-18 62 0 84M182 98c18 22 18 62 0 84"/>
+  </g>
+</svg>
