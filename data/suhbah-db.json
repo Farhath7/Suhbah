@@ -4,7 +4,7 @@
       "id": "admin-1",
       "name": "Suhbah Admin",
       "email": "admin@suhbah.local",
-      "passwordHash": "f9446b93b773c95118d6dcd454839738844f600264c10a2a474b0c55f2da30f3",
+      "passwordHash": "7842254878af8ecc3feed9952adc1a039ff0b827187edcfbb51512b575934aa9",
       "role": "owner",
       "createdAt": "2026-09-28T00:00:00.000Z"
     }
@@ -13,7 +13,7 @@
     {
       "id": "event-7",
       "number": "Suhbah 03",
-      "theme": "Finding Your Way Back",
+      "theme": "Finding Your Way Back - Upcoming",
       "date": "2026-10-31",
       "time": "3:00 - 5:00 PM",
       "location": "Bangalore",
@@ -22,7 +22,8 @@
       "registrationStatus": "Open",
       "image": "/assets/suhbah-03-separated-gathering.png",
       "createdAt": "2026-09-28T00:00:00.000Z",
-      "updatedAt": "2026-09-29T16:16:00.000Z"
+      "updatedAt": "2026-09-30T16:06:05.356Z",
+      "speaker": ""
     },
     {
       "id": "event-1",
@@ -34,6 +35,7 @@
       "speaker": "Mariyam Qurayshi",
       "description": "An honest first gathering on direction, return, and hope.",
       "recap": "This first Suhbah explored how the Quran changes the way we think, respond, and see ourselves. The conversation centered on letting Quranic guidance move beyond recitation into daily choices, character, and a more honest relationship with Allah.",
+      "speechLink": "",
       "status": "past",
       "registrationStatus": "Closed",
       "image": "/assets/suhbah-01-quran-changes-you.png",
@@ -50,11 +52,12 @@
       "speaker": "Mariyam Qurayshi",
       "description": "A conversation about belonging, identity, and the Quranic lens.",
       "recap": "This session reflected on companionship through the story of the People of the Cave. We spoke about the people we keep close, the spaces that protect our faith, and how sincere company can help us stay grounded when the world pulls elsewhere.",
+      "speechLink": "/assets/speeches/event-2-1790785944865.pdf",
       "status": "past",
       "registrationStatus": "Closed",
       "image": "/assets/suhbah-02-whos-in-your-cave.png",
       "createdAt": "2026-09-28T00:00:00.000Z",
-      "updatedAt": "2026-09-28T16:44:55.892Z"
+      "updatedAt": "2026-09-30T16:30:45.077Z"
     }
   ],
   "registrations": [],

@@ -72,7 +72,7 @@ img {
 }
 
 .container {
-  width: min(1120px, calc(100% - 32px));
+  width: min(1240px, calc(100% - 32px));
   margin: 0 auto;
 }
 
@@ -210,8 +210,9 @@ img {
   position: relative;
   padding: 38px 0 58px;
   background:
-    radial-gradient(circle at 8% 16%, rgba(200, 217, 230, 0.86), transparent 25%),
-    radial-gradient(circle at 92% 18%, rgba(255, 255, 255, 0.82), transparent 22%),
+    radial-gradient(circle at 2% 20%, rgba(200, 217, 230, 0.92), transparent 28%),
+    radial-gradient(circle at 98% 18%, rgba(255, 255, 255, 0.92), transparent 25%),
+    linear-gradient(90deg, rgba(86, 124, 141, 0.08), transparent 18%, transparent 82%, rgba(200, 217, 230, 0.3)),
     linear-gradient(180deg, var(--cream), var(--white) 72%);
   isolation: isolate;
 }
@@ -319,7 +320,8 @@ img {
   inset: 0;
   z-index: 0;
   background:
-    radial-gradient(circle at 18% 50%, rgba(200, 217, 230, 0.18), transparent 30%),
+    radial-gradient(circle at 4% 50%, rgba(200, 217, 230, 0.24), transparent 24%),
+    radial-gradient(circle at 96% 50%, rgba(245, 239, 235, 0.16), transparent 24%),
     repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.07) 0 1px, transparent 1px 34px);
   content: "";
   opacity: 0.9;
@@ -589,7 +591,7 @@ h3 {
   position: relative;
   z-index: 3;
   overflow: hidden;
-  min-height: 226px;
+  min-height: clamp(226px, 22vw, 320px);
   margin: 12px 12px 0;
   border: 1px solid rgba(255, 255, 255, 0.66);
   border-radius: 20px;
@@ -684,7 +686,7 @@ h3 {
   position: relative;
   z-index: 3;
   margin: 0 12px 12px;
-  padding: 24px 16px 16px;
+  padding: clamp(24px, 2.1vw, 32px) clamp(16px, 2vw, 28px) clamp(16px, 1.8vw, 24px);
   border-radius: 0 0 20px 20px;
   background:
     radial-gradient(86% 68% at 6% 18%, rgba(255, 255, 255, 0.1), transparent 54%),
@@ -866,16 +868,51 @@ h3 {
   -webkit-backdrop-filter: blur(20px) saturate(180%) contrast(108%);
 }
 
-.event-card .button.primary {
-  border-color: rgba(255, 255, 255, 0.5);
+.event-card .event-reserve-button {
+  position: relative;
+  overflow: hidden;
+  border-color: rgba(255, 255, 255, 0.72);
+  border-radius: 999px;
   background:
-    linear-gradient(145deg, rgba(47, 65, 86, 0.96), rgba(86, 124, 141, 0.78)),
-    var(--navy);
+    linear-gradient(115deg, rgba(255, 255, 255, 0.24), transparent 22% 56%, rgba(255, 255, 255, 0.1) 72%, transparent 92%),
+    radial-gradient(130% 160% at 18% 4%, rgba(255, 255, 255, 0.24), transparent 42%),
+    linear-gradient(145deg, rgba(31, 46, 63, 0.96), rgba(47, 65, 86, 0.9) 54%, rgba(86, 124, 141, 0.72)),
+    rgba(47, 65, 86, 0.84);
   box-shadow:
-    inset 0 1px 1px rgba(255, 255, 255, 0.34),
-    0 14px 30px rgba(47, 65, 86, 0.18);
-  backdrop-filter: blur(14px) saturate(160%);
-  -webkit-backdrop-filter: blur(14px) saturate(160%);
+    inset 0 1px 1px rgba(255, 255, 255, 0.62),
+    inset 0 -18px 34px rgba(18, 31, 46, 0.34),
+    0 18px 36px rgba(47, 65, 86, 0.26),
+    0 4px 10px rgba(255, 255, 255, 0.12);
+  color: var(--white);
+  text-shadow: 0 1px 10px rgba(18, 31, 46, 0.26);
+  backdrop-filter: blur(24px) saturate(210%) contrast(112%);
+  -webkit-backdrop-filter: blur(24px) saturate(210%) contrast(112%);
+}
+
+.event-card .event-reserve-button::before {
+  position: absolute;
+  inset: 2px;
+  border-radius: inherit;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.38), transparent 42%),
+    linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.16), transparent);
+  content: "";
+  pointer-events: none;
+}
+
+.event-card .event-reserve-button::after {
+  position: absolute;
+  inset: -45% auto -45% -35%;
+  width: 42%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.42), transparent);
+  content: "";
+  pointer-events: none;
+  transform: skewX(-18deg);
+  transition: transform 420ms ease;
+}
+
+.event-card .event-reserve-button:hover::after {
+  transform: translateX(330%) skewX(-18deg);
 }
 
 .count-value {
@@ -940,7 +977,8 @@ h3 {
   inset: 0;
   z-index: 0;
   background:
-    radial-gradient(circle at 12% 18%, rgba(200, 217, 230, 0.28), transparent 26%),
+    radial-gradient(circle at 2% 18%, rgba(200, 217, 230, 0.34), transparent 24%),
+    radial-gradient(circle at 98% 72%, rgba(255, 255, 255, 0.34), transparent 24%),
     repeating-linear-gradient(135deg, rgba(86, 124, 141, 0.055) 0 1px, transparent 1px 38px);
   content: "";
   opacity: 0.72;
@@ -949,7 +987,8 @@ h3 {
 
 .section:nth-of-type(even)::before {
   background:
-    radial-gradient(circle at 88% 16%, rgba(200, 217, 230, 0.3), transparent 26%),
+    radial-gradient(circle at 98% 16%, rgba(200, 217, 230, 0.34), transparent 24%),
+    radial-gradient(circle at 2% 78%, rgba(255, 255, 255, 0.34), transparent 24%),
     repeating-linear-gradient(45deg, rgba(86, 124, 141, 0.05) 0 1px, transparent 1px 40px);
 }
 
@@ -1553,6 +1592,7 @@ body.modal-open {
   font-size: clamp(1.55rem, 3.2vw, 2.5rem);
   font-weight: 700;
   line-height: 1.75;
+  text-align: right;
 }
 
 .quran-hadith figcaption {
@@ -1563,10 +1603,15 @@ body.modal-open {
   font-size: clamp(1.25rem, 2.4vw, 1.65rem);
   font-weight: 650;
   line-height: 1.32;
+  text-align: left;
 }
 
-.quran-hadith figcaption span {
+.quran-hadith .hadith-translation,
+.quran-hadith .hadith-source {
   display: block;
+}
+
+.quran-hadith .hadith-source {
   margin-top: 10px;
   color: var(--blue);
   font-size: 0.95rem;
@@ -1575,7 +1620,7 @@ body.modal-open {
 
 .quran-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
   gap: 10px;
 }
 
@@ -1629,13 +1674,15 @@ body.modal-open {
   position: relative;
   z-index: 1;
   display: block;
-  flex: 1 1 auto;
+  flex: 1 1 0;
+  min-width: 0;
   font-family: var(--font-display);
   max-width: 100%;
   font-size: clamp(1.45rem, 2vw, 1.9rem);
   line-height: 1.25;
   text-align: right;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
+  white-space: normal;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.72);
 }
 
@@ -1995,6 +2042,7 @@ body.modal-open {
 .admin-layout {
   min-height: 100vh;
   background: var(--cream);
+  font-family: var(--font-body);
 }
 
 .admin-shell {
@@ -2012,7 +2060,17 @@ body.modal-open {
 
 .admin-title {
   margin-bottom: 0;
-  font-size: clamp(2.8rem, 14vw, 5rem);
+  font-family: var(--font-body);
+  font-size: clamp(2rem, 7vw, 3.25rem);
+  font-weight: 800;
+  line-height: 1.05;
+}
+
+.admin-layout h2,
+.admin-layout h3 {
+  font-family: var(--font-body);
+  font-weight: 800;
+  letter-spacing: 0;
 }
 
 .admin-tabs {
@@ -2031,6 +2089,7 @@ body.modal-open {
   color: var(--blue);
   padding: 0 14px;
   cursor: pointer;
+  font-family: var(--font-body);
   font-weight: 800;
 }
 
@@ -2067,9 +2126,15 @@ td {
 
 th {
   color: var(--blue);
+  font-family: var(--font-body);
   font-size: 0.78rem;
+  font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.06em;
+}
+
+td {
+  font-size: 0.94rem;
 }
 
 .row-actions {
@@ -2084,6 +2149,7 @@ th {
   background: var(--white);
   color: var(--navy);
   cursor: pointer;
+  font-family: var(--font-body);
   font-weight: 800;
   padding: 0 10px;
 }
@@ -2094,6 +2160,7 @@ th {
   place-items: center;
   padding: 20px;
   background: var(--cream);
+  font-family: var(--font-body);
 }
 
 .login-card {
@@ -2102,6 +2169,23 @@ th {
   border-radius: 18px;
   background: var(--white);
   box-shadow: var(--shadow);
+}
+
+.login-brand {
+  justify-content: center;
+  width: 100%;
+}
+
+.login-card h2,
+.login-card > .muted {
+  text-align: center;
+}
+
+.login-card h2 {
+  font-family: var(--font-body);
+  font-size: clamp(1.7rem, 5vw, 2.25rem);
+  font-weight: 800;
+  line-height: 1.1;
 }
 
 .notice {
@@ -2249,7 +2333,7 @@ th {
 }
 
 .fade-in {
-  opacity: 0;
+  opacity: 1;
   transform: translateY(18px);
   transition: opacity 580ms ease, transform 580ms ease;
 }
@@ -2287,7 +2371,7 @@ th {
 
 @media (min-width: 640px) {
   .container {
-    width: min(1120px, calc(100% - 48px));
+    width: min(1240px, calc(100% - 48px));
   }
 
   .event-meta,
@@ -2349,7 +2433,7 @@ th {
   }
 
   .hero-grid {
-    grid-template-columns: minmax(0, 0.95fr) minmax(430px, 1.05fr);
+    grid-template-columns: minmax(0, 1fr) minmax(460px, 1.08fr);
     gap: 52px;
     align-items: center;
   }
@@ -2367,7 +2451,7 @@ th {
 
   .event-card {
     justify-self: end;
-    width: min(100%, 560px);
+    width: min(100%, 620px);
     margin-left: 0;
     transform: perspective(1200px) rotateX(0.8deg) rotateY(-1.1deg) translateZ(0);
   }
@@ -2377,7 +2461,7 @@ th {
   }
 
   .conversation-panel {
-    grid-template-columns: minmax(0, 0.9fr) minmax(420px, 1.1fr);
+    grid-template-columns: minmax(0, 0.95fr) minmax(440px, 1.05fr);
     gap: 58px;
   }
 
@@ -2412,6 +2496,111 @@ th {
 
   .footer-grid {
     grid-template-columns: 1.3fr 1fr 1fr;
+  }
+}
+
+@media (min-width: 1200px) {
+  .container {
+    width: min(1360px, calc(100% - 80px));
+  }
+
+  .nav-link {
+    padding: 0 12px;
+  }
+
+  .hero {
+    padding: 86px 0 94px;
+  }
+
+  .hero-grid {
+    grid-template-columns: minmax(0, 1.04fr) minmax(560px, 0.96fr);
+    gap: clamp(64px, 6vw, 104px);
+  }
+
+  .hero h1 {
+    max-width: 760px;
+    font-size: clamp(5.4rem, 5.9vw, 7.2rem);
+  }
+
+  .hero-copy,
+  .hero-copy .lead {
+    max-width: 760px;
+  }
+
+  .hero-copy .lead {
+    font-size: clamp(1.42rem, 1.65vw, 1.9rem);
+  }
+
+  .event-card {
+    width: min(100%, 650px);
+  }
+
+  .section {
+    padding: 104px 0;
+  }
+
+  .section-head {
+    max-width: 980px;
+  }
+
+  .section-head .lead {
+    max-width: 860px;
+  }
+
+  .card-grid {
+    gap: 22px;
+  }
+
+  .feature-card {
+    min-height: 260px;
+    padding: 34px;
+  }
+
+  .conversation-panel {
+    grid-template-columns: minmax(0, 1fr) minmax(540px, 0.95fr);
+    gap: clamp(70px, 7vw, 118px);
+  }
+
+  .conversation-copy,
+  .conversation-copy .lead {
+    max-width: 760px;
+  }
+
+  .reflection-list {
+    gap: 16px;
+  }
+
+  .past-grid {
+    gap: 18px;
+  }
+
+  .past-image {
+    height: 220px;
+  }
+
+  .stat-band .container {
+    display: grid;
+    grid-template-columns: minmax(360px, 0.78fr) minmax(0, 1fr);
+    gap: 52px;
+    align-items: center;
+    text-align: left;
+  }
+
+  .stat-band h2 {
+    margin: 0;
+  }
+
+  .stats-grid {
+    margin-top: 0;
+  }
+
+  .quran-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+
+  .registration-grid {
+    grid-template-columns: minmax(0, 1.05fr) minmax(520px, 0.95fr);
+    gap: 36px;
   }
 }
 

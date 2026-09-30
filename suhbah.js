@@ -3,6 +3,99 @@
 
   const app = document.getElementById('app');
   let db = { events: [], testimonials: [], registrations: [], communityStats: {}, socialLinks: {} };
+  const fallbackDb = {
+    events: [
+      {
+        id: 'event-7',
+        number: 'Suhbah 03',
+        theme: 'Finding Your Way Back - Upcoming',
+        date: '2026-10-31',
+        time: '3:00 - 5:00 PM',
+        location: 'Bangalore',
+        description:
+          'A space to pause, reflect, and explore what the Quran has to say about finding direction when life feels uncertain.',
+        status: 'upcoming',
+        registrationStatus: 'Open',
+        image: '/assets/suhbah-03-separated-gathering.png',
+        createdAt: '2026-09-28T00:00:00.000Z',
+        updatedAt: '2026-09-30T16:06:05.356Z',
+        speaker: '',
+      },
+      {
+        id: 'event-1',
+        number: 'Suhbah #01',
+        theme: 'How the Quran changes you',
+        date: '2026-04-18',
+        time: '5:00 PM - 7:00 PM',
+        location: 'Bangalore',
+        speaker: 'Mariyam Qurayshi',
+        description: 'An honest first gathering on direction, return, and hope.',
+        recap:
+          'This first Suhbah explored how the Quran changes the way we think, respond, and see ourselves. The conversation centered on letting Quranic guidance move beyond recitation into daily choices, character, and a more honest relationship with Allah.',
+        speechLink: '',
+        status: 'past',
+        registrationStatus: 'Closed',
+        image: '/assets/suhbah-01-quran-changes-you.png',
+        createdAt: '2026-09-28T00:00:00.000Z',
+        updatedAt: '2026-09-28T16:45:11.120Z',
+      },
+      {
+        id: 'event-2',
+        number: 'Suhbah #02',
+        theme: "Who's in your Cave?",
+        date: '2026-05-16',
+        time: '5:00 PM - 7:00 PM',
+        location: 'Bangalore',
+        speaker: 'Mariyam Qurayshi',
+        description: 'A conversation about belonging, identity, and the Quranic lens.',
+        recap:
+          'This session reflected on companionship through the story of the People of the Cave. We spoke about the people we keep close, the spaces that protect our faith, and how sincere company can help us stay grounded when the world pulls elsewhere.',
+        speechLink: '/assets/speeches/event-2-1790785944865.pdf',
+        status: 'past',
+        registrationStatus: 'Closed',
+        image: '/assets/suhbah-02-whos-in-your-cave.png',
+        createdAt: '2026-09-28T00:00:00.000Z',
+        updatedAt: '2026-09-30T16:30:45.077Z',
+      },
+    ],
+    testimonials: [
+      {
+        id: 'test-1',
+        quote: 'I came expecting a talk. I left with questions I actually wanted to think about.',
+        name: 'Suhbah attendee',
+        createdAt: '2026-09-28T00:00:00.000Z',
+        updatedAt: '2026-09-28T00:00:00.000Z',
+      },
+      {
+        id: 'test-2',
+        quote: 'Suhbah made the Quran feel much more relevant to the things I was going through.',
+        name: 'Community member',
+        createdAt: '2026-09-28T00:00:00.000Z',
+        updatedAt: '2026-09-28T00:00:00.000Z',
+      },
+      {
+        id: 'test-3',
+        quote:
+          'It was refreshing to sit with other young people and have honest conversations about faith.',
+        name: 'Monthly participant',
+        createdAt: '2026-09-28T00:00:00.000Z',
+        updatedAt: '2026-09-28T00:00:00.000Z',
+      },
+    ],
+    communityStats: {
+      members: '100+',
+      gatherings: '12',
+      community: '1',
+      other: 'Growing community',
+      updatedAt: '2026-09-28T00:00:00.000Z',
+    },
+    socialLinks: {
+      instagram: 'https://www.instagram.com/suhbah.connect',
+      whatsapp: 'https://chat.whatsapp.com/BuYGMDxux7PGnenXqh8hz9',
+      youtube: 'https://youtube.com/@suhbah',
+      updatedAt: '2026-09-29T16:58:13.293Z',
+    },
+  };
   let adminTab = 'events';
   let editing = {};
   let countdownTimer;
@@ -67,7 +160,11 @@
   }
 
   async function loadPublic() {
-    db = await api('/api/public');
+    try {
+      db = await api('/api/public');
+    } catch (error) {
+      db = fallbackDb;
+    }
   }
 
   async function loadAdmin() {
@@ -210,7 +307,10 @@
             </div>
             <figure class="quran-hadith">
               <blockquote lang="ar" dir="rtl">عَنْ عُثْمَانَ ـ رضى الله عنه ـ عَنِ النَّبِيِّ صلى الله عليه وسلم قَالَ "خَيْرُكُمْ مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ"</blockquote>
-              <figcaption>Narrated Uthman: The Prophet (ﷺ) said, "The best among you are those who learn the Qur'an and teach it."<span>Sahih al-Bukhari 5027</span></figcaption>
+              <figcaption>
+                <span class="hadith-translation">Narrated Uthman: The Prophet (ﷺ) said, "The best among you are those who learn the Qur'an and teach it."</span>
+                <span class="hadith-source">Sahih al-Bukhari 5027</span>
+              </figcaption>
             </figure>
             <div class="quran-grid">
               ${quranParaLinks()}
@@ -272,7 +372,7 @@
           <div class="countdown" data-countdown="${html(event.date)}T17:00:00+05:30">
             ${['Days', 'Hours', 'Minutes', 'Seconds'].map((label) => `<div class="count-unit"><span class="count-value">00</span><span class="count-label">${label}</span></div>`).join('')}
           </div>
-          <a class="button primary" href="#register">Reserve Your Spot</a>
+          <a class="button primary event-reserve-button" href="#register">Reserve Your Spot</a>
         </div>
       </article>
     `;
@@ -386,6 +486,7 @@
             <h2 id="recapTitle">${html(session.theme)}</h2>
             <p class="recap-meta">${html(dateLabel(session.date))} · ${html(session.time)} · ${html(session.location)}</p>
             <p class="lead">${html(session.recap || session.description)}</p>
+            ${session.speechLink ? `<a class="button secondary" href="${html(session.speechLink)}" target="_blank" rel="noreferrer">Open full session</a>` : ''}
           </section>
         </div>
       `,
@@ -415,7 +516,15 @@
           ${field('Email', 'email', 'email')}
           ${field('Phone Number', 'phone', 'tel')}
           ${field('Age', 'age', 'number')}
-          ${field('City', 'city', 'text')}
+          <label class="field">
+            <span>Gender</span>
+            <select name="gender" required>
+              <option value="">Select one</option>
+              <option>Female</option>
+              <option>Male</option>
+              <option>Prefer not to say</option>
+            </select>
+          </label>
           <label class="field">
             <span>What describes you the best?</span>
             <select name="profile" required>
@@ -424,6 +533,23 @@
               <option>Working professional</option>
               <option>College student</option>
               <option>Others</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Have you attended a previous Suhbah?</span>
+            <select name="attendedBefore" required>
+              <option value="">Select one</option>
+              <option>Yes</option>
+              <option>No</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>If yes, did you receive a Quran?</span>
+            <select name="receivedQuran" required>
+              <option value="">Select one</option>
+              <option>Yes</option>
+              <option>No</option>
+              <option>Not applicable</option>
             </select>
           </label>
           <label class="field">
@@ -470,7 +596,6 @@
           <a class="brand login-brand" href="/" data-route><img class="brand-logo" src="/assets/suhbah-logo.png" alt="Suhbah" /></a>
           <h2 style="margin-top: 22px;">Admin sign in</h2>
           <p class="muted">Protected dashboard for managing events, registrations, testimonials, statistics, and social links.</p>
-          <div class="notice">Demo admin: admin@suhbah.local · password: suhbah2026</div>
           ${message ? `<div class="notice">${html(message)}</div>` : ''}
           <div class="form-grid" style="margin-top: 16px;">
             ${field('Email', 'email', 'email')}
@@ -524,6 +649,8 @@
             ${adminInput('Speaker', 'speaker', active?.speaker, 'text', false)}
             <label class="field"><span>Upload image</span><input name="imageFile" type="file" accept="image/*" /></label>
             ${adminInput('Image URL or saved image data', 'image', active?.image, 'text', false)}
+            <label class="field"><span>Upload full speech PDF</span><input name="speechPdfFile" type="file" accept="application/pdf,.pdf" /></label>
+            ${adminInput('Full speech PDF link', 'speechLink', active?.speechLink, 'text', false)}
             ${adminSelect('Status', 'status', active?.status || 'upcoming', ['upcoming', 'past'])}
             ${adminSelect('Registration status', 'registrationStatus', active?.registrationStatus || 'Open', ['Open', 'Waitlist', 'Closed'])}
             <label class="field"><span>Description</span><textarea name="description" required>${html(active?.description || '')}</textarea></label>
@@ -549,12 +676,12 @@
         <div class="admin-top"><div><h2>Registrations</h2><p class="muted">${db.registrations.length} people registered.</p></div><button class="button secondary" id="exportCsv" type="button">Export CSV</button></div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Age</th><th>City</th><th>Profile</th><th>Event</th><th>Registration date</th></tr></thead>
+            <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Age</th><th>Gender</th><th>Profile</th><th>Attended before</th><th>Quran received</th><th>Event</th><th>Registration date</th></tr></thead>
             <tbody>
               ${db.registrations.map((reg) => {
                 const event = db.events.find((item) => item.id === reg.eventId);
-                return `<tr><td>${html(reg.name)}</td><td>${html(reg.email)}</td><td>${html(reg.phone)}</td><td>${html(reg.age)}</td><td>${html(reg.city)}</td><td>${html(reg.profile || '')}</td><td>${html(event?.theme || 'Suhbah')}</td><td>${html(shortDate(reg.createdAt))}</td></tr>`;
-              }).join('') || '<tr><td colspan="8">No registrations yet.</td></tr>'}
+                return `<tr><td>${html(reg.name)}</td><td>${html(reg.email)}</td><td>${html(reg.phone)}</td><td>${html(reg.age)}</td><td>${html(reg.gender || '')}</td><td>${html(reg.profile || '')}</td><td>${html(reg.attendedBefore || '')}</td><td>${html(reg.receivedQuran || '')}</td><td>${html(event?.theme || 'Suhbah')}</td><td>${html(shortDate(reg.createdAt))}</td></tr>`;
+              }).join('') || '<tr><td colspan="10">No registrations yet.</td></tr>'}
             </tbody>
           </table>
         </div>
@@ -702,7 +829,10 @@
       const data = formData(event.target);
       const file = event.target.imageFile.files[0];
       if (file) data.image = await fileToDataUrl(file);
+      const speechPdfFile = event.target.speechPdfFile.files[0];
+      if (speechPdfFile) data.speechLink = await fileToDataUrl(speechPdfFile);
       delete data.imageFile;
+      delete data.speechPdfFile;
       await api('/api/admin/events', { method: data.id ? 'PUT' : 'POST', body: JSON.stringify(data) });
       editing = {};
       await render();
@@ -773,10 +903,32 @@
 
   function exportCsv() {
     const rows = [
-      ['Name', 'Email', 'Phone', 'Age', 'City', 'Profile', 'Event', 'Registration date'],
+      [
+        'Name',
+        'Email',
+        'Phone',
+        'Age',
+        'Gender',
+        'Profile',
+        'Attended before',
+        'Quran received',
+        'Event',
+        'Registration date',
+      ],
       ...db.registrations.map((reg) => {
         const event = db.events.find((item) => item.id === reg.eventId);
-        return [reg.name, reg.email, reg.phone, reg.age, reg.city, reg.profile || '', event?.theme || 'Suhbah', shortDate(reg.createdAt)];
+        return [
+          reg.name,
+          reg.email,
+          reg.phone,
+          reg.age,
+          reg.gender || '',
+          reg.profile || '',
+          reg.attendedBefore || '',
+          reg.receivedQuran || '',
+          event?.theme || 'Suhbah',
+          shortDate(reg.createdAt),
+        ];
       }),
     ];
     const csv = rows.map((row) => row.map((cell) => `"${String(cell ?? '').replaceAll('"', '""')}"`).join(',')).join('\n');

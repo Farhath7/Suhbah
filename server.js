@@ -8,8 +8,15 @@ const PORT = Number(process.env.PORT || 4173);
 const ROOT = __dirname;
 const DATA_DIR = path.join(ROOT, 'data');
 const DB_PATH = path.join(DATA_DIR, 'suhbah-db.json');
+const ASSETS_DIR = path.join(ROOT, 'assets');
+const SPEECH_DIR = path.join(ASSETS_DIR, 'speeches');
 const SESSION_COOKIE = 'suhbah_session';
 const SESSION_TTL_MS = 1000 * 60 * 60 * 8;
+const DEMO_ADMIN_EMAIL = 'admin@suhbah.local';
+const DEMO_ADMIN_PASSWORD_HASH = 'f9446b93b773c95118d6dcd454839738844f600264c10a2a474b0c55f2da30f3';
+const adminEmail = process.env.ADMIN_EMAIL || DEMO_ADMIN_EMAIL;
+const adminPassword = process.env.ADMIN_PASSWORD || crypto.randomBytes(24).toString('base64url');
+const adminPasswordHash = hash(adminPassword);
 
 const sessions = new Map();
 
@@ -18,8 +25,8 @@ const initialDb = {
     {
       id: 'admin-1',
       name: 'Suhbah Admin',
-      email: 'admin@suhbah.local',
-      passwordHash: 'f9446b93b773c95118d6dcd454839738844f600264c10a2a474b0c55f2da30f3',
+      email: adminEmail,
+      passwordHash: adminPasswordHash,
       role: 'owner',
       createdAt: '2026-09-28T00:00:00.000Z',
     },
@@ -51,6 +58,7 @@ const initialDb = {
       description: 'An honest first gathering on direction, return, and hope.',
       recap:
         'This first Suhbah explored how the Quran changes the way we think, respond, and see ourselves. The conversation centered on letting Quranic guidance move beyond recitation into daily choices, character, and a more honest relationship with Allah.',
+      speechLink: '',
       status: 'past',
       registrationStatus: 'Closed',
       image: '/assets/suhbah-01-quran-changes-you.png',
@@ -68,6 +76,7 @@ const initialDb = {
       description: 'A conversation about belonging, identity, and the Quranic lens.',
       recap:
         'This session reflected on companionship through the story of the People of the Cave. We spoke about the people we keep close, the spaces that protect our faith, and how sincere company can help us stay grounded when the world pulls elsewhere.',
+      speechLink: '',
       status: 'past',
       registrationStatus: 'Closed',
       image: '/assets/suhbah-02-whos-in-your-cave.png',
@@ -117,7 +126,33 @@ const initialDb = {
 
 function ensureDb() {
   if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-  if (!fs.existsSync(DB_PATH)) writeDb(initialDb);
+  if (!fs.existsSync(DB_PATH)) {
+    migrateSpeechLinks(initialDb);
+    writeDb(initialDb);
+    return;
+  }
+
+  const db = JSON.parse(fs.readFileSync(DB_PATH, 'utf8'));
+  let changed = migrateSpeechLinks(db);
+  const demoAdmin = db.adminUsers?.find(
+    (admin) => admin.email === DEMO_ADMIN_EMAIL && admin.passwordHash === DEMO_ADMIN_PASSWORD_HASH,
+  );
+  if (demoAdmin) {
+    demoAdmin.email = adminEmail;
+    demoAdmin.passwordHash = adminPasswordHash;
+    changed = true;
+  }
+
+  if (process.env.ADMIN_EMAIL && process.env.ADMIN_PASSWORD) {
+    const primaryAdmin = db.adminUsers?.find((admin) => admin.id === 'admin-1') || db.adminUsers?.[0];
+    if (primaryAdmin && (primaryAdmin.email !== adminEmail || primaryAdmin.passwordHash !== adminPasswordHash)) {
+      primaryAdmin.email = adminEmail;
+      primaryAdmin.passwordHash = adminPasswordHash;
+      changed = true;
+    }
+  }
+
+  if (changed) writeDb(db);
 }
 
 function readDb() {
@@ -131,6 +166,34 @@ function writeDb(db) {
 
 function uid(prefix) {
   return `${prefix}-${Date.now()}-${crypto.randomBytes(5).toString('hex')}`;
+}
+
+function safeFilePart(value) {
+  return String(value || 'speech')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 80) || 'speech';
+}
+
+function saveSpeechPdf(dataUrl, eventId) {
+  if (!String(dataUrl || '').startsWith('data:application/pdf;base64,')) return dataUrl || '';
+  if (!fs.existsSync(SPEECH_DIR)) fs.mkdirSync(SPEECH_DIR, { recursive: true });
+  const base64 = dataUrl.split(',', 2)[1] || '';
+  const fileName = `${safeFilePart(eventId)}-${Date.now()}.pdf`;
+  fs.writeFileSync(path.join(SPEECH_DIR, fileName), Buffer.from(base64, 'base64'));
+  return `/assets/speeches/${fileName}`;
+}
+
+function migrateSpeechLinks(db) {
+  let changed = false;
+  for (const event of db.events || []) {
+    if (String(event.speechLink || '').startsWith('data:application/pdf;base64,')) {
+      event.speechLink = saveSpeechPdf(event.speechLink, event.id);
+      changed = true;
+    }
+  }
+  return changed;
 }
 
 function hash(value) {
@@ -150,7 +213,7 @@ function parseBody(req) {
     let body = '';
     req.on('data', (chunk) => {
       body += chunk;
-      if (body.length > 5_000_000) {
+      if (body.length > 50_000_000) {
         reject(new Error('Payload too large'));
         req.destroy();
       }
@@ -213,6 +276,7 @@ function serveFile(res, filePath) {
     '.png': 'image/png',
     '.jpg': 'image/jpeg',
     '.jpeg': 'image/jpeg',
+    '.pdf': 'application/pdf',
     '.svg': 'image/svg+xml',
   };
   fs.readFile(filePath, (error, data) => {
@@ -261,7 +325,18 @@ async function handleApi(req, res, url) {
 
   if (req.method === 'POST' && url.pathname === '/api/registrations') {
     const body = await parseBody(req);
-    const required = ['eventId', 'name', 'email', 'phone', 'age', 'city', 'profile', 'source'];
+    const required = [
+      'eventId',
+      'name',
+      'email',
+      'phone',
+      'age',
+      'gender',
+      'profile',
+      'attendedBefore',
+      'receivedQuran',
+      'source',
+    ];
     if (required.some((field) => !String(body[field] || '').trim())) {
       sendJson(res, 400, { error: 'Missing required registration fields' });
       return;
@@ -273,8 +348,10 @@ async function handleApi(req, res, url) {
       email: body.email,
       phone: body.phone,
       age: body.age,
-      city: body.city,
+      gender: body.gender,
       profile: body.profile,
+      attendedBefore: body.attendedBefore,
+      receivedQuran: body.receivedQuran,
       source: body.source,
       message: body.message || '',
       createdAt: new Date().toISOString(),
@@ -296,12 +373,14 @@ async function handleApi(req, res, url) {
     const body = await parseBody(req);
     if (req.method === 'POST') {
       const event = { ...body, id: uid('event'), createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
+      event.speechLink = saveSpeechPdf(event.speechLink, event.id);
       db.events.unshift(event);
       writeDb(db);
       sendJson(res, 201, { event });
       return;
     }
     if (req.method === 'PUT') {
+      body.speechLink = saveSpeechPdf(body.speechLink, body.id);
       db.events = db.events.map((event) =>
         event.id === body.id ? { ...event, ...body, updatedAt: new Date().toISOString() } : event,
       );
