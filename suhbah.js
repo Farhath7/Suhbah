@@ -3,99 +3,6 @@
 
   const app = document.getElementById('app');
   let db = { events: [], testimonials: [], registrations: [], communityStats: {}, socialLinks: {} };
-  const fallbackDb = {
-    events: [
-      {
-        id: 'event-7',
-        number: 'Suhbah 03',
-        theme: 'Finding Your Way Back - Upcoming',
-        date: '2026-10-31',
-        time: '3:00 - 5:00 PM',
-        location: 'Bangalore',
-        description:
-          'A space to pause, reflect, and explore what the Quran has to say about finding direction when life feels uncertain.',
-        status: 'upcoming',
-        registrationStatus: 'Open',
-        image: '/assets/suhbah-03-separated-gathering.png',
-        createdAt: '2026-09-28T00:00:00.000Z',
-        updatedAt: '2026-09-30T16:06:05.356Z',
-        speaker: '',
-      },
-      {
-        id: 'event-1',
-        number: 'Suhbah #01',
-        theme: 'How the Quran changes you',
-        date: '2026-04-18',
-        time: '5:00 PM - 7:00 PM',
-        location: 'Bangalore',
-        speaker: 'Mariyam Qurayshi',
-        description: 'An honest first gathering on direction, return, and hope.',
-        recap:
-          'This first Suhbah explored how the Quran changes the way we think, respond, and see ourselves. The conversation centered on letting Quranic guidance move beyond recitation into daily choices, character, and a more honest relationship with Allah.',
-        speechLink: '',
-        status: 'past',
-        registrationStatus: 'Closed',
-        image: '/assets/suhbah-01-quran-changes-you.png',
-        createdAt: '2026-09-28T00:00:00.000Z',
-        updatedAt: '2026-09-28T16:45:11.120Z',
-      },
-      {
-        id: 'event-2',
-        number: 'Suhbah #02',
-        theme: "Who's in your Cave?",
-        date: '2026-05-16',
-        time: '5:00 PM - 7:00 PM',
-        location: 'Bangalore',
-        speaker: 'Mariyam Qurayshi',
-        description: 'A conversation about belonging, identity, and the Quranic lens.',
-        recap:
-          'This session reflected on companionship through the story of the People of the Cave. We spoke about the people we keep close, the spaces that protect our faith, and how sincere company can help us stay grounded when the world pulls elsewhere.',
-        speechLink: '/assets/speeches/event-2-1790785944865.pdf',
-        status: 'past',
-        registrationStatus: 'Closed',
-        image: '/assets/suhbah-02-whos-in-your-cave.png',
-        createdAt: '2026-09-28T00:00:00.000Z',
-        updatedAt: '2026-09-30T16:30:45.077Z',
-      },
-    ],
-    testimonials: [
-      {
-        id: 'test-1',
-        quote: 'I came expecting a talk. I left with questions I actually wanted to think about.',
-        name: 'Suhbah attendee',
-        createdAt: '2026-09-28T00:00:00.000Z',
-        updatedAt: '2026-09-28T00:00:00.000Z',
-      },
-      {
-        id: 'test-2',
-        quote: 'Suhbah made the Quran feel much more relevant to the things I was going through.',
-        name: 'Community member',
-        createdAt: '2026-09-28T00:00:00.000Z',
-        updatedAt: '2026-09-28T00:00:00.000Z',
-      },
-      {
-        id: 'test-3',
-        quote:
-          'It was refreshing to sit with other young people and have honest conversations about faith.',
-        name: 'Monthly participant',
-        createdAt: '2026-09-28T00:00:00.000Z',
-        updatedAt: '2026-09-28T00:00:00.000Z',
-      },
-    ],
-    communityStats: {
-      members: '100+',
-      gatherings: '12',
-      community: '1',
-      other: 'Growing community',
-      updatedAt: '2026-09-28T00:00:00.000Z',
-    },
-    socialLinks: {
-      instagram: 'https://www.instagram.com/suhbah.connect',
-      whatsapp: 'https://chat.whatsapp.com/BuYGMDxux7PGnenXqh8hz9',
-      youtube: 'https://youtube.com/@suhbah',
-      updatedAt: '2026-09-29T16:58:13.293Z',
-    },
-  };
   let adminTab = 'events';
   let editing = {};
   let countdownTimer;
@@ -160,11 +67,7 @@
   }
 
   async function loadPublic() {
-    try {
-      db = await api('/api/public');
-    } catch (error) {
-      db = fallbackDb;
-    }
+    db = await api('/api/public');
   }
 
   async function loadAdmin() {
