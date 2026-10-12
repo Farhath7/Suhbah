@@ -6,6 +6,7 @@
   let adminTab = 'events';
   let editing = {};
   let countdownTimer;
+  let registrationEventId = '';
 
   async function api(path, options = {}) {
     const response = await fetch(path, {
@@ -52,7 +53,7 @@
     return (
       db.events
         .filter((event) => event.status === 'upcoming')
-        .sort((a, b) => new Date(a.date) - new Date(b.date))[0] || db.events[0]
+        .sort((a, b) => new Date(a.date) - new Date(b.date))[0]
     );
   }
 
@@ -60,10 +61,24 @@
     return window.location.pathname.replace(/\/$/, '') === '/admin';
   }
 
-  function route(path) {
+  function registrationUrl(event) {
+    return event ? `/register/${encodeURIComponent(event.id)}` : '/#register';
+  }
+
+  function registrationIsOpen(event) {
+    return event?.status === 'upcoming' && ['Open', 'Waitlist'].includes(event.registrationStatus);
+  }
+
+  function homeAnchor(hash) {
+    return window.location.pathname === '/' ? hash : `/${hash}`;
+  }
+
+  async function route(path) {
     window.history.pushState({}, '', path);
-    render();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    await render();
+    const target = document.getElementById(window.location.hash.slice(1));
+    if (target) target.scrollIntoView({ behavior: 'smooth' });
+    else window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   async function loadPublic() {
@@ -80,16 +95,16 @@
         <nav class="container nav" aria-label="Primary navigation">
           <a class="brand" href="/" data-route><img class="brand-logo" src="/assets/suhbah-logo.png" alt="Suhbah" /></a>
           <div class="nav-links" id="navLinks">
-            <a class="nav-link" href="#home">Home</a>
-            <a class="nav-link" href="#about">About</a>
-            <a class="nav-link" href="#events">Events</a>
-            <a class="nav-link" href="#community">Community</a>
-            <a class="nav-link" href="#quran-library">Quran</a>
-            <a class="nav-link" href="#testimonials">Voices</a>
-            <a class="nav-link" href="#contact">Contact</a>
+            <a class="nav-link" href="${homeAnchor('#home')}">Home</a>
+            <a class="nav-link" href="${homeAnchor('#about')}">About</a>
+            <a class="nav-link" href="${homeAnchor('#events')}">Events</a>
+            <a class="nav-link" href="${homeAnchor('#community')}">Community</a>
+            <a class="nav-link" href="${homeAnchor('#quran-library')}">Quran</a>
+            <a class="nav-link" href="${homeAnchor('#testimonials')}">Voices</a>
+            <a class="nav-link" href="${homeAnchor('#contact')}">Contact</a>
             <a class="nav-link" href="/admin" data-route>Admin</a>
           </div>
-          <div class="nav-actions"><a class="button primary" href="#register">Join Next Suhbah</a></div>
+          <div class="nav-actions"><a class="button primary" href="${registrationUrl(upcomingEvent())}" data-route>Join Next Suhbah</a></div>
           <button class="menu-button" type="button" aria-label="Open menu" aria-controls="navLinks" aria-expanded="false"><span class="menu-icon"></span></button>
         </nav>
       </header>
@@ -97,7 +112,12 @@
   }
 
   function publicShell() {
-    return `<div class="site">${header()}${publicMain()}${footer()}</div>`;
+    const registrationPath = window.location.pathname.match(/^\/register\/([^/]+)\/?$/);
+    const event = registrationPath ? db.events.find((item) => item.id === decodeURIComponent(registrationPath[1])) : null;
+    const main = registrationPath
+      ? `<main class="registration-page">${event ? registrationSection(event, true) : '<section class="section white"><div class="container"><h1>Suhbah not found</h1><p>This registration link is no longer available.</p><a class="button secondary" href="/" data-route>Back to Suhbah</a></div></section>'}</main>`
+      : publicMain();
+    return `<div class="site">${header()}${main}${footer()}</div>`;
   }
 
   function publicMain() {
@@ -121,7 +141,7 @@
               <h1>Reconnect with the Quran.<span class="hero-heading-line">Reconnect with yourself.</span></h1>
               <p class="lead">Suhbah is a community of young people coming together every month to explore the Quran, ask questions, reflect on its message, and build a lasting connection with it.</p>
               <div class="hero-actions">
-                <a class="button primary" href="#register">Join the Next Suhbah</a>
+                <a class="button primary" href="${registrationUrl(event)}" data-route>Join the Next Suhbah</a>
                 <a class="button ghost" href="#about">Learn About Suhbah</a>
               </div>
             </div>
@@ -173,6 +193,7 @@
         </section>
         <section class="section white" id="events">
           <div class="container">
+            ${upcomingEventCards()}
             <div class="section-head fade-in"><h2>Previous Suhbahs</h2></div>
             <div class="past-grid">${past.map(pastCard).join('')}</div>
           </div>
@@ -225,18 +246,37 @@
             <h2>Your next step starts here.</h2>
             <p class="lead">You don't need to know everything about the Quran.<br />You just need to show up.</p>
             <div class="cta-row">
-              <a class="button secondary" href="#register">Join the Next Suhbah</a>
+              <a class="button secondary" href="${registrationUrl(event)}" data-route>Join the Next Suhbah</a>
               <a class="button ghost" href="${html(db.socialLinks.whatsapp)}" target="_blank" rel="noreferrer">Join the Community</a>
             </div>
           </div>
         </section>
-        <section class="section white" id="register">
+        ${registrationSection(event)}
+      </main>
+    `;
+  }
+
+  function upcomingEventCards() {
+    const events = db.events.filter((event) => event.status === 'upcoming').sort((a, b) => new Date(a.date) - new Date(b.date));
+    if (!events.length) return '';
+    return `<div class="section-head fade-in"><h2>Upcoming Suhbahs</h2><p class="lead">Choose your gathering to view its registration.</p></div>
+      <div class="upcoming-registration-grid">${events.map((event) => `<article class="admin-card fade-in">
+        <span class="event-kicker">${html(event.number)} · ${html(event.registrationStatus)}</span>
+        <h3>${html(event.theme)}</h3><p class="muted">${html(dateLabel(event.date))} · ${html(event.time)} · ${html(event.location)}</p>
+        <a class="button secondary" href="${registrationUrl(event)}" data-route>${registrationIsOpen(event) ? (event.registrationStatus === 'Waitlist' ? 'Join Waitlist' : 'Register for this Suhbah') : 'View Suhbah'}</a>
+      </article>`).join('')}</div>`;
+  }
+
+  function registrationSection(event, standalone = false) {
+    if (!event) return `<section class="section white" id="register"><div class="container"><h2>Registrations will open soon</h2><p class="lead">Check back for the next Suhbah.</p></div></section>`;
+    return `<section class="section white" id="register">
+          ${standalone ? '<div class="container registration-back"><a href="/#events">← All Suhbahs</a></div>' : ''}
           <div class="container registration-grid">
             <div class="registration-copy fade-in">
               <p class="registration-label-text">Event registration</p>
               <h2 class="registration-brand">Suhbah</h2>
-              <p class="registration-subtitle">Reserve your spot</p>
-              <p class="lead">${html(event.number)}: ${html(event.theme)}</p>
+              <p class="registration-subtitle">${registrationIsOpen(event) ? (event.registrationStatus === 'Waitlist' ? 'Join the waitlist' : 'Reserve your spot') : 'Registrations closed'}</p>
+              <${standalone ? 'h1' : 'h3'} class="lead registration-event-title">${html(event.number)}: ${html(event.theme)}</${standalone ? 'h1' : 'h3'}>
               <div class="registration-event-strip">
                 <span>${html(dateLabel(event.date))}</span>
                 <span>${html(event.time)}</span>
@@ -258,11 +298,11 @@
             <div id="registrationMount" class="fade-in">${registrationForm(event)}</div>
           </div>
         </section>
-      </main>
     `;
   }
 
   function eventCard(event) {
+    if (!event) return '<article class="event-card fade-in"><div class="event-card-body"><h2>The next Suhbah is coming soon.</h2><p class="lead">Watch this space for our next gathering.</p></div></article>';
     return `
       <article class="event-card fade-in" aria-label="Upcoming Suhbah event">
         <div class="event-card-media" ${mediaStyle(event.image || '/assets/suhbah-gathering-hero.png')}>${registrationStatus(event.registrationStatus)}</div>
@@ -275,7 +315,7 @@
           <div class="countdown" data-countdown="${html(event.date)}T17:00:00+05:30">
             ${['Days', 'Hours', 'Minutes', 'Seconds'].map((label) => `<div class="count-unit"><span class="count-value">00</span><span class="count-label">${label}</span></div>`).join('')}
           </div>
-          <a class="button primary event-reserve-button" href="#register">Reserve Your Spot</a>
+          <a class="button primary event-reserve-button" href="${registrationUrl(event)}" data-route>${registrationIsOpen(event) ? (event.registrationStatus === 'Waitlist' ? 'Join the Waitlist' : 'Reserve Your Spot') : 'View Suhbah'}</a>
         </div>
       </article>
     `;
@@ -335,14 +375,31 @@
       'عم',
     ];
 
-    return Array.from({ length: 30 }, (_, index) => {
-      const number = index + 1;
+    return QuranLibrary.juz.map(({ number, surahs }, index) => {
       const label = String(number).padStart(2, '0');
       return `
-        <a class="quran-card" href="http://www.janathimessage.co.uk/quran/para${number}.pdf" target="_blank" rel="noreferrer" aria-label="Open Juz ${label}">
-          <span class="quran-card-number" aria-hidden="true">${label}</span>
-          <strong lang="ar" dir="rtl">${paraNames[index]}</strong>
-        </a>
+        <details class="quran-juz" id="quran-juz-${number}">
+          <summary class="quran-card" aria-label="Juz ${label}: ${surahs.length} surah${surahs.length === 1 ? '' : 's'}">
+            <span class="quran-card-number" aria-hidden="true">${label}</span>
+            <div class="quran-juz-title"><strong lang="ar" dir="rtl">${paraNames[index]}</strong><span>${surahs.length} surah${surahs.length === 1 ? '' : 's'}</span></div>
+            <span class="quran-expand" aria-hidden="true">+</span>
+          </summary>
+          <div class="quran-juz-content">
+            <a class="quran-open-juz" href="${QuranLibrary.pdfUrl(number)}" target="_blank" rel="noreferrer">Open full Juz ${label} <span aria-hidden="true">↗</span></a>
+            <ul class="quran-surahs">
+              ${surahs.map((surah) => `
+                <li>
+                  <a class="quran-surah-link" href="${QuranLibrary.pdfUrl(surah.juz, surah.page)}" target="_blank" rel="noreferrer" aria-label="Open Surah ${html(surah.name)} from the beginning, Juz ${surah.juz}, PDF page ${surah.page}">
+                    <span class="quran-surah-number">${surah.number}</span>
+                    <span><strong>${html(surah.name)}</strong><small>Starts in Juz ${surah.juz} · PDF page ${surah.page}</small></span>
+                    <span aria-hidden="true">↗</span>
+                  </a>
+                  ${surah.juz < number ? `<a class="quran-surah-continue" href="${QuranLibrary.pdfUrl(number)}" target="_blank" rel="noreferrer" aria-label="Continue Surah ${html(surah.name)} in Juz ${number}">Continue in this Juz ↗</a>` : ''}
+                </li>
+              `).join('')}
+            </ul>
+          </div>
+        </details>
       `;
     }).join('');
   }
@@ -411,8 +468,12 @@
   }
 
   function registrationForm(event) {
+    if (!registrationIsOpen(event)) return `<div class="form-panel"><h2>Registrations closed</h2><p class="lead">Registration for ${html(event.number)}: ${html(event.theme)} is closed.</p><a class="button secondary" href="/#events">See other Suhbahs</a></div>`;
+    const waitlist = event.registrationStatus === 'Waitlist';
     return `
-      <form class="form-panel" id="registrationForm">
+      <form class="form-panel" id="registrationForm" aria-label="Registration for ${html(event.number)}: ${html(event.theme)}">
+        <h2>${waitlist ? 'Join the waitlist' : 'Register'} for ${html(event.number)}</h2>
+        <p class="muted">${html(event.theme)}${waitlist ? ' · We will contact you if a spot opens.' : ''}</p>
         <div class="form-grid">
           <input type="hidden" name="eventId" value="${html(event.id)}" />
           ${field('Full Name', 'name', 'text')}
@@ -425,7 +486,6 @@
               <option value="">Select one</option>
               <option>Female</option>
               <option>Male</option>
-              <option>Prefer not to say</option>
             </select>
           </label>
           <label class="field">
@@ -467,7 +527,7 @@
             </select>
           </label>
           <label class="field"><span>Optional message</span><textarea name="message" placeholder="Anything you want us to know?"></textarea></label>
-          <button class="button primary" type="submit">Reserve My Spot</button>
+          <button class="button primary" type="submit">${waitlist ? 'Join Waitlist' : 'Reserve My Spot'}</button>
         </div>
       </form>
     `;
@@ -483,7 +543,7 @@
         <div class="container">
           <div class="footer-grid">
             <div><a class="brand footer-brand" href="/" data-route><img class="brand-logo" src="/assets/suhbah-logo.png" alt="Suhbah" /></a><p>Reconnecting young people with the Quran, one gathering at a time.</p></div>
-            <div><h3>Links</h3><div class="footer-links"><a href="#home">Home</a><a href="#about">About</a><a href="#events">Events</a><a href="#community">Community</a><a href="#contact">Contact</a></div></div>
+            <div><h3>Links</h3><div class="footer-links"><a href="${homeAnchor('#home')}">Home</a><a href="${homeAnchor('#about')}">About</a><a href="${homeAnchor('#events')}">Events</a><a href="${homeAnchor('#community')}">Community</a><a href="${homeAnchor('#contact')}">Contact</a></div></div>
             <div><h3>Social</h3><div class="social-links"><a href="${html(db.socialLinks.instagram)}" target="_blank" rel="noreferrer">Instagram</a><a href="${html(db.socialLinks.whatsapp)}" target="_blank" rel="noreferrer">WhatsApp</a></div></div>
           </div>
           <div class="footer-bottom">© 2026 Suhbah. All rights reserved.</div>
@@ -565,7 +625,8 @@
             <article class="admin-card">
               <span class="event-kicker">${html(event.number)} · ${html(event.status)}</span>
               <h3>${html(event.theme)}</h3>
-              <div class="row-actions"><button class="small-button" data-edit-event="${html(event.id)}" type="button">Edit</button><button class="small-button" data-delete-event="${html(event.id)}" type="button">Delete</button></div>
+              <p class="muted">Registration: ${html(event.registrationStatus)}</p>
+              <div class="row-actions"><button class="small-button" data-edit-event="${html(event.id)}" type="button">Edit</button><button class="small-button" data-delete-event="${html(event.id)}" type="button">Delete</button><a class="small-button" href="${registrationUrl(event)}" target="_blank" rel="noreferrer">Registration page ↗</a></div>
             </article>
           `).join('')}
         </div>
@@ -574,22 +635,36 @@
   }
 
   function registrationsAdmin() {
+    const registrations = filteredRegistrations();
+    const eventIds = [...new Set([...db.events.map((event) => event.id), ...db.registrations.map((reg) => reg.eventId)])];
     return `
       <div class="table-panel admin-card">
-        <div class="admin-top"><div><h2>Registrations</h2><p class="muted">${db.registrations.length} people registered.</p></div><button class="button secondary" id="exportCsv" type="button">Export CSV</button></div>
+        <div class="admin-top"><div><h2>Registrations</h2><p class="muted">${registrations.length} people registered${registrationEventId ? ' for this Suhbah' : ' across all Suhbahs'}.</p></div><button class="button secondary" id="exportCsv" type="button">Export CSV</button></div>
+        <label class="field registration-filter"><span>Filter by Suhbah</span><select id="registrationEventFilter"><option value="">All Suhbahs</option>${eventIds.map((id) => {
+          const event = db.events.find((item) => item.id === id);
+          const reg = db.registrations.find((item) => item.eventId === id);
+          const count = db.registrations.filter((item) => item.eventId === id).length;
+          return `<option value="${html(id)}" ${registrationEventId === id ? 'selected' : ''}>${html(event ? `${event.number}: ${event.theme}` : `${registrationEventLabel(reg)} (archived)`)} (${count})</option>`;
+        }).join('')}</select></label>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Age</th><th>Gender</th><th>Profile</th><th>Attended before</th><th>Quran received</th><th>Event</th><th>Registration date</th></tr></thead>
+            <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Age</th><th>Gender</th><th>Profile</th><th>Attended before</th><th>Quran received</th><th>Suhbah</th><th>Registration type</th><th>Registration date</th></tr></thead>
             <tbody>
-              ${db.registrations.map((reg) => {
-                const event = db.events.find((item) => item.id === reg.eventId);
-                return `<tr><td>${html(reg.name)}</td><td>${html(reg.email)}</td><td>${html(reg.phone)}</td><td>${html(reg.age)}</td><td>${html(reg.gender || '')}</td><td>${html(reg.profile || '')}</td><td>${html(reg.attendedBefore || '')}</td><td>${html(reg.receivedQuran || '')}</td><td>${html(event?.theme || 'Suhbah')}</td><td>${html(shortDate(reg.createdAt))}</td></tr>`;
-              }).join('') || '<tr><td colspan="10">No registrations yet.</td></tr>'}
+              ${registrations.map((reg) => `<tr><td>${html(reg.name)}</td><td>${html(reg.email)}</td><td>${html(reg.phone)}</td><td>${html(reg.age)}</td><td>${html(reg.gender || '')}</td><td>${html(reg.profile || '')}</td><td>${html(reg.attendedBefore || '')}</td><td>${html(reg.receivedQuran || '')}</td><td>${html(registrationEventLabel(reg))}</td><td>${html(reg.registrationStatus === 'Waitlist' ? 'Waitlist' : 'Reserved')}</td><td>${html(shortDate(reg.createdAt))}</td></tr>`).join('') || '<tr><td colspan="11">No registrations for this selection.</td></tr>'}
             </tbody>
           </table>
         </div>
       </div>
     `;
+  }
+
+  function filteredRegistrations() {
+    return db.registrations.filter((reg) => !registrationEventId || reg.eventId === registrationEventId);
+  }
+
+  function registrationEventLabel(reg) {
+    const event = db.events.find((item) => item.id === reg.eventId);
+    return event ? `${event.number}: ${event.theme}` : [reg.eventNumber, reg.eventTheme].filter(Boolean).join(': ') || `Suhbah (${reg.eventId})`;
   }
 
   function testimonialsAdmin() {
@@ -633,6 +708,7 @@
       link.addEventListener('click', (event) => {
         const href = link.getAttribute('href');
         if (!href || href.startsWith('#')) return;
+        if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
         event.preventDefault();
         route(href);
       });
@@ -678,25 +754,31 @@
 
     document.getElementById('registrationForm')?.addEventListener('submit', async (event) => {
       event.preventDefault();
-      const button = event.target.querySelector('button[type="submit"]');
+      const form = event.target;
+      const data = formData(form);
+      const button = form.querySelector('button[type="submit"]');
+      const originalLabel = button.textContent;
       button.disabled = true;
       button.textContent = 'Reserving...';
       try {
-        await api('/api/registrations', { method: 'POST', body: JSON.stringify(formData(event.target)) });
+        const { registration } = await api('/api/registrations', { method: 'POST', body: JSON.stringify(data) });
+        if (!form.isConnected) return;
+        const waitlist = registration.registrationStatus === 'Waitlist';
         document.getElementById('registrationMount').innerHTML = `
-          <div class="success-panel">
+          <div class="success-panel" role="status">
             <div>
-              <h3>You're in.</h3>
-              <p class="lead">We're looking forward to seeing you at the next Suhbah.</p>
-              <a class="button secondary" href="#home">Back to Suhbah</a>
+              <h3>${waitlist ? "You're on the waitlist." : "You're in."}</h3>
+              <p class="lead">${waitlist ? 'You joined the waitlist for' : 'Your spot is reserved for'} ${html(registration.eventNumber)}: ${html(registration.eventTheme)}.${waitlist ? ' We will contact you if a spot opens.' : ' We look forward to seeing you there.'}</p>
+              <a class="button secondary" href="/">Back to Suhbah</a>
             </div>
           </div>
         `;
         reveal();
       } catch (error) {
         button.disabled = false;
-        button.textContent = 'Reserve My Spot';
-        event.target.insertAdjacentHTML('afterbegin', `<div class="notice">${html(error.message)}</div>`);
+        button.textContent = originalLabel;
+        form.querySelector('.notice')?.remove();
+        form.insertAdjacentHTML('afterbegin', `<div class="notice" role="alert">${html(error.message)}</div>`);
       }
     });
   }
@@ -793,6 +875,10 @@
     });
 
     document.getElementById('exportCsv')?.addEventListener('click', exportCsv);
+    document.getElementById('registrationEventFilter')?.addEventListener('change', async (event) => {
+      registrationEventId = event.target.value;
+      await render();
+    });
   }
 
   function fileToDataUrl(file) {
@@ -816,10 +902,10 @@
         'Attended before',
         'Quran received',
         'Event',
+        'Registration type',
         'Registration date',
       ],
-      ...db.registrations.map((reg) => {
-        const event = db.events.find((item) => item.id === reg.eventId);
+      ...filteredRegistrations().map((reg) => {
         return [
           reg.name,
           reg.email,
@@ -829,7 +915,8 @@
           reg.profile || '',
           reg.attendedBefore || '',
           reg.receivedQuran || '',
-          event?.theme || 'Suhbah',
+          registrationEventLabel(reg),
+          reg.registrationStatus === 'Waitlist' ? 'Waitlist' : 'Reserved',
           shortDate(reg.createdAt),
         ];
       }),
@@ -839,7 +926,7 @@
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = 'suhbah-registrations.csv';
+    link.download = registrationEventId ? `suhbah-${registrationEventId.replace(/[^a-z0-9_-]/gi, '-')}-registrations.csv` : 'suhbah-registrations.csv';
     link.click();
     URL.revokeObjectURL(url);
   }

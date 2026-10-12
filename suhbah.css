@@ -16,6 +16,14 @@
   -webkit-font-smoothing: antialiased;
 }
 
+@font-face {
+  font-family: "PageQ3";
+  src: url("/assets/fonts/PageQ3.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -1622,7 +1630,57 @@ body.modal-open {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
   gap: 10px;
+  align-items: start;
 }
+
+.quran-juz {
+  min-width: 0;
+  border: 1px solid rgba(86, 124, 141, 0.22);
+  border-radius: var(--radius);
+  background: var(--white);
+  overflow: hidden;
+}
+
+.quran-juz .quran-card {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  cursor: pointer;
+  list-style: none;
+}
+
+.quran-juz .quran-card::-webkit-details-marker { display: none; }
+.quran-juz .quran-card:hover { transform: none; box-shadow: none; }
+.quran-juz-title { flex: 1; min-width: 0; }
+.quran-juz-title > span { display: block; margin-top: 5px; text-align: right; }
+.quran-expand { flex: 0 0 auto; }
+.quran-juz[open] .quran-expand { transform: rotate(45deg); }
+.quran-juz-content { padding: 0 14px 14px; }
+.quran-open-juz {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  color: var(--blue);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+.quran-surahs { list-style: none; padding: 0; margin: 0; }
+.quran-surahs li { border-top: 1px solid rgba(86, 124, 141, 0.18); }
+.quran-surah-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 56px;
+  padding: 10px 0;
+  color: var(--navy);
+}
+.quran-surah-number { min-width: 24px; color: var(--blue); font-size: 0.75rem; }
+.quran-surah-link > span:nth-child(2) { flex: 1; min-width: 0; }
+.quran-surah-link strong { display: block; font-size: 0.9rem; }
+.quran-surah-link small { display: block; margin-top: 4px; color: var(--blue); font-size: 0.72rem; }
+.quran-surah-continue { display: block; padding: 0 0 12px 34px; color: var(--blue); font-size: 0.75rem; }
+.quran-surah-link:hover strong, .quran-surah-continue:hover { text-decoration: underline; }
+.quran-juz a:focus-visible, .quran-juz summary:focus-visible { outline: 2px solid var(--blue); outline-offset: -2px; }
 
 .quran-card {
   position: relative;
@@ -1676,7 +1734,7 @@ body.modal-open {
   display: block;
   flex: 1 1 0;
   min-width: 0;
-  font-family: var(--font-display);
+  font-family: "PageQ3", var(--font-display), serif;
   max-width: 100%;
   font-size: clamp(1.45rem, 2vw, 1.9rem);
   line-height: 1.25;
@@ -1714,6 +1772,11 @@ body.modal-open {
   gap: 24px;
   align-items: stretch;
 }
+
+.upcoming-registration-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 20px; margin-bottom: 48px; }
+.registration-back { margin-bottom: 24px; color: var(--blue); font-weight: 700; }
+.registration-event-title { margin-top: 16px; font-size: clamp(1.45rem, 2.5vw, 2rem); }
+.registration-filter { max-width: 520px; margin-bottom: 24px; }
 
 #registrationMount {
   display: flex;

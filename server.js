@@ -278,6 +278,7 @@ function serveFile(res, filePath) {
     '.jpeg': 'image/jpeg',
     '.pdf': 'application/pdf',
     '.svg': 'image/svg+xml',
+    '.ttf': 'font/ttf',
   };
   fs.readFile(filePath, (error, data) => {
     if (error) {
@@ -325,6 +326,15 @@ async function handleApi(req, res, url) {
 
   if (req.method === 'POST' && url.pathname === '/api/registrations') {
     const body = await parseBody(req);
+    const event = db.events.find((item) => item.id === body.eventId);
+    if (!event) {
+      sendJson(res, 404, { error: 'This Suhbah was not found.' });
+      return;
+    }
+    if (event.status !== 'upcoming' || !['Open', 'Waitlist'].includes(event.registrationStatus)) {
+      sendJson(res, 409, { error: `Registration for ${event.number} is closed.` });
+      return;
+    }
     const required = [
       'eventId',
       'name',
@@ -344,6 +354,9 @@ async function handleApi(req, res, url) {
     const registration = {
       id: uid('reg'),
       eventId: body.eventId,
+      eventNumber: event.number,
+      eventTheme: event.theme,
+      registrationStatus: event.registrationStatus,
       name: body.name,
       email: body.email,
       phone: body.phone,
@@ -452,7 +465,7 @@ const server = http.createServer(async (req, res) => {
     }
 
     let filePath;
-    if (url.pathname === '/' || url.pathname === '/admin' || url.pathname === '/admin/') {
+    if (url.pathname === '/' || url.pathname === '/admin' || url.pathname === '/admin/' || /^\/register\/[^/]+\/?$/.test(url.pathname)) {
       filePath = path.join(ROOT, 'index.html');
     } else {
       filePath = path.join(ROOT, decodeURIComponent(url.pathname));
