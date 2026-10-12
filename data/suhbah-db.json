@@ -14,7 +14,7 @@
       "id": "event-7",
       "number": "Suhbah 03",
       "theme": "Finding Your Way Back - Upcoming",
-      "date": "2026-10-31",
+      "date": "2026-10-24",
       "time": "3:00 - 5:00 PM",
       "location": "Bangalore",
       "description": "A space to pause, reflect, and explore what the Quran has to say about finding direction when life feels uncertain.",
@@ -22,8 +22,9 @@
       "registrationStatus": "Open",
       "image": "/assets/suhbah-03-separated-gathering.png",
       "createdAt": "2026-09-28T00:00:00.000Z",
-      "updatedAt": "2026-09-30T16:06:05.356Z",
-      "speaker": ""
+      "updatedAt": "2026-10-12T10:28:03.371Z",
+      "speaker": "",
+      "speechLink": ""
     },
     {
       "id": "event-1",
