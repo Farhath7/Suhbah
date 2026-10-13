@@ -416,10 +416,6 @@
     }).join('');
   }
 
-  function pastMediaStyle(image) {
-    return image ? `style="background-image: url('${html(image)}')"` : '';
-  }
-
   function feature(label, title, text) {
     return `<article class="feature-card fade-in"><span class="feature-label">${html(label)}</span><h3>${html(title)}</h3><p class="muted">${html(text)}</p></article>`;
   }
@@ -431,7 +427,7 @@
   function pastCard(event) {
     return `
       <article class="past-card fade-in" data-recap-id="${html(event.id)}" role="button" tabindex="0" aria-label="View recap for ${html(event.number)}: ${html(event.theme)}">
-        <div class="past-image" ${pastMediaStyle(event.image)}></div>
+        <div class="past-image">${event.image ? `<img src="${html(event.image)}" alt="${html(event.number)}: ${html(event.theme)}" loading="lazy" />` : ''}</div>
         <div class="past-body">
           <span class="event-kicker">${html(event.number)}</span>
           <h3>${html(event.theme)}</h3>
@@ -454,8 +450,10 @@
         <div class="recap-overlay" role="presentation">
           <section class="recap-dialog" role="dialog" aria-modal="true" aria-labelledby="recapTitle">
             <button class="recap-close" type="button" aria-label="Close recap">&times;</button>
-            <span class="event-kicker">${html(session.number)}</span>
-            <h2 id="recapTitle">${html(session.theme)}</h2>
+            <div class="recap-heading">
+              ${session.image ? `<img class="recap-thumbnail" src="${html(session.image)}" alt="${html(session.number)}: ${html(session.theme)}" />` : ''}
+              <div><span class="event-kicker">${html(session.number)}</span><h2 id="recapTitle">${html(session.theme)}</h2></div>
+            </div>
             <p class="recap-meta">${html(dateLabel(session.date))} · ${html(session.time)} · ${html(session.location)}</p>
             <p class="lead">${html(session.recap || session.description)}</p>
             ${session.speechLink ? `<a class="button secondary" href="${html(session.speechLink)}" target="_blank" rel="noreferrer">Open full session</a>` : ''}
@@ -583,18 +581,30 @@
   }
 
   function adminShell() {
+    const summaries = [
+      ['Total events', db.events.length, 'Gatherings in your library'],
+      ['Upcoming', db.events.filter((event) => event.status === 'upcoming').length, 'Gatherings ahead'],
+      ['Registrations', db.registrations.length, 'Across all gatherings'],
+      ['Testimonials', db.testimonials.length, 'Voices from the community'],
+    ];
     return `
       <div class="admin-layout">
-        ${header(true)}
+        <header class="admin-header"><div class="container admin-header-inner">
+          <a class="brand" href="/" data-route><img class="brand-logo" src="/assets/suhbah-logo.png" alt="Suhbah" /></a>
+          <a class="admin-workspace-label" href="/admin" data-route>Admin workspace</a>
+          <div class="admin-header-actions"><a class="small-button" href="/" target="_blank" rel="noreferrer">View website &nearr;</a><button class="small-button" id="logoutButton" type="button">Log out</button></div>
+        </div></header>
         <main class="container admin-shell">
           <div class="admin-top">
-            <div><span class="eyebrow"><span class="dot"></span> Admin dashboard</span><h1 class="admin-title">Suhbah Admin</h1></div>
-            <button class="button ghost" id="logoutButton" type="button">Log out</button>
+            <div><span class="admin-overline">COMMUNITY MANAGEMENT</span><h1 class="admin-title">Your Suhbah workspace</h1></div>
           </div>
-          <div class="admin-tabs" role="tablist">
-            ${['events', 'registrations', 'testimonials', 'statistics', 'social'].map((tab) => `<button class="admin-tab ${adminTab === tab ? 'active' : ''}" data-tab="${tab}" type="button">${tab[0].toUpperCase()}${tab.slice(1)}</button>`).join('')}
+          <div class="admin-summary" aria-label="Community overview">
+            ${summaries.map(([label, value, detail]) => `<div class="admin-metric"><span>${label}</span><strong>${value}</strong><small>${detail}</small></div>`).join('')}
           </div>
-          <section>${adminSection()}</section>
+          <nav class="admin-tabs" aria-label="Dashboard sections">
+            ${['events', 'registrations', 'testimonials', 'statistics', 'social'].map((tab) => `<button class="admin-tab ${adminTab === tab ? 'active' : ''}" data-tab="${tab}" aria-current="${adminTab === tab ? 'page' : 'false'}" type="button">${tab[0].toUpperCase()}${tab.slice(1)}</button>`).join('')}
+          </nav>
+          <section class="admin-content" aria-label="${html(adminTab)}">${adminSection()}</section>
         </main>
       </div>
     `;
@@ -613,7 +623,7 @@
     return `
       <div class="admin-grid">
         <form class="form-panel" id="eventForm">
-          <h2>${active ? 'Edit event' : 'Create event'}</h2>
+          <div class="admin-panel-heading"><span class="admin-overline">${active ? 'EVENT DETAILS' : 'PLAN A GATHERING'}</span><h2>${active ? 'Edit event' : 'Create an event'}</h2><p class="muted">${active ? 'Update the details your community sees.' : 'Set the details, then open registration for your community.'}</p></div>
           <input type="hidden" name="id" value="${html(active?.id || '')}" />
           <div class="form-grid">
             ${adminInput('Event number', 'number', active?.number)}
@@ -623,24 +633,25 @@
             ${adminInput('Location', 'location', active?.location)}
             ${adminInput('Speaker', 'speaker', active?.speaker, 'text', false)}
             <label class="field"><span>Upload image</span><input name="imageFile" type="file" accept="image/*" /></label>
-            ${adminInput('Image URL or saved image data', 'image', active?.image, 'text', false)}
             <label class="field"><span>Upload full speech PDF</span><input name="speechPdfFile" type="file" accept="application/pdf,.pdf" /></label>
             ${adminInput('Full speech PDF link', 'speechLink', active?.speechLink, 'text', false)}
             ${adminSelect('Status', 'status', active?.status || 'upcoming', ['upcoming', 'past'])}
             ${adminSelect('Registration status', 'registrationStatus', active?.registrationStatus || 'Open', ['Open', 'Waitlist', 'Closed'])}
             <label class="field"><span>Description</span><textarea name="description" required>${html(active?.description || '')}</textarea></label>
-            <button class="button primary" type="submit">${active ? 'Save event' : 'Create event'}</button>
+            <div class="admin-form-actions"><button class="button primary" type="submit">${active ? 'Save changes' : 'Create event'}</button>${active ? '<button class="button secondary" type="button" id="cancelEventEdit">Cancel editing</button>' : ''}</div>
           </div>
         </form>
         <div class="admin-cards">
+          <div class="admin-list-heading"><div><span class="admin-overline">YOUR GATHERINGS</span><h2>Event library</h2></div><span class="admin-count">${db.events.length} events</span></div>
           ${db.events.map((event) => `
-            <article class="admin-card">
-              <span class="event-kicker">${html(event.number)} · ${html(event.status)}</span>
+            <article class="admin-card admin-event-card">
+              <div class="admin-event-top"><span class="event-kicker">${html(event.number)}</span><span class="admin-status ${event.status === 'upcoming' ? 'is-upcoming' : ''}">${html(event.status)}</span></div>
               <h3>${html(event.theme)}</h3>
-              <p class="muted">Registration: ${html(event.registrationStatus)}</p>
-              <div class="row-actions"><button class="small-button" data-edit-event="${html(event.id)}" type="button">Edit</button><button class="small-button" data-delete-event="${html(event.id)}" type="button">Delete</button><a class="small-button" href="${registrationUrl(event)}" target="_blank" rel="noreferrer">Registration page ↗</a></div>
+              <p class="admin-event-details">${html(event.date ? shortDate(`${event.date}T00:00:00`) : 'Date to be confirmed')}${event.time ? ` &middot; ${html(event.time)}` : ''}<br>${html(event.location || 'Location to be confirmed')}</p>
+              <div class="admin-event-registration"><span>Registration <strong>${html(event.registrationStatus)}</strong></span><span>${db.registrations.filter((reg) => reg.eventId === event.id).length} registered</span></div>
+              <div class="row-actions"><button class="small-button" data-edit-event="${html(event.id)}" type="button">Edit event</button><a class="small-button" href="${registrationUrl(event)}" target="_blank" rel="noreferrer">Registration page &nearr;</a><button class="small-button admin-delete" data-delete-event="${html(event.id)}" type="button" aria-label="Delete ${html(event.number)}">Delete</button></div>
             </article>
-          `).join('')}
+          `).join('') || '<div class="admin-empty"><h3>Your first gathering starts here</h3><p>Create an event using the form. It will appear here, ready to manage.</p></div>'}
         </div>
       </div>
     `;
@@ -704,7 +715,7 @@
   }
 
   function socialAdmin() {
-    return `<form class="form-panel" id="socialForm"><h2>Social Links</h2><div class="form-grid">${adminInput('Instagram', 'instagram', db.socialLinks.instagram, 'url')}${adminInput('WhatsApp', 'whatsapp', db.socialLinks.whatsapp, 'url')}${adminInput('YouTube', 'youtube', db.socialLinks.youtube, 'url')}<button class="button primary" type="submit">Save social links</button></div></form>`;
+    return `<form class="form-panel" id="socialForm"><h2>Social Links</h2><p class="muted">Keep your community connected on Instagram and WhatsApp.</p><div class="form-grid">${adminInput('Instagram', 'instagram', db.socialLinks.instagram, 'url')}${adminInput('WhatsApp', 'whatsapp', db.socialLinks.whatsapp, 'url')}<button class="button primary" type="submit">Save social links</button></div></form>`;
   }
 
   function adminInput(label, name, value = '', type = 'text', required = true) {
@@ -820,6 +831,10 @@
   }
 
   function bindAdmin() {
+    document.getElementById('cancelEventEdit')?.addEventListener('click', async () => {
+      editing = {};
+      await render();
+    });
     document.getElementById('loginForm')?.addEventListener('submit', async (event) => {
       event.preventDefault();
       try {
@@ -863,6 +878,7 @@
       button.addEventListener('click', async () => {
         editing = { events: button.dataset.editEvent };
         await render();
+        document.getElementById('eventForm')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
     });
 
