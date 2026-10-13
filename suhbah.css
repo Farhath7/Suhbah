@@ -1695,6 +1695,7 @@ body.modal-open {
 .registration-copy {
   position: relative;
   display: grid;
+  align-self: start;
   align-content: start;
   padding: clamp(22px, 2.8vw, 30px);
   overflow: hidden;
@@ -2362,9 +2363,6 @@ td {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   }
 
-  .registration-copy {
-    min-height: 100%;
-  }
 }
 
 @media (min-width: 900px) {
