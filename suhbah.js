@@ -223,21 +223,34 @@
           </div>
         </section>
         <section class="section quran-library" id="quran-library">
-          <div class="container fade-in">
-            <div class="quran-library-head">
-              <span>Explore the Quran</span>
-              <h2>Quran Library</h2>
-            </div>
-            <figure class="quran-hadith">
+          <div class="container">
+            <div class="quran-library-intro">
+              <div class="quran-library-head">
+                <span class="quran-eyebrow">Read. Reflect. Reconnect.</span>
+                <h2>Quran Library</h2>
+                <p>A little time with the Quran.<br />A meaningful part of your day.</p>
+                <div class="quran-library-stats"><span>30 Juz</span><span>114 Surahs</span></div>
+              </div>
+              <figure class="quran-hadith">
               <blockquote lang="ar" dir="rtl">عَنْ عُثْمَانَ ـ رضى الله عنه ـ عَنِ النَّبِيِّ صلى الله عليه وسلم قَالَ "خَيْرُكُمْ مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ"</blockquote>
               <figcaption>
                 <span class="hadith-translation">Narrated Uthman: The Prophet (ﷺ) said, "The best among you are those who learn the Qur'an and teach it."</span>
                 <span class="hadith-source">Sahih al-Bukhari 5027</span>
               </figcaption>
-            </figure>
+              </figure>
+            </div>
+            <div class="quran-browse-bar">
+              <div><h3>Find your place</h3><p>Choose a Juz to explore its surahs, or open the full PDF.</p></div>
+              <label class="quran-search" for="quranSearch">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" /><path d="m16 16 4.5 4.5" /></svg>
+                <input id="quranSearch" type="search" placeholder="Search Juz or surah" aria-label="Search by Juz number or surah name" autocomplete="off" />
+              </label>
+            </div>
+            <p class="quran-results" id="quranResults" role="status" aria-live="polite" aria-atomic="true">Showing all 30 Juz</p>
             <div class="quran-grid">
               ${quranParaLinks()}
             </div>
+            <div class="quran-empty" id="quranEmpty" hidden><h3>No matching Juz found</h3><p>Try a Juz number from 1 to 30 or a surah name, such as Al-Kahf.</p><button type="button" id="quranClear">Clear search</button></div>
           </div>
         </section>
         <section class="section cta">
@@ -380,8 +393,8 @@
         <details class="quran-juz" id="quran-juz-${number}">
           <summary class="quran-card" aria-label="Juz ${label}: ${surahs.length} surah${surahs.length === 1 ? '' : 's'}">
             <span class="quran-card-number" aria-hidden="true">${label}</span>
-            <div class="quran-juz-title"><strong lang="ar" dir="rtl">${paraNames[index]}</strong><span>${surahs.length} surah${surahs.length === 1 ? '' : 's'}</span></div>
-            <span class="quran-expand" aria-hidden="true">+</span>
+            <div class="quran-juz-title"><span class="quran-juz-label">Juz ${label}</span><strong lang="ar" dir="rtl">${paraNames[index]}</strong><span class="quran-juz-meta">${surahs.length} surah${surahs.length === 1 ? '' : 's'}</span></div>
+            <span class="quran-expand" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="m6 9 6 6 6-6" /></svg></span>
           </summary>
           <div class="quran-juz-content">
             <a class="quran-open-juz" href="${QuranLibrary.pdfUrl(number)}" target="_blank" rel="noreferrer">Open full Juz ${label} <span aria-hidden="true">↗</span></a>
@@ -732,6 +745,30 @@
   }
 
   function bindPublic() {
+    const quranSearch = document.getElementById('quranSearch');
+    if (quranSearch) {
+      const normalizeSearch = (value) => value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9\u0600-\u06ff]/g, '');
+      const cards = [...document.querySelectorAll('.quran-juz')];
+      const filterQuran = () => {
+        const query = normalizeSearch(quranSearch.value);
+        const juzNumber = query.match(/^(?:juz|para)?0*(\d+)$/)?.[1];
+        let count = 0;
+        cards.forEach((card, index) => {
+          const juz = QuranLibrary.juz[index];
+          const matches = !query || (juzNumber ? juz.number === Number(juzNumber) : normalizeSearch(card.textContent).includes(query));
+          card.hidden = !matches;
+          if (matches) count += 1;
+        });
+        document.getElementById('quranResults').textContent = query ? `${count} matching Juz` : 'Showing all 30 Juz';
+        document.getElementById('quranEmpty').hidden = count > 0;
+      };
+      quranSearch.addEventListener('input', filterQuran);
+      document.getElementById('quranClear').addEventListener('click', () => {
+        quranSearch.value = '';
+        filterQuran();
+        quranSearch.focus();
+      });
+    }
     document.querySelectorAll('.past-card[data-recap-id]').forEach((card) => {
       card.addEventListener('click', () => openRecap(card.dataset.recapId));
       card.addEventListener('keydown', (event) => {
