@@ -377,7 +377,8 @@ async function handleApi(req, res, url) {
 
   if (url.pathname === '/api/admin') {
     if (!requireAdmin(req, res)) return;
-    sendJson(res, 200, db);
+    const { adminUsers, ...dashboardDb } = db;
+    sendJson(res, 200, dashboardDb);
     return;
   }
 
@@ -472,9 +473,12 @@ const server = http.createServer(async (req, res) => {
     }
 
     const resolved = path.resolve(filePath);
-    if (!resolved.startsWith(ROOT)) {
-      res.writeHead(403);
-      res.end('Forbidden');
+    const relative = path.relative(ROOT, resolved).split(path.sep).join('/');
+    const publicFiles = new Set(['index.html', 'suhbah.js', 'suhbah.css', 'quran-library.js']);
+    if (relative.startsWith('../') || path.isAbsolute(relative) ||
+        (!publicFiles.has(relative) && !relative.startsWith('assets/'))) {
+      res.writeHead(404);
+      res.end('Not found');
       return;
     }
     serveFile(res, resolved);

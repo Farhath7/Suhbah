@@ -89,7 +89,7 @@
     db = await api('/api/admin');
   }
 
-  function header() {
+  function header(showAdmin = false) {
     return `
       <header class="header">
         <nav class="container nav" aria-label="Primary navigation">
@@ -101,7 +101,7 @@
             <a class="nav-link" href="${homeAnchor('#community')}">Community</a>
             <a class="nav-link" href="${homeAnchor('#quran-library')}">Quran</a>
             <a class="nav-link" href="${homeAnchor('#testimonials')}">Voices</a>
-            <a class="nav-link" href="/admin" data-route>Admin</a>
+            ${showAdmin ? '<a class="nav-link" href="/admin" data-route>Admin</a>' : ''}
           </div>
           <div class="nav-actions"><a class="button primary" href="${registrationUrl(upcomingEvent())}" data-route>Join Next Suhbah</a></div>
           <button class="menu-button" type="button" aria-label="Open menu" aria-controls="navLinks" aria-expanded="false"><span class="menu-icon"></span></button>
@@ -585,7 +585,7 @@
   function adminShell() {
     return `
       <div class="admin-layout">
-        ${header()}
+        ${header(true)}
         <main class="container admin-shell">
           <div class="admin-top">
             <div><span class="eyebrow"><span class="dot"></span> Admin dashboard</span><h1 class="admin-title">Suhbah Admin</h1></div>
