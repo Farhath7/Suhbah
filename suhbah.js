@@ -7,6 +7,7 @@
   let editing = {};
   let countdownTimer;
   let registrationEventId = '';
+  let renderedPath = window.location.pathname;
 
   async function api(path, options = {}) {
     const response = await fetch(path, {
@@ -62,7 +63,8 @@
   }
 
   function registrationUrl(event) {
-    return event ? `/register/${encodeURIComponent(event.id)}` : '/#register';
+    if (!event || (!isAdmin() && event.id === upcomingEvent()?.id)) return homeAnchor('#register');
+    return `/register/${encodeURIComponent(event.id)}`;
   }
 
   function registrationIsOpen(event) {
@@ -1256,6 +1258,7 @@
   }
 
   async function render() {
+    renderedPath = window.location.pathname;
     try {
       if (isAdmin()) {
         try {
@@ -1278,6 +1281,8 @@
     }
   }
 
-  window.addEventListener('popstate', render);
+  window.addEventListener('popstate', () => {
+    if (window.location.pathname !== renderedPath) render();
+  });
   render();
 })();
