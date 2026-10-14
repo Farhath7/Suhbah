@@ -95,14 +95,17 @@
         <nav class="container nav" aria-label="Primary navigation">
           <a class="brand" href="/" data-route><img class="brand-logo" src="/assets/suhbah-logo.png" alt="Suhbah" /></a>
           <div class="nav-links" id="navLinks">
-            <a class="nav-link" href="${homeAnchor('#home')}">Home</a>
             <a class="nav-link" href="${homeAnchor('#about')}">About</a>
-            <a class="nav-link" href="${homeAnchor('#events')}">Events</a>
-            <a class="nav-link" href="${homeAnchor('#community')}">Community</a>
-            <a class="nav-link" href="${homeAnchor('#quran-library')}">Quran</a>
-            <a class="nav-link" href="/bookmarks" data-route>Bookmarks</a>
-            <a class="nav-link" href="${homeAnchor('#testimonials')}">Voices</a>
+            <a class="nav-link" href="${homeAnchor('#events')}">Gatherings</a>
+            <details class="nav-resources">
+              <summary class="nav-link">Resources<svg class="nav-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m4 6 4 4 4-4" /></svg></summary>
+              <div class="nav-resource-links">
+                <a class="nav-link" href="${homeAnchor('#quran-library')}">Quran</a>
+                <a class="nav-link" href="/bookmarks" data-route>Bookmarks</a>
+              </div>
+            </details>
             ${showAdmin ? '<a class="nav-link" href="/admin" data-route>Admin</a>' : ''}
+            <a class="button primary nav-mobile-join" href="${registrationUrl(upcomingEvent())}" data-route>Join Next Suhbah</a>
           </div>
           <div class="nav-actions"><a class="button primary" href="${registrationUrl(upcomingEvent())}" data-route>Join Next Suhbah</a></div>
           <button class="menu-button" type="button" aria-label="Open menu" aria-controls="navLinks" aria-expanded="false"><span class="menu-icon"></span></button>
@@ -932,7 +935,25 @@
     return `<label class="field"><span>${html(label)}</span><select name="${html(name)}" required>${options.map((option) => `<option ${option === value ? 'selected' : ''}>${html(option)}</option>`).join('')}</select></label>`;
   }
 
+  let navigationController;
+
   function bindCommon() {
+    navigationController?.abort();
+    navigationController = new AbortController();
+    const resources = document.querySelector('.nav-resources');
+    document.addEventListener('click', (event) => {
+      if (resources && !resources.contains(event.target)) resources.open = false;
+    }, { signal: navigationController.signal });
+    document.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape') return;
+      if (resources?.open) {
+        resources.open = false;
+        resources.querySelector('summary').focus();
+      } else if (document.querySelector('.nav-links.open')) {
+        document.querySelector('.menu-button')?.click();
+        document.querySelector('.menu-button')?.focus();
+      }
+    }, { signal: navigationController.signal });
     document.querySelectorAll('[data-route]').forEach((link) => {
       link.addEventListener('click', (event) => {
         const href = link.getAttribute('href');
@@ -956,6 +977,7 @@
           links.classList.remove('open');
           document.body.classList.remove('menu-open');
           menu.setAttribute('aria-expanded', 'false');
+          if (resources) resources.open = false;
         }),
       );
     }
