@@ -748,9 +748,9 @@
     const donationContact = db.socialLinks.instagram || db.socialLinks.whatsapp;
     return `
       ${donationContact ? `<aside class="donation-banner" aria-label="Support Suhbah"><div class="container donation-banner-inner">
-        <svg class="donation-heart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z" /></svg>
-        <p>Interested in supporting Suhbah with a donation? DM us and we’ll get in touch.</p>
-        <a href="${html(donationContact)}" target="_blank" rel="noopener noreferrer">${db.socialLinks.instagram ? 'Message us on Instagram' : 'Connect with our community'} <span aria-hidden="true">↗</span></a>
+        <span class="donation-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z" /></svg></span>
+        <div class="donation-copy"><strong>A little support. A lasting impact.</strong><p>Help Suhbah grow with a donation. Send us a DM to connect.</p></div>
+        <a href="${html(donationContact)}" target="_blank" rel="noopener noreferrer">${db.socialLinks.instagram ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.5" cy="6.5" r=".8" fill="currentColor" stroke="none" /></svg> DM us on Instagram' : 'Connect with our community'} <span aria-hidden="true">↗</span></a>
       </div></aside>` : ''}
       <footer class="footer">
         <div class="container">
