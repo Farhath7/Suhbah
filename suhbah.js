@@ -75,12 +75,56 @@
     return window.location.pathname === '/' ? hash : `/${hash}`;
   }
 
+  let registrationScrollFrame;
+  let registrationScrollController;
+
+  function stopRegistrationScroll() {
+    cancelAnimationFrame(registrationScrollFrame);
+    registrationScrollController?.abort();
+  }
+
+  function scrollToRegistration() {
+    const target = document.getElementById('register');
+    if (!target) return;
+    stopRegistrationScroll();
+    const start = window.scrollY;
+    const headerHeight = document.querySelector('.header')?.getBoundingClientRect().height || 0;
+    const end = Math.max(0, Math.min(
+      start + target.getBoundingClientRect().top - headerHeight - 16,
+      document.documentElement.scrollHeight - window.innerHeight,
+    ));
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      window.scrollTo({ top: end, behavior: 'instant' });
+      return;
+    }
+    const duration = Math.min(3200, Math.max(1600, Math.abs(end - start) * 0.25));
+    registrationScrollController = new AbortController();
+    const options = { passive: true, signal: registrationScrollController.signal };
+    window.addEventListener('wheel', stopRegistrationScroll, options);
+    window.addEventListener('touchstart', stopRegistrationScroll, options);
+    window.addEventListener('keydown', (event) => {
+      if (['Escape', 'ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '].includes(event.key)) stopRegistrationScroll();
+    }, options);
+    let started;
+    const step = (time) => {
+      started ??= time;
+      const progress = Math.min(1, (time - started) / duration);
+      const eased = progress < 0.5 ? 4 * progress ** 3 : 1 - (-2 * progress + 2) ** 3 / 2;
+      window.scrollTo({ top: start + (end - start) * eased, behavior: 'instant' });
+      if (progress < 1) registrationScrollFrame = requestAnimationFrame(step);
+      else stopRegistrationScroll();
+    };
+    registrationScrollFrame = requestAnimationFrame(step);
+  }
+
   async function route(path) {
+    stopRegistrationScroll();
     window.history.pushState({}, '', path);
-    if (!window.location.hash) window.scrollTo({ top: 0, behavior: 'instant' });
+    if (!window.location.hash || window.location.hash === '#register') window.scrollTo({ top: 0, behavior: 'instant' });
     await render();
     const target = document.getElementById(window.location.hash.slice(1));
-    if (target) target.scrollIntoView({ behavior: 'smooth' });
+    if (target?.id === 'register') scrollToRegistration();
+    else if (target) target.scrollIntoView({ behavior: 'smooth' });
     else window.scrollTo({ top: 0, behavior: 'instant' });
   }
 
@@ -960,8 +1004,15 @@
     document.querySelectorAll('[data-route]').forEach((link) => {
       link.addEventListener('click', (event) => {
         const href = link.getAttribute('href');
-        if (!href || href.startsWith('#')) return;
+        if (!href) return;
         if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        if (href === '#register') {
+          event.preventDefault();
+          if (window.location.hash !== href) window.history.pushState({}, '', href);
+          scrollToRegistration();
+          return;
+        }
+        if (href.startsWith('#')) return;
         event.preventDefault();
         route(href);
       });
@@ -1258,6 +1309,7 @@
   }
 
   async function render() {
+    stopRegistrationScroll();
     renderedPath = window.location.pathname;
     try {
       if (isAdmin()) {
@@ -1282,6 +1334,7 @@
   }
 
   window.addEventListener('popstate', () => {
+    stopRegistrationScroll();
     if (window.location.pathname !== renderedPath) render();
   });
   render();
