@@ -745,7 +745,13 @@
   }
 
   function footer() {
+    const donationContact = db.socialLinks.instagram || db.socialLinks.whatsapp;
     return `
+      ${donationContact ? `<aside class="donation-banner" aria-label="Support Suhbah"><div class="container donation-banner-inner">
+        <svg class="donation-heart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z" /></svg>
+        <p>Interested in supporting Suhbah with a donation? DM us and we’ll get in touch.</p>
+        <a href="${html(donationContact)}" target="_blank" rel="noopener noreferrer">${db.socialLinks.instagram ? 'Message us on Instagram' : 'Connect with our community'} <span aria-hidden="true">↗</span></a>
+      </div></aside>` : ''}
       <footer class="footer">
         <div class="container">
           <div class="footer-grid">

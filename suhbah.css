@@ -58,6 +58,17 @@
   .bookmark-preview { padding: 20px; }
 }
 
+.donation-banner { padding: 16px 0; background: #e8eef1; border-top: 1px solid rgba(86, 124, 141, .15); font-family: var(--font-display); }
+.donation-banner-inner { display: flex; align-items: center; gap: 14px; }
+.donation-heart { width: 22px; height: 22px; flex-shrink: 0; color: var(--blue); }
+.donation-banner p { margin: 0; flex: 1; font-size: 1.05rem; line-height: 1.4; font-weight: 600; }
+.donation-banner a { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; color: var(--navy); font-size: 1rem; font-weight: 700; text-decoration: underline; text-underline-offset: 4px; }
+.donation-banner a:hover { color: var(--blue); }
+@media (max-width: 699px) {
+  .donation-banner-inner { display: grid; grid-template-columns: 22px minmax(0, 1fr); column-gap: 12px; row-gap: 2px; }
+  .donation-banner a { grid-column: 2; width: fit-content; }
+}
+
 :root {
   color-scheme: light;
   --navy: #2F4156;
