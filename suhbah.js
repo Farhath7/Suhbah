@@ -75,10 +75,11 @@
 
   async function route(path) {
     window.history.pushState({}, '', path);
+    if (!window.location.hash) window.scrollTo({ top: 0, behavior: 'instant' });
     await render();
     const target = document.getElementById(window.location.hash.slice(1));
     if (target) target.scrollIntoView({ behavior: 'smooth' });
-    else window.scrollTo({ top: 0, behavior: 'smooth' });
+    else window.scrollTo({ top: 0, behavior: 'instant' });
   }
 
   async function loadPublic() {
