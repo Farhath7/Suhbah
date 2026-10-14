@@ -466,7 +466,7 @@ const server = http.createServer(async (req, res) => {
     }
 
     let filePath;
-    if (url.pathname === '/' || url.pathname === '/admin' || url.pathname === '/admin/' || /^\/register\/[^/]+\/?$/.test(url.pathname)) {
+    if (url.pathname === '/' || url.pathname === '/admin' || url.pathname === '/admin/' || /^\/bookmarks\/?$/.test(url.pathname) || /^\/register\/[^/]+\/?$/.test(url.pathname)) {
       filePath = path.join(ROOT, 'index.html');
     } else {
       filePath = path.join(ROOT, decodeURIComponent(url.pathname));

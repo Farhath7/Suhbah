@@ -100,6 +100,7 @@
             <a class="nav-link" href="${homeAnchor('#events')}">Events</a>
             <a class="nav-link" href="${homeAnchor('#community')}">Community</a>
             <a class="nav-link" href="${homeAnchor('#quran-library')}">Quran</a>
+            <a class="nav-link" href="/bookmarks" data-route>Bookmarks</a>
             <a class="nav-link" href="${homeAnchor('#testimonials')}">Voices</a>
             ${showAdmin ? '<a class="nav-link" href="/admin" data-route>Admin</a>' : ''}
           </div>
@@ -115,8 +116,201 @@
     const event = registrationPath ? db.events.find((item) => item.id === decodeURIComponent(registrationPath[1])) : null;
     const main = registrationPath
       ? `<main class="registration-page">${event ? registrationSection(event, true) : '<section class="section white"><div class="container"><h1>Suhbah not found</h1><p>This registration link is no longer available.</p><a class="button secondary" href="/" data-route>Back to Suhbah</a></div></section>'}</main>`
-      : publicMain();
+      : /^\/bookmarks\/?$/.test(window.location.pathname) ? bookmarkPanel() : publicMain();
     return `<div class="site">${header()}${main}${footer()}</div>`;
+  }
+
+  function bookmarkPanel() {
+    return `<main class="bookmark-page"><section class="section"><div class="container">
+      <div class="section-head"><span class="eyebrow">A little something for your next chapter</span><h1>Your name. Your bookmark.</h1><p class="lead">Choose a design and make it yours with your name in Arabic.</p></div>
+      <div class="bookmark-layout">
+        <form class="bookmark-controls" id="bookmarkForm">
+          <h2>Make it yours</h2>
+          <fieldset class="bookmark-templates"><legend>Choose your template</legend>
+            <label><input type="radio" name="bookmarkTemplate" value="palestine" checked /><span class="bookmark-template-card"><span class="bookmark-swatch bookmark-swatch-palestine"></span>Palestine</span></label>
+            <label><input type="radio" name="bookmarkTemplate" value="heritage" /><span class="bookmark-template-card"><span class="bookmark-swatch bookmark-swatch-heritage"></span>Olive &amp; heritage</span></label>
+            <label><input type="radio" name="bookmarkTemplate" value="jerusalem" /><span class="bookmark-template-card"><span class="bookmark-swatch bookmark-swatch-jerusalem"></span>Jerusalem stories</span></label>
+            <label><input type="radio" name="bookmarkTemplate" value="watermelon" /><span class="bookmark-template-card"><span class="bookmark-swatch bookmark-swatch-watermelon"></span>Watermelon &amp; keffiyeh</span></label>
+            <label><input type="radio" name="bookmarkTemplate" value="olive" /><span class="bookmark-template-card"><span class="bookmark-swatch bookmark-swatch-olive"></span>Olive garden</span></label>
+            <label><input type="radio" name="bookmarkTemplate" value="midnight" /><span class="bookmark-template-card"><span class="bookmark-swatch bookmark-swatch-midnight"></span>Midnight gold</span></label>
+            <label><input type="radio" name="bookmarkTemplate" value="rose" /><span class="bookmark-template-card"><span class="bookmark-swatch bookmark-swatch-rose"></span>Rose arch</span></label>
+          </fieldset>
+          <label class="field" for="bookmarkName"><span>Your name in Arabic</span><input id="bookmarkName" type="text" lang="ar" dir="rtl" maxlength="48" placeholder="اسمك هنا" autocomplete="off" required aria-describedby="bookmarkHint" /></label>
+          <p class="bookmark-hint" id="bookmarkHint">Type or paste your Arabic name. It runs vertically through the design.</p>
+          <label class="field" for="bookmarkFont"><span>Name style</span><select id="bookmarkFont"><option value="serif">Classic</option><option value="sans-serif">Simple</option></select></label>
+          <label class="field" for="bookmarkSize"><span>Name size <output id="bookmarkSizeValue" for="bookmarkSize">84</output></span><input id="bookmarkSize" type="range" min="40" max="120" step="2" value="84" /></label>
+          <label class="field" for="bookmarkColor"><span>Name colour</span><input id="bookmarkColor" type="color" value="#762f2c" /></label>
+          <button class="button primary" id="bookmarkDownload" type="submit" disabled>Download bookmark · PNG</button>
+          <p class="bookmark-hint">Your name stays in your browser. Long names resize automatically to fit.</p>
+          <p class="bookmark-status" id="bookmarkStatus" role="status" aria-live="polite">Loading your design…</p>
+        </form>
+        <figure class="bookmark-preview"><div class="bookmark-preview-heading"><span>Live preview</span><span id="bookmarkTemplateLabel">Palestine</span></div><canvas id="bookmarkCanvas" role="img" aria-label="Bookmark preview with a sample Arabic name"></canvas><figcaption>Your design, ready for the pages you love.</figcaption></figure>
+      </div>
+    </div></section></main>`;
+  }
+
+  function bindBookmark() {
+    const canvas = document.getElementById('bookmarkCanvas');
+    if (!canvas) return;
+    const form = document.getElementById('bookmarkForm');
+    const name = document.getElementById('bookmarkName');
+    const font = document.getElementById('bookmarkFont');
+    const size = document.getElementById('bookmarkSize');
+    const color = document.getElementById('bookmarkColor');
+    const download = document.getElementById('bookmarkDownload');
+    const status = document.getElementById('bookmarkStatus');
+    const context = canvas.getContext('2d');
+    const templates = {
+      palestine: { title: 'Palestine', color: '#762f2c', image: '/assets/bookmark-palestine.jpg' },
+      heritage: { title: 'Olive & heritage', color: '#3f593e', image: '/assets/bookmark-olive-heritage.png' },
+      jerusalem: { title: 'Jerusalem stories', color: '#762f2c', image: '/assets/bookmark-jerusalem-stories.png' },
+      watermelon: { title: 'Watermelon & keffiyeh', color: '#762f2c', image: '/assets/bookmark-watermelon-keffiyeh.png' },
+      olive: { title: 'Olive garden', color: '#3f593e' },
+      midnight: { title: 'Midnight gold', color: '#e9cb86' },
+      rose: { title: 'Rose arch', color: '#833f51' },
+    };
+    const artworks = {};
+    let selectedTemplate = 'palestine';
+    canvas.width = 487;
+    canvas.height = 1280;
+    function paintTemplate(template) {
+      const w = canvas.width, h = canvas.height;
+      context.save();
+      context.scale(w / 487, h / 1280);
+      if (template === 'olive') {
+        context.fillStyle = '#f6f3e6';
+        context.fillRect(0, 0, 487, 1280);
+        context.strokeStyle = '#a8b48d';
+        context.lineWidth = 2;
+        context.strokeRect(24, 24, 439, 1232);
+        for (const bottom of [false, true]) {
+          context.save();
+          if (bottom) { context.translate(487, 1280); context.rotate(Math.PI); }
+          for (const right of [false, true]) {
+            context.save();
+            if (right) { context.translate(487, 0); context.scale(-1, 1); }
+            context.strokeStyle = '#65784e';
+            context.lineWidth = 4;
+            context.beginPath(); context.moveTo(45, 45); context.quadraticCurveTo(160, 115, 62, 345); context.stroke();
+            for (let i = 0; i < 7; i++) {
+              const y = 75 + i * 37, x = 82 + Math.sin(i / 2) * 24;
+              context.fillStyle = i % 2 ? '#87966b' : '#526b49';
+              context.beginPath(); context.ellipse(x - 18, y, 12, 30, -.65, 0, Math.PI * 2); context.fill();
+              context.beginPath(); context.ellipse(x + 24, y + 15, 12, 30, .7, 0, Math.PI * 2); context.fill();
+            }
+            context.restore();
+          }
+          context.restore();
+        }
+      } else if (template === 'midnight') {
+        context.fillStyle = '#172c3b'; context.fillRect(0, 0, 487, 1280);
+        context.strokeStyle = '#b99a56'; context.lineWidth = 2;
+        context.strokeRect(24, 24, 439, 1232); context.strokeRect(35, 35, 417, 1210);
+        for (const y of [135, 255, 1025, 1145]) {
+          for (const x of [85, 243.5, 402]) {
+            context.beginPath();
+            for (let i = 0; i < 16; i++) {
+              const angle = i * Math.PI / 8, radius = i % 2 ? 23 : 46;
+              const px = x + Math.cos(angle) * radius, py = y + Math.sin(angle) * radius;
+              if (i === 0) context.moveTo(px, py); else context.lineTo(px, py);
+            }
+            context.closePath(); context.stroke();
+          }
+        }
+        context.beginPath(); context.moveTo(243.5, 335); context.lineTo(243.5, 380); context.moveTo(243.5, 900); context.lineTo(243.5, 945); context.stroke();
+      } else {
+        context.fillStyle = '#f5e5e5'; context.fillRect(0, 0, 487, 1280);
+        context.fillStyle = '#fff8ef';
+        context.beginPath(); context.roundRect(67, 85, 353, 1110, 176); context.fill();
+        context.strokeStyle = '#b8818d'; context.lineWidth = 3; context.stroke();
+        context.beginPath(); context.roundRect(84, 103, 319, 1074, 159); context.stroke();
+        for (const y of [255, 1025]) {
+          context.fillStyle = '#b8818d';
+          for (let i = 0; i < 8; i++) {
+            const angle = i * Math.PI / 4;
+            context.beginPath(); context.ellipse(243.5 + Math.cos(angle) * 25, y + Math.sin(angle) * 25, 11, 22, angle + Math.PI / 2, 0, Math.PI * 2); context.fill();
+          }
+          context.fillStyle = '#d9b369'; context.beginPath(); context.arc(243.5, y, 12, 0, Math.PI * 2); context.fill();
+        }
+      }
+      context.restore();
+    }
+    const arabicLetters = /[\u0620-\u063f\u0641-\u064a\u066e-\u066f\u0671-\u06d3\u06fa-\u06fc\u0750-\u077f\u08a0-\u08c9]/u;
+    function draw() {
+      const template = form.elements.bookmarkTemplate.value;
+      if (template !== selectedTemplate) { color.value = templates[template].color; selectedTemplate = template; }
+      const artwork = artworks[template];
+      const imageTemplate = Boolean(templates[template].image);
+      const ready = !imageTemplate || Boolean(artwork?.naturalWidth);
+      document.getElementById('bookmarkTemplateLabel').textContent = templates[template].title;
+      document.getElementById('bookmarkSizeValue').value = size.value;
+      const text = name.value.trim();
+      const valid = text.length > 0 && arabicLetters.test(text) && /^[\p{Script_Extensions=Arabic}\s\-]+$/u.test(text);
+      name.setCustomValidity(text && !valid ? 'Please enter your name using Arabic letters.' : '');
+      download.disabled = !valid || !ready;
+      canvas.width = ready && imageTemplate ? artwork.naturalWidth : 487;
+      canvas.height = ready && imageTemplate ? artwork.naturalHeight : 1280;
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      if (imageTemplate) {
+        if (!ready) {
+          status.textContent = artwork?.dataset.failed ? 'The design could not load. Please choose another template or refresh.' : 'Loading your design…';
+          return;
+        }
+        context.drawImage(artwork, 0, 0, canvas.width, canvas.height);
+      } else paintTemplate(template);
+      context.direction = 'rtl';
+      context.textAlign = 'center';
+      context.textBaseline = 'middle';
+      context.fillStyle = color.value;
+      const label = text || 'اسمك هنا';
+      let pixels = Number(size.value) * canvas.width / 487;
+      const family = font.value === 'serif' ? '"Times New Roman", serif' : 'Tahoma, Arial, sans-serif';
+      context.font = `${pixels}px ${family}`;
+      while (context.measureText(label).width > canvas.height * 0.48 && pixels > 6) {
+        pixels -= 1;
+        context.font = `${pixels}px ${family}`;
+      }
+      context.save();
+      context.translate(canvas.width * (imageTemplate ? 0.30 : 0.50), canvas.height * (imageTemplate ? 0.48 : 0.50));
+      context.rotate(-Math.PI / 2);
+      context.fillText(label, 0, 0);
+      context.restore();
+      canvas.setAttribute('aria-label', text ? `Bookmark preview for ${text}` : 'Bookmark preview with a sample Arabic name');
+      status.textContent = text && !valid ? 'Please use Arabic letters for your name.' : valid ? 'Your bookmark is ready to download.' : 'Enter your Arabic name to download your bookmark.';
+    }
+    form.addEventListener('input', draw);
+    form.addEventListener('change', draw);
+    Object.entries(templates).forEach(([key, template]) => {
+      if (!template.image) return;
+      const artwork = new Image();
+      artworks[key] = artwork;
+      artwork.onload = () => { if (selectedTemplate === key) draw(); };
+      artwork.onerror = () => { artwork.dataset.failed = 'true'; if (selectedTemplate === key) draw(); };
+      artwork.src = template.image;
+    });
+    draw();
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      if (download.disabled || !form.reportValidity()) return;
+      draw();
+      download.disabled = true;
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          draw();
+          status.textContent = 'The download could not be created. Please try again.';
+          return;
+        }
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `suhbah-bookmark-${selectedTemplate}.png`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 10000);
+        draw();
+      }, 'image/png');
+    });
   }
 
   function publicMain() {
@@ -284,6 +478,7 @@
     return `<section class="section white" id="register">
           ${standalone ? '<div class="container registration-back"><a href="/#events">← All Suhbahs</a></div>' : ''}
           <div class="container registration-grid">
+            <div class="registration-story">
             <div class="registration-copy fade-in">
               <p class="registration-label-text">Event registration</p>
               <h2 class="registration-brand">Suhbah</h2>
@@ -306,6 +501,8 @@
                 </ul>
                 <p class="registration-note-closing">Come as you are. Bring a notebook if you like, and bring a friend if someone comes to mind.</p>
               </div>
+            </div>
+            <div class="registration-art" aria-hidden="true"><img src="/assets/registration-still-life.png" alt="" loading="eager" fetchpriority="high" /></div>
             </div>
             <div id="registrationMount" class="fade-in">${registrationForm(event)}</div>
           </div>
@@ -756,6 +953,7 @@
   }
 
   function bindPublic() {
+    bindBookmark();
     const quranSearch = document.getElementById('quranSearch');
     if (quranSearch) {
       const normalizeSearch = (value) => value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9\u0600-\u06ff]/g, '');

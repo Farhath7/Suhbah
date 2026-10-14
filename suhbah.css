@@ -1,3 +1,63 @@
+.bookmark-page .section-head h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  line-height: 1.1;
+  margin: 18px 0;
+}
+.bookmark-layout {
+  font-family: var(--font-display);
+  font-weight: 600;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 48px;
+  max-width: 980px;
+  margin: 36px auto 0;
+  align-items: start;
+}
+.bookmark-controls {
+  display: grid;
+  gap: 20px;
+  padding: clamp(20px, 4vw, 36px);
+  background: var(--white);
+  border: 1px solid var(--mist);
+  border-radius: var(--radius);
+  box-shadow: var(--soft-shadow);
+}
+.bookmark-controls h2 { margin: 0 0 6px; }
+.bookmark-templates { border: 0; padding: 0; margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.bookmark-templates legend { margin-bottom: 12px; font-size: 1.05rem; font-weight: 700; }
+.bookmark-templates label { position: relative; cursor: pointer; }
+.bookmark-templates input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.bookmark-template-card { display: flex; align-items: center; gap: 10px; padding: 10px; border: 2px solid var(--mist); border-radius: 8px; font-size: .95rem; }
+.bookmark-templates input:checked + .bookmark-template-card { border-color: var(--navy); background: #f1f5f7; }
+.bookmark-templates input:focus-visible + .bookmark-template-card { outline: 3px solid var(--blue); outline-offset: 3px; }
+.bookmark-swatch { width: 25px; height: 58px; border-radius: 3px; flex-shrink: 0; }
+.bookmark-swatch-palestine { background: url('/assets/bookmark-palestine.jpg') center / cover; }
+.bookmark-swatch-heritage { background: url('/assets/bookmark-olive-heritage.png') center / cover; }
+.bookmark-swatch-jerusalem { background: url('/assets/bookmark-jerusalem-stories.png') center / cover; }
+.bookmark-swatch-watermelon { background: url('/assets/bookmark-watermelon-keffiyeh.png') center / cover; }
+.bookmark-swatch-olive { background: #f6f3e6; border: 4px solid #87966b; }
+.bookmark-swatch-midnight { background: #172c3b; border: 3px double #e9cb86; }
+.bookmark-swatch-rose { background: #fff8ef; border: 5px solid #b8818d; border-radius: 15px; }
+#bookmarkColor { width: 100%; height: 44px; padding: 4px; border: 1px solid var(--mist); border-radius: 6px; background: white; cursor: pointer; }
+#bookmarkSizeValue { float: right; font-variant-numeric: tabular-nums; color: var(--blue); }
+.bookmark-controls .field { min-width: 0; }
+.bookmark-controls .field > span { font-weight: 700; }
+.bookmark-controls input[type="text"], .bookmark-controls select { width: 100%; min-width: 0; }
+#bookmarkName { font-size: 1.5rem; font-family: "Traditional Arabic", "Times New Roman", serif; font-weight: 400; }
+#bookmarkSize { width: 100%; accent-color: var(--navy); }
+.bookmark-hint, .bookmark-status { margin: 0; font-size: 1rem; line-height: 1.5; }
+.bookmark-hint { color: #567080; }
+.bookmark-controls button:disabled { opacity: .5; cursor: not-allowed; }
+.bookmark-preview { margin: 0; padding: 24px; border-radius: var(--radius); background: #e4e9df; text-align: center; }
+.bookmark-preview-heading { display: flex; justify-content: space-between; gap: 12px; font-size: .95rem; margin-bottom: 24px; }
+.bookmark-preview canvas { display: block; width: 100%; max-width: 235px; height: auto; margin: auto; background: white; box-shadow: 0 12px 28px #2b292526; }
+.bookmark-preview figcaption { font-size: .95rem; margin-top: 24px; }
+@media (max-width: 699px) {
+  .bookmark-layout { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .bookmark-preview { padding: 20px; }
+}
+
 :root {
   color-scheme: light;
   --navy: #2F4156;
@@ -1712,6 +1772,15 @@ body.modal-open {
   display: grid;
   gap: 24px;
   align-items: stretch;
+}
+
+.registration-story { min-width: 0; display: flex; flex-direction: column; }
+.registration-story .registration-copy { align-self: stretch; }
+.registration-art { display: flex; flex: none; align-items: center; justify-content: center; margin-top: 22px; padding: 16px 12px; min-height: 260px; background: radial-gradient(ellipse at 50% 65%, rgba(200, 217, 230, .3), transparent 68%); }
+.registration-art img { display: block; width: min(100%, 620px); height: auto; max-height: 340px; object-fit: contain; opacity: 1; }
+@media (max-width: 899px) {
+  .registration-art { min-height: 0; margin-top: 12px; padding: 16px 20px; }
+  .registration-art img { max-height: 200px; }
 }
 
 .upcoming-registration-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 20px; margin-bottom: 48px; }

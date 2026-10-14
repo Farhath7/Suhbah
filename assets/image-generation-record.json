@@ -1,0 +1,26 @@
+{
+  "tool": "Built-in image_gen.imagegen",
+  "reference": "assets/bookmark-palestine.jpg",
+  "assets": [
+    {
+      "path": "assets/bookmark-olive-heritage.png",
+      "transparent_background": false,
+      "prompt": "Create ONE new flat printable bookmark template inspired by input image 1 (style reference only). Asset for website name personalization. Very tall narrow portrait aspect ratio EXACTLY 487:1280 (about 0.38), full-bleed flat artwork, no mockup, no desk, no shadows outside edges. Match reference's tactile hand-cut scrapbook collage, white-edged paper stickers, vintage Palestinian ephemera, olive leaves and Palestine cultural motifs. New variation 'Olive & Heritage': collage concentrated along RIGHT 35% edge, top 18% and bottom 18%, with olive branches, vintage postage stamps without readable text, brass old key, black-and-white keffiyeh scraps, tiny red watermelon cutout, warm stone Jerusalem architecture at bottom right. White paper background. Leave x=8% to x=52%, y=24% to y=74% TOTALLY BLANK WHITE for a vertical Arabic name added by code. No letters, no words, no names, no quote, no watermark anywhere. Rich yet tasteful olive green, warm cream, sepia, charcoal and muted red. As detailed and tactile as uploaded design, distinct arrangement, straight rectangular canvas."
+    },
+    {
+      "path": "assets/bookmark-jerusalem-stories.png",
+      "transparent_background": false,
+      "prompt": "Create ONE new flat printable bookmark template inspired by input image 1 (style reference only). Very tall narrow portrait aspect ratio EXACTLY 487:1280 (about 0.38), full-bleed flat artwork. Match reference's tactile hand-cut scrapbook collage, white-edged paper stickers, vintage Palestinian ephemera and cultural motifs. New variation 'Jerusalem Stories': warm golden Dome of the Rock architectural cutout at bottom right, old Jerusalem limestone windows and archways, vintage unlabeled postage stamps, white-edged paper stickers of traditional embroidered clothing, olive leaves, antique coin, a little black-and-white keffiyeh texture, Palestinian flag-colour paper scraps. Warm golden ochre, dusty rose, olive, charcoal, red accents. Collage concentrated along RIGHT 35% edge, top 18% and bottom 18%. White paper background. Leave x=8% to x=52%, y=24% to y=74% TOTALLY BLANK WHITE for a vertical Arabic name added by code. No letters, no words, no names, no quote, no readable stamp text, no watermark anywhere. As detailed and tactile as uploaded design, distinct arrangement. No mockup, no desk, no extra border, no perspective, no shadows outside edges, straight rectangular canvas."
+    },
+    {
+      "path": "assets/bookmark-watermelon-keffiyeh.png",
+      "transparent_background": false,
+      "prompt": "Create ONE new flat printable bookmark template inspired by input image 1 (style reference only). Very tall narrow portrait aspect ratio EXACTLY 487:1280 (about 0.38), full-bleed flat artwork. Match reference's tactile hand-cut scrapbook collage, white-edged paper stickers, vintage Palestinian ephemera and cultural motifs. New variation 'Watermelon & Keffiyeh': vivid hand-painted watermelon wedges at top right and bottom right, lush olive branch stickers, black-and-white keffiyeh paper scraps down the right edge, a small vintage brass key, unlabeled vintage olive-green postage stamp, embroidered Palestinian floral textile sticker near bottom right, a subtle folded Palestinian flag paper cutout. Red, black, olive green and vintage cream. Collage concentrated along RIGHT 35% edge, top 18% and bottom 18%. White paper background. Leave x=8% to x=52%, y=24% to y=74% TOTALLY BLANK WHITE for a vertical Arabic name added by code. No letters, no words, no names, no quote, no readable stamp text, no watermark anywhere. As detailed and tactile as uploaded design, distinct arrangement. No mockup, no desk, no extra border, no perspective, no shadows outside edges, straight rectangular canvas."
+    },
+    {
+      "path": "assets/registration-still-life.png",
+      "transparent_background": true,
+      "prompt": "Use case: illustration-story. Asset type: decorative illustration beneath a Quran community gathering registration panel on a website. Create one elegant horizontal watercolor-and-pencil still life on a genuinely transparent background, approximately 2:1 aspect ratio. An open unlabeled book resting on a simple low wooden book stand at center, a small closed cream notebook with navy ribbon and a blue pen on the left, two graceful olive branches framing the sides, a small brass lantern on the right with gentle warm glow. Restrained muted slate navy #2F4156, dusty blue #567C8D, sage olive, cream and delicate brass gold. Airy refined editorial illustration with textured brushwork and soft natural shadows under objects, lots of transparent breathing space, calm welcoming atmosphere fitting an evening reflection gathering. No people, NO text, NO Arabic writing, NO letters, NO symbols pretending to be writing, no logos or watermark. Book pages lightly shaded and completely blank. No rectangular background, no card frame, no UI. The illustration should look polished and detailed at 600px wide, with objects clustered into a balanced low composition."
+    }
+  ]
+}
