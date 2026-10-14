@@ -320,6 +320,8 @@
 
     return `
       <main>
+        <div class="sky-intro">
+          <div class="live-sky" aria-hidden="true"><div class="sky-clouds-right"></div></div>
         <section class="tagline-band" aria-label="Quranic community tagline">
           <div class="container tagline-inner fade-in">
             <span class="tagline-reference">Quran 81:26</span>
@@ -341,6 +343,7 @@
             ${eventCard(event)}
           </div>
         </section>
+        </div>
         <section class="section about-section" id="about">
           <div class="container">
             <div class="section-head fade-in">

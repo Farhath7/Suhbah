@@ -151,6 +151,72 @@ img {
   position: relative;
   min-height: 100vh;
   overflow: hidden;
+  isolation: isolate;
+}
+
+.sky-intro {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.live-sky {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  background: #dce0fb;
+}
+
+.live-sky::before {
+  content: "";
+  position: absolute;
+  inset: -12%;
+  background: url('/assets/codex-cloud-background.webp') center top / cover no-repeat;
+  animation: sky-cloud-drift 18s linear infinite alternate;
+  will-change: transform;
+}
+
+.live-sky::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to top, var(--cream), rgba(245, 239, 235, 0.88) 35px, rgba(245, 239, 235, 0.4) 110px, transparent 220px),
+    radial-gradient(ellipse at 100% 0%, rgba(210, 236, 250, 0.92) 0%, rgba(221, 239, 251, 0.72) 24%, rgba(235, 244, 252, 0.2) 48%, transparent 68%);
+}
+
+@keyframes sky-cloud-drift {
+  from { transform: translate3d(-5%, 1%, 0); }
+  to { transform: translate3d(5%, -2%, 0); }
+}
+
+.sky-clouds-right {
+  position: absolute;
+  z-index: 1;
+  top: -12%;
+  right: -20%;
+  width: 95%;
+  height: 88%;
+  background: url('/assets/codex-cloud-background.webp') left top / 170% auto no-repeat;
+  filter: saturate(0.25) brightness(1.12);
+  opacity: 0.85;
+  -webkit-mask-image: radial-gradient(ellipse at 35% 18%, #000 12%, rgba(0, 0, 0, 0.9) 35%, transparent 72%);
+  mask-image: radial-gradient(ellipse at 35% 18%, #000 12%, rgba(0, 0, 0, 0.9) 35%, transparent 72%);
+  animation: sky-right-drift 28s linear infinite alternate;
+  will-change: transform;
+}
+
+@keyframes sky-right-drift {
+  from { transform: translate3d(10%, 0, 0) scaleX(-1); }
+  to { transform: translate3d(-18%, 3%, 0) scaleX(-1); }
+}
+
+@media (max-width: 639px) {
+  .sky-clouds-right {
+    background-size: auto 100%;
+  }
 }
 
 .site::before {
@@ -295,15 +361,13 @@ img {
 .hero {
   position: relative;
   padding: 38px 0 58px;
-  background:
-    radial-gradient(circle at 2% 20%, rgba(200, 217, 230, 0.92), transparent 28%),
-    radial-gradient(circle at 98% 18%, rgba(255, 255, 255, 0.92), transparent 25%),
-    linear-gradient(90deg, rgba(86, 124, 141, 0.08), transparent 18%, transparent 82%, rgba(200, 217, 230, 0.3)),
-    linear-gradient(180deg, var(--cream), var(--white) 72%);
+  overflow: hidden;
+  background: transparent;
   isolation: isolate;
 }
 
 .hero::before {
+  display: none;
   position: absolute;
   inset: 86px -72px auto auto;
   width: min(68vw, 390px);
@@ -319,6 +383,7 @@ img {
 }
 
 .hero::after {
+  display: none;
   position: absolute;
   inset: auto -10% -24% -10%;
   height: 220px;
@@ -393,47 +458,79 @@ img {
 .tagline-band {
   position: relative;
   overflow: hidden;
-  padding: 24px 0 26px;
-  background:
-    linear-gradient(135deg, rgba(47, 65, 86, 0.97), rgba(86, 124, 141, 0.94)),
-    var(--navy);
-  color: var(--white);
+  padding: 0;
+  background: transparent;
+  color: var(--navy);
   isolation: isolate;
 }
 
 .tagline-band::before {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  background:
-    radial-gradient(circle at 4% 50%, rgba(200, 217, 230, 0.24), transparent 24%),
-    radial-gradient(circle at 96% 50%, rgba(245, 239, 235, 0.16), transparent 24%),
-    repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.07) 0 1px, transparent 1px 34px);
-  content: "";
-  opacity: 0.9;
-  pointer-events: none;
+  display: none;
 }
 
-.tagline-inner {
+.container.tagline-inner {
   position: relative;
   z-index: 1;
+  isolation: isolate;
   display: grid;
+  width: 100%;
   gap: 6px;
+  padding: 24px clamp(16px, 4vw, 40px) 26px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   justify-items: center;
   text-align: center;
 }
 
+.tagline-inner::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 28% 20%, rgba(255, 255, 255, 0.38), transparent 62%),
+    linear-gradient(115deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.07) 48%, rgba(216, 235, 249, 0.16));
+  backdrop-filter: blur(16px) saturate(1.12);
+  -webkit-backdrop-filter: blur(16px) saturate(1.12);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 20%, #000 58%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 20%, #000 58%, transparent);
+}
+
+.tagline-inner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(115deg, transparent 12%, rgba(255, 255, 255, 0.2) 30%, transparent 50%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 28%, #000 50%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 28%, #000 50%, transparent);
+}
+
 .tagline-reference {
-  color: var(--mist);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--navy);
   font-size: 0.78rem;
   font-weight: 800;
   letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 
+.tagline-reference::before,
+.tagline-reference::after {
+  content: "";
+  width: 30px;
+  height: 1px;
+  background: rgba(86, 124, 141, 0.35);
+}
+
 .tagline-transliteration {
   margin: 0;
-  color: var(--white);
+  color: var(--navy);
   font-family: var(--font-display);
   font-size: clamp(1.85rem, 5.6vw, 3.6rem);
   font-weight: 700;
@@ -442,7 +539,7 @@ img {
 
 .tagline-translation {
   margin: 0;
-  color: var(--mist);
+  color: var(--navy);
   font-size: clamp(1rem, 2.3vw, 1.35rem);
   font-weight: 800;
   letter-spacing: 0.12em;
@@ -1032,11 +1129,14 @@ h3 {
 
 .about-section {
   background:
+    linear-gradient(to bottom, var(--cream), transparent 180px),
     linear-gradient(135deg, rgba(245, 239, 235, 0.9), rgba(200, 217, 230, 0.46)),
     var(--cream);
 }
 
 .about-section::before {
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 160px);
+  mask-image: linear-gradient(to bottom, transparent, #000 160px);
   background:
     url("/assets/arabic-pattern-dense.svg") left -80px top -90px / 260px 260px repeat,
     url("/assets/arabic-pattern-dense.svg") right -90px bottom -110px / 300px 300px repeat;
@@ -3100,6 +3200,12 @@ td {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .live-sky::before,
+  .sky-clouds-right {
+    animation: none !important;
+    will-change: auto;
+  }
+
   *,
   *::before,
   *::after {
