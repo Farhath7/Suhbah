@@ -167,7 +167,7 @@
     const main = registrationPath
       ? `<main class="registration-page">${event ? registrationSection(event, true) : '<section class="section white"><div class="container"><h1>Suhbah not found</h1><p>This registration link is no longer available.</p><a class="button secondary" href="/" data-route>Back to Suhbah</a></div></section>'}</main>`
       : /^\/bookmarks\/?$/.test(window.location.pathname) ? bookmarkPanel() : publicMain();
-    return `<div class="site">${header()}${main}${footer()}</div>`;
+    return `<div class="site">${header()}${main}${footer()}${donationBanner()}</div>`;
   }
 
   function bookmarkPanel() {
@@ -408,6 +408,8 @@
           </div>
         </section>
         <section class="section navy" id="why">
+          <div class="conversation-ambient" aria-hidden="true">${Array.from({ length: 14 }, (_, index) => `<span class="ambient-sparkle${index % 3 === 0 ? ' is-star' : ''}" style="--spark-x:${6 + (index * 29) % 89}%;--spark-y:${10 + (index * 17) % 78}%;--spark-size:${index % 3 === 0 ? 7 : 3}px;--spark-duration:${6 + index % 5}s;--spark-delay:-${index * 1.7}s"></span>`).join('')}</div>
+          <div class="conversation-sparkles" aria-hidden="true"></div>
           <div class="container conversation-panel fade-in">
             <div class="conversation-copy">
               <p class="conversation-label">Why Suhbah exists</p>
@@ -519,7 +521,7 @@
     const events = db.events.filter((event) => event.status === 'upcoming').sort((a, b) => new Date(a.date) - new Date(b.date));
     if (!events.length) return '';
     return `<div class="section-head fade-in"><h2>Upcoming Suhbahs</h2><p class="lead">Choose your gathering to view its registration.</p></div>
-      <div class="upcoming-registration-grid">${events.map((event) => `<article class="admin-card fade-in">
+      <div class="upcoming-registration-grid">${events.map((event) => `<article class="admin-card upcoming-registration-card fade-in">
         <span class="event-kicker">${html(event.number)} · ${html(event.registrationStatus)}</span>
         <h3>${html(event.theme)}</h3><p class="muted">${html(dateLabel(event.date))} · ${html(event.time)} · ${html(event.location)}</p>
         <a class="button secondary" href="${registrationUrl(event)}" data-route>${registrationIsOpen(event) ? (event.registrationStatus === 'Waitlist' ? 'Join Waitlist' : 'Register for this Suhbah') : 'View Suhbah'}</a>
@@ -567,7 +569,7 @@
     if (!event) return '<article class="event-card fade-in"><div class="event-card-body"><h2>The next Suhbah is coming soon.</h2><p class="lead">Watch this space for our next gathering.</p></div></article>';
     return `
       <article class="event-card fade-in" aria-label="Upcoming Suhbah event">
-        <div class="event-card-media" ${mediaStyle(event.image || '/assets/suhbah-gathering-hero.png')}>${registrationStatus(event.registrationStatus)}</div>
+        <div class="event-card-media" ${mediaStyle(event.image || '/assets/suhbah-quran.jpg')}>${registrationStatus(event.registrationStatus)}</div>
         <div class="event-card-body">
           <span class="event-section-label">The Next Suhbah</span>
           <span class="event-kicker">${html(event.number)}</span>
@@ -797,14 +799,22 @@
     return `<label class="field"><span>${html(label)}</span><input name="${html(name)}" type="${html(type)}" value="${html(value)}" ${required ? 'required' : ''} /></label>`;
   }
 
-  function footer() {
+  function donationBanner() {
     const donationContact = db.socialLinks.instagram || db.socialLinks.whatsapp;
+    if (!donationContact) return '';
     return `
-      ${donationContact ? `<aside class="donation-banner" aria-label="Support Suhbah"><div class="container donation-banner-inner">
-        <span class="donation-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z" /></svg></span>
-        <div class="donation-copy"><strong>A little support. A lasting impact.</strong><p>Help Suhbah grow with a donation. Send us a DM to connect.</p></div>
-        <a href="${html(donationContact)}" target="_blank" rel="noopener noreferrer">${db.socialLinks.instagram ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.5" cy="6.5" r=".8" fill="currentColor" stroke="none" /></svg> DM us on Instagram' : 'Connect with our community'} <span aria-hidden="true">↗</span></a>
-      </div></aside>` : ''}
+      <aside class="donation-banner" aria-label="Support Suhbah">
+        <a class="donation-button" href="${html(donationContact)}" target="_blank" rel="noopener noreferrer" aria-label="Support Suhbah - ${db.socialLinks.instagram ? 'DM us on Instagram' : 'message us'} to donate (opens in a new tab)">
+          <span class="donation-heart" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z" /></svg></span>
+          <span class="donation-label"><strong>Keep Suhbah growing.</strong><small>Your generosity helps bring young hearts together around the Quran.<span class="donation-message">Help us create more moments of reflection, connection, and good company.</span><span class="donation-signoff">Every little contribution matters.</span></small></span>
+          <span class="donation-cta">DM to donate <span aria-hidden="true">&#8599;</span></span>
+        </a>
+      </aside>
+    `;
+  }
+
+  function footer() {
+    return `
       <footer class="footer">
         <div class="container">
           <div class="footer-grid">
@@ -1037,8 +1047,44 @@
     }
   }
 
+  function bindConversationSparkles() {
+    const section = document.getElementById('why');
+    const layer = section?.querySelector('.conversation-sparkles');
+    if (!layer) return;
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let lastSparkle = 0;
+    section.addEventListener('pointermove', (event) => {
+      if (event.pointerType !== 'mouse' || reducedMotion.matches) return;
+      const now = performance.now();
+      if (now - lastSparkle < 55) return;
+      lastSparkle = now;
+      const bounds = section.getBoundingClientRect();
+      for (let index = 0; index < 2; index += 1) {
+        if (layer.childElementCount >= 32) break;
+        const sparkle = document.createElement('span');
+        const size = index ? 3 + Math.random() * 3 : 8 + Math.random() * 7;
+        sparkle.className = index ? 'conversation-sparkle is-dust' : 'conversation-sparkle';
+        sparkle.style.left = `${event.clientX - bounds.left + (Math.random() - .5) * 38}px`;
+        sparkle.style.top = `${event.clientY - bounds.top + (Math.random() - .5) * 38}px`;
+        sparkle.style.width = `${size}px`;
+        sparkle.style.height = `${size}px`;
+        sparkle.style.color = Math.random() > .5 ? '#f4d7a1' : '#d5f1ff';
+        layer.appendChild(sparkle);
+        const driftX = (Math.random() - .5) * 50;
+        const driftY = -18 - Math.random() * 36;
+        const animation = sparkle.animate([
+          { opacity: 0, transform: 'translate(-50%, -50%) scale(.25) rotate(0deg)', offset: 0 },
+          { opacity: .9, transform: 'translate(-50%, -50%) scale(1) rotate(20deg)', offset: .2 },
+          { opacity: 0, transform: `translate(calc(-50% + ${driftX}px), calc(-50% + ${driftY}px)) scale(.1) rotate(80deg)`, offset: 1 },
+        ], { duration: 750 + Math.random() * 450, easing: 'ease-out' });
+        animation.onfinish = () => sparkle.remove();
+      }
+    }, { passive: true });
+  }
+
   function bindPublic() {
     bindBookmark();
+    bindConversationSparkles();
     const quranSearch = document.getElementById('quranSearch');
     if (quranSearch) {
       const normalizeSearch = (value) => value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9\u0600-\u06ff]/g, '');
