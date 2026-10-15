@@ -1709,6 +1709,7 @@ h3 {
   line-height: 1.2;
 }
 
+.recap-takeaways-heading { margin: 24px 0 12px; color: var(--blue); font-size: 1.4rem; font-weight: 700; }
 .recap-points { padding-left: 1.6em; }
 .recap-points li { padding-left: .3em; margin-bottom: .75em; }
 .recap-points li::marker { color: var(--blue); font-weight: 600; }
