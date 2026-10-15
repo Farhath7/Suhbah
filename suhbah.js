@@ -8,6 +8,8 @@
   let countdownTimer;
   let registrationEventId = '';
   let renderedPath = window.location.pathname;
+  let donationCollapsed = false;
+  try { donationCollapsed = localStorage.getItem('suhbah-donation-collapsed') === 'true'; } catch {}
 
   async function api(path, options = {}) {
     const response = await fetch(path, {
@@ -803,8 +805,9 @@
     const donationContact = db.socialLinks.instagram || db.socialLinks.whatsapp;
     if (!donationContact) return '';
     return `
-      <aside class="donation-banner" aria-label="Support Suhbah">
-        <a class="donation-button" href="${html(donationContact)}" target="_blank" rel="noopener noreferrer" aria-label="Support Suhbah - ${db.socialLinks.instagram ? 'DM us on Instagram' : 'message us'} to donate (opens in a new tab)">
+      <aside class="donation-banner${donationCollapsed ? ' is-collapsed' : ''}" aria-label="Support Suhbah">
+        <button class="donation-toggle" type="button" aria-expanded="${!donationCollapsed}" aria-controls="donationCard" aria-label="${donationCollapsed ? 'Show donation banner' : 'Hide donation banner'}"><span>Support Suhbah</span><span class="donation-toggle-action">${donationCollapsed ? 'Show' : 'Hide'}</span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m4 6 4 4 4-4" /></svg></button>
+        <a id="donationCard" class="donation-button" ${donationCollapsed ? 'inert' : ''} href="${html(donationContact)}" target="_blank" rel="noopener noreferrer" aria-label="Support Suhbah - ${db.socialLinks.instagram ? 'DM us on Instagram' : 'message us'} to donate (opens in a new tab)">
           <span class="donation-heart" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z" /></svg></span>
           <span class="donation-label"><strong>Keep Suhbah growing.</strong><small>Your generosity helps bring young hearts together around the Quran.<span class="donation-message">Help us create more moments of reflection, connection, and good company.</span><span class="donation-signoff">Every little contribution matters.</span></small></span>
           <span class="donation-cta">DM to donate <span aria-hidden="true">&#8599;</span></span>
@@ -998,6 +1001,16 @@
   function bindCommon() {
     navigationController?.abort();
     navigationController = new AbortController();
+    const donationToggle = document.querySelector('.donation-toggle');
+    donationToggle?.addEventListener('click', () => {
+      donationCollapsed = !donationCollapsed;
+      document.querySelector('.donation-banner').classList.toggle('is-collapsed', donationCollapsed);
+      donationToggle.setAttribute('aria-expanded', String(!donationCollapsed));
+      donationToggle.setAttribute('aria-label', donationCollapsed ? 'Show donation banner' : 'Hide donation banner');
+      donationToggle.querySelector('.donation-toggle-action').textContent = donationCollapsed ? 'Show' : 'Hide';
+      document.getElementById('donationCard').inert = donationCollapsed;
+      try { localStorage.setItem('suhbah-donation-collapsed', String(donationCollapsed)); } catch {}
+    });
     const resources = document.querySelector('.nav-resources');
     document.addEventListener('click', (event) => {
       if (resources && !resources.contains(event.target)) resources.open = false;
