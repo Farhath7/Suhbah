@@ -696,6 +696,7 @@
   function openRecap(eventId) {
     const session = db.events.find((event) => event.id === eventId);
     if (!session) return;
+    const recapPoints = (session.recap || session.description || '').split(/\r?\n/).map((point) => point.trim()).filter(Boolean);
     document.querySelector('.recap-overlay')?.remove();
     document.body.classList.add('modal-open');
     document.body.insertAdjacentHTML(
@@ -709,7 +710,7 @@
               <div><span class="event-kicker">${html(session.number)}</span><h2 id="recapTitle">${html(session.theme)}</h2></div>
             </div>
             <p class="recap-meta">${html(dateLabel(session.date))} · ${html(session.time)} · ${html(session.location)}</p>
-            <p class="lead">${html(session.recap || session.description)}</p>
+            ${recapPoints.length > 1 ? `<ol class="lead recap-points">${recapPoints.map((point) => `<li>${html(point)}</li>`).join('')}</ol>` : `<p class="lead">${html(recapPoints[0] || '')}</p>`}
             ${session.speechLink ? `<a class="button secondary" href="${html(session.speechLink)}" target="_blank" rel="noreferrer">Open full session</a>` : ''}
           </section>
         </div>
@@ -907,7 +908,7 @@
             ${adminSelect('Status', 'status', active?.status || 'upcoming', ['upcoming', 'past'])}
             ${adminSelect('Registration status', 'registrationStatus', active?.registrationStatus || 'Open', ['Open', 'Waitlist', 'Closed'])}
             <label class="field"><span>Description</span><textarea name="description" required>${html(active?.description || '')}</textarea></label>
-            <label class="field"><span>Recap summary</span><textarea name="recap" rows="5" aria-describedby="recapHelp">${html(active?.recap || '')}</textarea><small class="muted" id="recapHelp">Shown in View Recap for past gatherings. Leave blank to use the event description.</small></label>
+            <label class="field"><span>Recap summary</span><textarea name="recap" rows="5" aria-describedby="recapHelp">${html(active?.recap || '')}</textarea><small class="muted" id="recapHelp">Shown in View Recap for past gatherings. Put each point on a new line to show a numbered list. Leave blank to use the event description.</small></label>
             <div class="admin-form-actions"><button class="button primary" type="submit">${active ? 'Save changes' : 'Create event'}</button>${active ? '<button class="button secondary" type="button" id="cancelEventEdit">Cancel editing</button>' : ''}</div>
           </div>
         </form>
