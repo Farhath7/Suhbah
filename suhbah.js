@@ -710,7 +710,7 @@
               <div><span class="event-kicker">${html(session.number)}</span><h2 id="recapTitle">${html(session.theme)}</h2></div>
             </div>
             <p class="recap-meta">${html(dateLabel(session.date))} · ${html(session.time)} · ${html(session.location)}</p>
-            ${recapPoints.length > 1 ? `<h3 class="recap-takeaways-heading">Key takeaways</h3><ol class="lead recap-points">${recapPoints.map((point) => `<li>${html(point)}</li>`).join('')}</ol>` : `<p class="lead">${html(recapPoints[0] || '')}</p>`}
+            ${recapPoints.length > 1 ? `<h3 class="recap-takeaways-heading">Key takeaways</h3><ol class="lead recap-points">${recapPoints.map((point) => `<li>${html(point)}</li>`).join('')}</ol><p class="recap-reflection">Which one will you put into practice this week?</p>` : `<p class="lead">${html(recapPoints[0] || '')}</p>`}
             ${session.speechLink ? `<a class="button secondary" href="${html(session.speechLink)}" target="_blank" rel="noreferrer">Open full session</a>` : ''}
           </section>
         </div>

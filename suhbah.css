@@ -1713,6 +1713,7 @@ h3 {
 .recap-points { padding-left: 1.6em; }
 .recap-points li { padding-left: .3em; margin-bottom: .75em; }
 .recap-points li::marker { color: var(--blue); font-weight: 600; }
+.recap-reflection { margin: 20px 0; padding: 18px 20px; border-left: 3px solid var(--blue); border-radius: 0 8px 8px 0; background: var(--cream); color: var(--navy); font-family: var(--font-display); font-size: clamp(1.15rem, 3.5vw, 1.4rem); font-style: italic; font-weight: 600; line-height: 1.3; text-align: center; text-wrap: balance; }
 
 .recap-meta {
   color: var(--blue);
