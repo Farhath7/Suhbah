@@ -904,6 +904,7 @@
             ${adminSelect('Status', 'status', active?.status || 'upcoming', ['upcoming', 'past'])}
             ${adminSelect('Registration status', 'registrationStatus', active?.registrationStatus || 'Open', ['Open', 'Waitlist', 'Closed'])}
             <label class="field"><span>Description</span><textarea name="description" required>${html(active?.description || '')}</textarea></label>
+            <label class="field"><span>Recap summary</span><textarea name="recap" rows="5" aria-describedby="recapHelp">${html(active?.recap || '')}</textarea><small class="muted" id="recapHelp">Shown in View Recap for past gatherings. Leave blank to use the event description.</small></label>
             <div class="admin-form-actions"><button class="button primary" type="submit">${active ? 'Save changes' : 'Create event'}</button>${active ? '<button class="button secondary" type="button" id="cancelEventEdit">Cancel editing</button>' : ''}</div>
           </div>
         </form>
