@@ -2799,7 +2799,7 @@ td {
   .hero-grid {
     grid-template-columns: minmax(0, 1fr) minmax(460px, 1.08fr);
     gap: 52px;
-    align-items: center;
+    align-items: start;
   }
 
   .hero-copy {
