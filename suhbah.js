@@ -180,6 +180,7 @@
           <h2>Make it yours</h2>
           <fieldset class="bookmark-templates"><legend>Choose your template</legend>
             <label><input type="radio" name="bookmarkTemplate" value="palestine" checked /><span class="bookmark-template-card"><span class="bookmark-swatch bookmark-swatch-palestine"></span>Palestine</span></label>
+            <label><input type="radio" name="bookmarkTemplate" value="palestine-olives" /><span class="bookmark-template-card"><span class="bookmark-swatch bookmark-swatch-palestine-olives"></span>Palestine &amp; olives</span></label>
             <label><input type="radio" name="bookmarkTemplate" value="heritage" /><span class="bookmark-template-card"><span class="bookmark-swatch bookmark-swatch-heritage"></span>Olive &amp; heritage</span></label>
             <label><input type="radio" name="bookmarkTemplate" value="jerusalem" /><span class="bookmark-template-card"><span class="bookmark-swatch bookmark-swatch-jerusalem"></span>Jerusalem stories</span></label>
             <label><input type="radio" name="bookmarkTemplate" value="watermelon" /><span class="bookmark-template-card"><span class="bookmark-swatch bookmark-swatch-watermelon"></span>Watermelon &amp; keffiyeh</span></label>
@@ -214,6 +215,7 @@
     const context = canvas.getContext('2d');
     const templates = {
       palestine: { title: 'Palestine', color: '#762f2c', image: '/assets/bookmark-palestine.jpg' },
+      'palestine-olives': { title: 'Palestine & olives', color: '#3f593e', image: '/assets/bookmark-palestine-olives.jpg', namePlacement: { x: 0.5, y: 0.228, rotation: 0, maxWidth: 0.74, sizeScale: 0.5 } },
       heritage: { title: 'Olive & heritage', color: '#3f593e', image: '/assets/bookmark-olive-heritage.png' },
       jerusalem: { title: 'Jerusalem stories', color: '#762f2c', image: '/assets/bookmark-jerusalem-stories.png' },
       watermelon: { title: 'Watermelon & keffiyeh', color: '#762f2c', image: '/assets/bookmark-watermelon-keffiyeh.png' },
@@ -292,10 +294,14 @@
       const template = form.elements.bookmarkTemplate.value;
       if (template !== selectedTemplate) { color.value = templates[template].color; selectedTemplate = template; }
       const artwork = artworks[template];
+      const placement = templates[template].namePlacement;
       const imageTemplate = Boolean(templates[template].image);
       const ready = !imageTemplate || Boolean(artwork?.naturalWidth);
       document.getElementById('bookmarkTemplateLabel').textContent = templates[template].title;
       document.getElementById('bookmarkSizeValue').value = size.value;
+      document.getElementById('bookmarkHint').textContent = placement
+        ? 'Type or paste your Arabic name. It sits in the white space above the illustration.'
+        : 'Type or paste your Arabic name. It runs vertically through the design.';
       const text = name.value.trim();
       const valid = text.length > 0 && arabicLetters.test(text) && /^[\p{Script_Extensions=Arabic}\s\-]+$/u.test(text);
       name.setCustomValidity(text && !valid ? 'Please enter your name using Arabic letters.' : '');
@@ -315,16 +321,17 @@
       context.textBaseline = 'middle';
       context.fillStyle = color.value;
       const label = text || 'اسمك هنا';
-      let pixels = Number(size.value) * canvas.width / 487;
+      let pixels = Number(size.value) * canvas.width / 487 * (placement?.sizeScale || 1);
+      const maxNameWidth = placement ? canvas.width * placement.maxWidth : canvas.height * 0.48;
       const family = font.value === 'serif' ? '"Times New Roman", serif' : 'Tahoma, Arial, sans-serif';
       context.font = `${pixels}px ${family}`;
-      while (context.measureText(label).width > canvas.height * 0.48 && pixels > 6) {
+      while (context.measureText(label).width > maxNameWidth && pixels > 6) {
         pixels -= 1;
         context.font = `${pixels}px ${family}`;
       }
       context.save();
-      context.translate(canvas.width * (imageTemplate ? 0.30 : 0.50), canvas.height * (imageTemplate ? 0.48 : 0.50));
-      context.rotate(-Math.PI / 2);
+      context.translate(canvas.width * (placement?.x ?? (imageTemplate ? 0.30 : 0.50)), canvas.height * (placement?.y ?? (imageTemplate ? 0.48 : 0.50)));
+      context.rotate(placement?.rotation ?? -Math.PI / 2);
       context.fillText(label, 0, 0);
       context.restore();
       canvas.setAttribute('aria-label', text ? `Bookmark preview for ${text}` : 'Bookmark preview with a sample Arabic name');

@@ -33,6 +33,7 @@
 .bookmark-templates input:focus-visible + .bookmark-template-card { outline: 3px solid var(--blue); outline-offset: 3px; }
 .bookmark-swatch { width: 25px; height: 58px; border-radius: 3px; flex-shrink: 0; }
 .bookmark-swatch-palestine { background: url('/assets/bookmark-palestine.jpg') center / cover; }
+.bookmark-swatch-palestine-olives { background: url('/assets/bookmark-palestine-olives.jpg') center / cover; }
 .bookmark-swatch-heritage { background: url('/assets/bookmark-olive-heritage.png') center / cover; }
 .bookmark-swatch-jerusalem { background: url('/assets/bookmark-jerusalem-stories.png') center / cover; }
 .bookmark-swatch-watermelon { background: url('/assets/bookmark-watermelon-keffiyeh.png') center / cover; }
