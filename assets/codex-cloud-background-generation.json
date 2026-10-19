@@ -1,0 +1,6 @@
+{
+  "tool": "built-in image_gen",
+  "reference": "D:/HONOR Share/Screenshot/capture_20261014143153454.bmp",
+  "asset": "assets/codex-cloud-background.webp",
+  "prompt": "Use case: precise-object-edit. Edit target: provided screenshot. Extract the EXACT background as a clean website background asset, wide landscape same framing. Remove ALL interface foreground: ChatGPT logo, entire navigation and buttons, central logo, headline, subtitle, CTA, Trusted by text and all partner logos, large white application window at bottom, scrollbar at right. Inpaint those removed areas with continuous matching background. Preserve the existing background composition and colors exactly: saturated periwinkle blue in top left, lavender purple top right, huge luminous soft white wispy cloud sweeping diagonally from bottom left to upper center, delicate feathery texture in that diagonal white cloud, soft bluish silhouette at lower left and pale white lavender fade at bottom. No new objects, no text, no logos, no UI. Keep the original cloud shapes, colors, soft focus and lighting outside removed areas unchanged. This is only the clean cloud background."
+}
