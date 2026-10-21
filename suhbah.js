@@ -577,8 +577,10 @@
   function eventCard(event) {
     if (!event) return '<article class="event-card fade-in"><div class="event-card-body"><h2>The next Suhbah is coming soon.</h2><p class="lead">Watch this space for our next gathering.</p></div></article>';
     return `
-      <article class="event-card fade-in" aria-label="Upcoming Suhbah event">
-        <div class="event-card-media" ${mediaStyle(event.image || '/assets/suhbah-quran.jpg')}>${registrationStatus(event.registrationStatus)}</div>
+      <article class="event-card fade-in" id="upcoming-banner" aria-label="Upcoming Suhbah event">
+        <div class="event-card-media" ${mediaStyle(event.image || '/assets/suhbah-quran.jpg')}>
+          ${registrationStatus(event.registrationStatus)}
+        </div>
         <div class="event-card-body">
           <span class="event-section-label">The Next Suhbah</span>
           <span class="event-kicker">${html(event.number)}</span>
@@ -739,6 +741,23 @@
     return `<article class="testimonial-card fade-in"><p>"${html(item.quote)}"</p><strong>${html(item.name)}</strong></article>`;
   }
 
+  function communityGroupUrl(event) {
+    const link = String(event?.communityGroupLink || '').trim();
+    try {
+      const url = new URL(link);
+      if (!['https:', 'http:'].includes(url.protocol)) return '';
+    } catch {
+      return '';
+    }
+    return link;
+  }
+
+  function communityGroupLink(event) {
+    const link = communityGroupUrl(event);
+    if (!link) return '';
+    return `<div class="community-group-link"><p class="muted">Join the community group for ${html(event.number)} for updates and reminders.</p><a class="button secondary" href="${html(link)}" target="_blank" rel="noopener noreferrer">Join this Suhbah's community group</a></div>`;
+  }
+
   function registrationForm(event) {
     if (!registrationIsOpen(event)) return `<div class="form-panel"><h2>Registrations closed</h2><p class="lead">Registration for ${html(event.number)}: ${html(event.theme)} is closed.</p><a class="button secondary" href="/#events">See other Suhbahs</a></div>`;
     const waitlist = event.registrationStatus === 'Waitlist';
@@ -800,6 +819,7 @@
           </label>
           <label class="field"><span>Optional message</span><textarea name="message" placeholder="Anything you want us to know?"></textarea></label>
           <button class="button primary" type="submit">${waitlist ? 'Join Waitlist' : 'Reserve My Spot'}</button>
+          ${communityGroupUrl(event) ? '<p class="muted">After registration, you will be taken to WhatsApp. Tap Join to join this Suhbah\'s community group.</p>' : ''}
         </div>
       </form>
     `;
@@ -909,6 +929,7 @@
             ${adminInput('Time', 'time', active?.time)}
             ${adminInput('Location', 'location', active?.location)}
             ${adminInput('Speaker', 'speaker', active?.speaker, 'text', false)}
+            <label class="field"><span>Community group link</span><input name="communityGroupLink" type="url" pattern="https?://.*" value="${html(active?.communityGroupLink || '')}" placeholder="https://chat.whatsapp.com/..." aria-describedby="communityGroupHelp" /><small class="muted" id="communityGroupHelp">The group for this month's Suhbah. Registration opens this invite so attendees can join on WhatsApp.</small></label>
             <label class="field"><span>Upload image</span><input name="imageFile" type="file" accept="image/*" /></label>
             <label class="field"><span>Upload full speech PDF</span><input name="speechPdfFile" type="file" accept="application/pdf,.pdf" /></label>
             ${adminInput('Full speech PDF link', 'speechLink', active?.speechLink, 'text', false)}
@@ -1167,11 +1188,14 @@
             <div>
               <h3>${waitlist ? "You're on the waitlist." : "You're in."}</h3>
               <p class="lead">${waitlist ? 'You joined the waitlist for' : 'Your spot is reserved for'} ${html(registration.eventNumber)}: ${html(registration.eventTheme)}.${waitlist ? ' We will contact you if a spot opens.' : ' We look forward to seeing you there.'}</p>
+              ${communityGroupLink(db.events.find((item) => item.id === registration.eventId))}
               <a class="button secondary" href="/">Back to Suhbah</a>
             </div>
           </div>
         `;
         reveal();
+        const groupUrl = communityGroupUrl(db.events.find((item) => item.id === registration.eventId));
+        if (groupUrl) window.location.assign(groupUrl);
       } catch (error) {
         button.disabled = false;
         button.textContent = originalLabel;

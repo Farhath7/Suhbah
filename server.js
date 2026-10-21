@@ -3,6 +3,11 @@ const fs = require('fs');
 const http = require('http');
 const path = require('path');
 const { URL } = require('url');
+const { createConfirmationSender } = require('./registration-email');
+
+const envPath = path.join(__dirname, '.env');
+if (fs.existsSync(envPath)) process.loadEnvFile(envPath);
+const sendConfirmation = createConfirmationSender();
 
 const PORT = Number(process.env.PORT || 4173);
 const ROOT = __dirname;
@@ -351,6 +356,10 @@ async function handleApi(req, res, url) {
       sendJson(res, 400, { error: 'Missing required registration fields' });
       return;
     }
+    if (typeof body.email !== 'string' || !/^[^\s@,;<>]+@[^\s@,;<>]+\.[^\s@,;<>]+$/.test(body.email.trim())) {
+      sendJson(res, 400, { error: 'Please enter a valid email address.' });
+      return;
+    }
     const registration = {
       id: uid('reg'),
       eventId: body.eventId,
@@ -358,7 +367,7 @@ async function handleApi(req, res, url) {
       eventTheme: event.theme,
       registrationStatus: event.registrationStatus,
       name: body.name,
-      email: body.email,
+      email: body.email.trim(),
       phone: body.phone,
       age: body.age,
       gender: body.gender,
@@ -368,10 +377,31 @@ async function handleApi(req, res, url) {
       source: body.source,
       message: body.message || '',
       createdAt: new Date().toISOString(),
+      confirmationEmailStatus: sendConfirmation ? 'pending' : 'not_configured',
     };
     db.registrations.unshift(registration);
     writeDb(db);
     sendJson(res, 201, { registration });
+    if (sendConfirmation) {
+      // Email delivery must never prevent a saved registration or the WhatsApp redirect.
+      void (async () => {
+        let status;
+        try {
+          await sendConfirmation(registration, event);
+          status = 'sent';
+        } catch {
+          status = 'failed';
+          console.warn(`Confirmation email failed for registration ${registration.id}`);
+        }
+        const latest = readDb();
+        const saved = latest.registrations.find((item) => item.id === registration.id);
+        if (saved) {
+          saved.confirmationEmailStatus = status;
+          saved.confirmationEmailUpdatedAt = new Date().toISOString();
+          writeDb(latest);
+        }
+      })().catch(() => console.warn(`Could not record confirmation email status for ${registration.id}`));
+    }
     return;
   }
 
@@ -490,4 +520,5 @@ const server = http.createServer(async (req, res) => {
 ensureDb();
 server.listen(PORT, () => {
   console.log(`Suhbah running at http://localhost:${PORT}`);
+  if (!sendConfirmation) console.log('Confirmation emails are disabled until GMAIL_APP_PASSWORD is configured.');
 });

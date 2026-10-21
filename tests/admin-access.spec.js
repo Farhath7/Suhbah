@@ -11,7 +11,7 @@ test('public navigation hides admin and dashboard access requires an admin sessi
   const temporaryRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'suhbah-admin-test-'));
   let server;
   try {
-    for (const file of ['server.js', 'index.html', 'suhbah.js', 'suhbah.css', 'quran-library.js']) {
+    for (const file of ['server.js', 'registration-email.js', 'index.html', 'suhbah.js', 'suhbah.css', 'quran-library.js']) {
       fs.copyFileSync(path.join(root, file), path.join(temporaryRoot, file));
     }
     fs.mkdirSync(path.join(temporaryRoot, 'data'));
@@ -37,7 +37,7 @@ test('public navigation hides admin and dashboard access requires an admin sessi
     });
     server = spawn(process.execPath, ['server.js'], {
       cwd: temporaryRoot,
-      env: { ...process.env, PORT: String(port), ADMIN_EMAIL: email, ADMIN_PASSWORD: password },
+      env: { ...process.env, GMAIL_APP_PASSWORD: '', PORT: String(port), ADMIN_EMAIL: email, ADMIN_PASSWORD: password },
       windowsHide: true,
       stdio: ['ignore', 'pipe', 'pipe'],
     });
@@ -81,9 +81,12 @@ test('public navigation hides admin and dashboard access requires an admin sessi
     await page.locator('[data-edit-event="test-event"]').click();
     await expect(page.locator('[name="theme"]')).toHaveValue('Finding Your Way Back');
     await page.locator('[name="theme"]').fill('Finding Your Way Back - updated');
+    const communityGroupLink = 'https://chat.whatsapp.com/test-monthly-group';
+    await page.locator('[name="communityGroupLink"]').fill(communityGroupLink);
     await page.getByRole('button', { name: 'Save changes', exact: true }).click();
     await expect(page.locator('.admin-event-card').first()).toContainText('Finding Your Way Back - updated');
     await page.locator('[data-edit-event="test-event"]').click();
+    await expect(page.locator('[name="communityGroupLink"]')).toHaveValue(communityGroupLink);
     await page.getByRole('button', { name: 'Cancel editing', exact: true }).click();
     await expect(page.locator('[name="theme"]')).toHaveValue('');
     for (const tab of ['registrations', 'testimonials', 'statistics', 'social', 'events']) {
@@ -104,6 +107,31 @@ test('public navigation hides admin and dashboard access requires an admin sessi
     await page.locator('#logoutButton').click();
     await expect(page.locator('#loginForm')).toBeVisible();
     expect((await page.request.get(`${base}/api/admin`)).status()).toBe(401);
+    await page.goto(`${base}/register/test-event`);
+    await expect(page.locator('#registrationForm')).toContainText('After registration, you will be taken to WhatsApp.');
+    await expect(page.locator('#registrationForm .community-group-link')).toHaveCount(0);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+    for (const [name, value] of Object.entries({ name: 'Test Attendee', email: 'attendee@example.test', phone: '9876543210', age: '23' })) {
+      await page.locator(`#registrationForm [name="${name}"]`).fill(value);
+    }
+    for (const [name, value] of Object.entries({ gender: 'Female', profile: 'Student', attendedBefore: 'No', receivedQuran: 'Not applicable', source: 'WhatsApp' })) {
+      await page.locator(`#registrationForm [name="${name}"]`).selectOption(value);
+    }
+    await page.route('**/api/registrations', (route) => route.fulfill({ status: 500, contentType: 'application/json', body: JSON.stringify({ error: 'Please try again.' }) }));
+    await page.getByRole('button', { name: 'Reserve My Spot', exact: true }).click();
+    await expect(page.locator('#registrationForm [role="alert"]')).toHaveText('Please try again.');
+    await expect(page).toHaveURL(`${base}/register/test-event`);
+    await page.unroute('**/api/registrations');
+    // Keep the browser local while verifying the exact external invite destination.
+    await page.route(communityGroupLink, (route) => route.fulfill({ contentType: 'text/html', body: '<h1>WhatsApp group invite</h1>' }));
+    await page.getByRole('button', { name: 'Reserve My Spot', exact: true }).click();
+    await expect(page).toHaveURL(communityGroupLink);
+    const savedDb = JSON.parse(fs.readFileSync(path.join(temporaryRoot, 'data', 'suhbah-db.json'), 'utf8'));
+    expect(savedDb.registrations).toHaveLength(1);
+    expect(savedDb.registrations[0]).toMatchObject({ eventId: 'test-event', email: 'attendee@example.test' });
+    expect(savedDb.registrations[0].confirmationEmailStatus).toBe('not_configured');
+    await page.goto(`${base}/register/past-event`);
+    await expect(page.locator('#registrationMount .community-group-link')).toHaveCount(0);
   } finally {
     if (server && server.exitCode === null) {
       await new Promise((resolve) => { server.once('exit', resolve); server.kill(); });

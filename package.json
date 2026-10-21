@@ -3,6 +3,7 @@
     "start": "node server.js"
   },
   "dependencies": {
+    "nodemailer": "^10.1.7",
     "playwright": "^1.57.0"
   }
 }

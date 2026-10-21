@@ -10,7 +10,7 @@ test('Arabic bookmark templates download the exact preview and work on mobile', 
   const temporaryRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'suhbah-bookmark-test-'));
   let server;
   try {
-    for (const file of ['server.js', 'index.html', 'suhbah.js', 'suhbah.css', 'quran-library.js']) {
+    for (const file of ['server.js', 'registration-email.js', 'index.html', 'suhbah.js', 'suhbah.css', 'quran-library.js']) {
       fs.copyFileSync(path.join(root, file), path.join(temporaryRoot, file));
     }
     fs.mkdirSync(path.join(temporaryRoot, 'assets'));
@@ -27,7 +27,7 @@ test('Arabic bookmark templates download the exact preview and work on mobile', 
     });
     server = spawn(process.execPath, ['server.js'], {
       cwd: temporaryRoot,
-      env: { ...process.env, PORT: String(port) },
+      env: { ...process.env, GMAIL_APP_PASSWORD: '', PORT: String(port) },
       windowsHide: true,
       stdio: ['ignore', 'pipe', 'pipe'],
     });
