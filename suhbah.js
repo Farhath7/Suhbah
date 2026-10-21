@@ -372,6 +372,11 @@
     });
   }
 
+  function ambientSparkles(count = 90) {
+    const between = (min, max) => min + Math.random() * (max - min);
+    return `<div class="conversation-ambient" aria-hidden="true">${Array.from({ length: count }, (_, index) => `<span class="ambient-sparkle${index % 2 === 0 ? ' is-star' : ''}" style="--spark-x:${between(2, 98)}%;--spark-y:${between(5, 95)}%;--spark-size:${index % 2 === 0 ? between(9, 16) : between(3, 6)}px;--spark-duration:${between(2.2, 4.8)}s;--spark-delay:-${between(0, 10)}s;--drift-x:${between(-45, 45)}px;--drift-y:${between(-45, 45)}px;--bend-x:${between(-28, 28)}px;--bend-y:${between(-28, 28)}px"></span>`).join('')}</div>`;
+  }
+
   function publicMain() {
     const event = upcomingEvent();
     const past = db.events.filter((item) => item.status === 'past').slice(0, 4);
@@ -417,7 +422,7 @@
           </div>
         </section>
         <section class="section navy" id="why">
-          <div class="conversation-ambient" aria-hidden="true">${Array.from({ length: 14 }, (_, index) => `<span class="ambient-sparkle${index % 3 === 0 ? ' is-star' : ''}" style="--spark-x:${6 + (index * 29) % 89}%;--spark-y:${10 + (index * 17) % 78}%;--spark-size:${index % 3 === 0 ? 7 : 3}px;--spark-duration:${6 + index % 5}s;--spark-delay:-${index * 1.7}s"></span>`).join('')}</div>
+          ${ambientSparkles()}
           <div class="conversation-sparkles" aria-hidden="true"></div>
           <div class="container conversation-panel fade-in">
             <div class="conversation-copy">
@@ -531,6 +536,8 @@
     if (!events.length) return '';
     return `<div class="section-head fade-in"><h2>Upcoming Suhbahs</h2><p class="lead">Choose your gathering to view its registration.</p></div>
       <div class="upcoming-registration-grid">${events.map((event) => `<article class="admin-card upcoming-registration-card fade-in">
+        <div class="galaxy-backdrop" aria-hidden="true">${Array.from({ length: 110 }, () => `<i style="left:${Math.random() * 100}%;top:${Math.random() * 100}%;--star-size:${.7 + Math.random() * 1.5}px;--twinkle-time:${2 + Math.random() * 4}s;--twinkle-delay:-${Math.random() * 8}s"></i>`).join('')}</div>
+        ${ambientSparkles(42)}
         <span class="event-kicker">${html(event.number)} · ${html(event.registrationStatus)}</span>
         <h3>${html(event.theme)}</h3><p class="muted">${html(dateLabel(event.date))} · ${html(event.time)} · ${html(event.location)}</p>
         <a class="button secondary" href="${registrationUrl(event)}" data-route>${registrationIsOpen(event) ? (event.registrationStatus === 'Waitlist' ? 'Join Waitlist' : 'Register for this Suhbah') : 'View Suhbah'}</a>
@@ -851,7 +858,7 @@
           <div class="footer-grid">
             <div><a class="brand footer-brand" href="/" data-route><img class="brand-logo" src="/assets/suhbah-logo.png" alt="Suhbah" /></a><p>Reconnecting young people with the Quran, one gathering at a time.</p></div>
             <div><h3>Links</h3><div class="footer-links"><a href="${homeAnchor('#home')}">Home</a><a href="${homeAnchor('#about')}">About</a><a href="${homeAnchor('#events')}">Events</a><a href="${homeAnchor('#community')}">Community</a></div></div>
-            <div><h3>Social</h3><div class="social-links"><a href="${html(db.socialLinks.instagram)}" target="_blank" rel="noreferrer">Instagram</a><a href="${html(db.socialLinks.whatsapp)}" target="_blank" rel="noreferrer">WhatsApp</a></div></div>
+            <div><h3>Connect</h3><div class="social-links"><a href="${html(db.socialLinks.instagram)}" target="_blank" rel="noreferrer">Instagram</a><a href="${html(db.socialLinks.whatsapp)}" target="_blank" rel="noreferrer">WhatsApp</a></div><div class="footer-email"><a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=suhbah.connect%40gmail.com" target="_blank" rel="noopener noreferrer">Write to us<span class="footer-email-address">suhbah.connect@gmail.com</span></a></div></div>
           </div>
           <div class="footer-bottom">© 2026 Suhbah. All rights reserved.</div>
         </div>
@@ -1099,27 +1106,27 @@
     section.addEventListener('pointermove', (event) => {
       if (event.pointerType !== 'mouse' || reducedMotion.matches) return;
       const now = performance.now();
-      if (now - lastSparkle < 55) return;
+      if (now - lastSparkle < 24) return;
       lastSparkle = now;
       const bounds = section.getBoundingClientRect();
-      for (let index = 0; index < 2; index += 1) {
-        if (layer.childElementCount >= 32) break;
+      for (let index = 0; index < 5; index += 1) {
+        if (layer.childElementCount >= 140) break;
         const sparkle = document.createElement('span');
-        const size = index ? 3 + Math.random() * 3 : 8 + Math.random() * 7;
+        const size = index ? 4 + Math.random() * 4 : 12 + Math.random() * 9;
         sparkle.className = index ? 'conversation-sparkle is-dust' : 'conversation-sparkle';
         sparkle.style.left = `${event.clientX - bounds.left + (Math.random() - .5) * 38}px`;
         sparkle.style.top = `${event.clientY - bounds.top + (Math.random() - .5) * 38}px`;
         sparkle.style.width = `${size}px`;
         sparkle.style.height = `${size}px`;
-        sparkle.style.color = Math.random() > .5 ? '#f4d7a1' : '#d5f1ff';
+        sparkle.style.color = Math.random() > .5 ? '#ffe7b5' : '#effbff';
         layer.appendChild(sparkle);
-        const driftX = (Math.random() - .5) * 50;
-        const driftY = -18 - Math.random() * 36;
+        const driftX = (Math.random() - .5) * 70;
+        const driftY = -28 - Math.random() * 48;
         const animation = sparkle.animate([
           { opacity: 0, transform: 'translate(-50%, -50%) scale(.25) rotate(0deg)', offset: 0 },
-          { opacity: .9, transform: 'translate(-50%, -50%) scale(1) rotate(20deg)', offset: .2 },
+          { opacity: 1, transform: 'translate(-50%, -50%) scale(1) rotate(20deg)', offset: .2 },
           { opacity: 0, transform: `translate(calc(-50% + ${driftX}px), calc(-50% + ${driftY}px)) scale(.1) rotate(80deg)`, offset: 1 },
-        ], { duration: 750 + Math.random() * 450, easing: 'ease-out' });
+        ], { duration: 550 + Math.random() * 300, easing: 'ease-out' });
         animation.onfinish = () => sparkle.remove();
       }
     }, { passive: true });
