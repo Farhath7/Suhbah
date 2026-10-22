@@ -803,14 +803,15 @@
     const waitlist = event.registrationStatus === 'Waitlist';
     return `
       <form class="form-panel" id="registrationForm" aria-label="Registration for ${html(event.number)}: ${html(event.theme)}">
-        <h2>${waitlist ? 'Join the waitlist' : 'Register'} for ${html(event.number)}</h2>
-        <p class="muted">${html(event.theme)}${waitlist ? ' · We will contact you if a spot opens.' : ''}</p>
-        <div class="form-grid">
+        <header class="registration-form-header"><h2>${waitlist ? 'Join the waitlist' : 'Register'} for ${html(event.number)}</h2>
+        <p class="muted">${html(event.theme)}${waitlist ? ' · We will contact you if a spot opens.' : ''}</p></header>
+        <div class="registration-fields">
           <input type="hidden" name="eventId" value="${html(event.id)}" />
-          ${field('Full Name', 'name', 'text')}
-          ${field('Email', 'email', 'email')}
-          ${field('Phone Number', 'phone', 'tel')}
-          ${field('Age', 'age', 'number')}
+          <fieldset class="registration-field-group"><legend>Your details</legend>
+          <label class="field full-width"><span>Full name</span><input name="name" autocomplete="name" required /></label>
+          <label class="field contact-field"><span>Email</span><input name="email" type="email" autocomplete="email" required /></label>
+          <label class="field contact-field"><span>Phone number</span><input name="phone" type="tel" autocomplete="tel" required /></label>
+          <label class="field"><span>Age</span><input name="age" type="number" inputmode="numeric" required /></label>
           <label class="field">
             <span>Gender</span>
             <select name="gender" required>
@@ -819,8 +820,10 @@
               <option>Male</option>
             </select>
           </label>
-          <label class="field">
-            <span>What describes you the best?</span>
+          </fieldset>
+          <fieldset class="registration-field-group"><legend>A little about you</legend>
+          <label class="field full-width">
+            <span>What best describes you?</span>
             <select name="profile" required>
               <option value="">Select one</option>
               <option>Student</option>
@@ -829,24 +832,19 @@
               <option>Others</option>
             </select>
           </label>
-          <label class="field">
-            <span>Have you attended a previous Suhbah?</span>
-            <select name="attendedBefore" required>
+          <fieldset class="attendance-choice full-width"><legend>Have you attended Suhbah before?</legend>
+            <div class="attendance-options"><label><input type="radio" name="attendedBefore" value="Yes" required /> Yes</label><label><input type="radio" name="attendedBefore" value="No" required /> No, this is my first time</label></div>
+          </fieldset>
+          <label class="field full-width" id="receivedQuranField" hidden>
+            <span>Did you receive a Quran?</span>
+            <select name="receivedQuran">
               <option value="">Select one</option>
               <option>Yes</option>
               <option>No</option>
+              <option selected>Not applicable</option>
             </select>
           </label>
-          <label class="field">
-            <span>If yes, did you receive a Quran?</span>
-            <select name="receivedQuran" required>
-              <option value="">Select one</option>
-              <option>Yes</option>
-              <option>No</option>
-              <option>Not applicable</option>
-            </select>
-          </label>
-          <label class="field">
+          <label class="field full-width">
             <span>How did you hear about Suhbah?</span>
             <select name="source" required>
               <option value="">Select one</option>
@@ -857,7 +855,8 @@
               <option>Other</option>
             </select>
           </label>
-          <label class="field"><span>Optional message</span><textarea name="message" placeholder="Anything you want us to know?"></textarea></label>
+          </fieldset>
+          <details class="registration-message"><summary>Add a message <span>(optional)</span></summary><label class="field"><span>Anything you want us to know?</span><textarea name="message" rows="2"></textarea></label></details>
           <button class="button primary" type="submit">${waitlist ? 'Join Waitlist' : 'Reserve My Spot'}</button>
           ${communityGroupUrl(event) ? '<p class="muted">After registration, you will be taken to the WhatsApp group for this month\'s Suhbah gathering.</p>' : ''}
         </div>
@@ -1211,7 +1210,17 @@
       if (event.key === 'Escape') closeRecap();
     });
 
-    document.getElementById('registrationForm')?.addEventListener('submit', async (event) => {
+    const registrationFormElement = document.getElementById('registrationForm');
+    registrationFormElement?.addEventListener('change', (event) => {
+      if (event.target.name !== 'attendedBefore') return;
+      const attended = registrationFormElement.elements.attendedBefore.value === 'Yes';
+      const question = registrationFormElement.elements.receivedQuran;
+      document.getElementById('receivedQuranField').hidden = !attended;
+      question.required = attended;
+      question.value = attended ? '' : 'Not applicable';
+    });
+
+    registrationFormElement?.addEventListener('submit', async (event) => {
       event.preventDefault();
       const form = event.target;
       const data = formData(form);

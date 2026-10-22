@@ -2451,6 +2451,97 @@ body.modal-open {
   box-shadow: 0 24px 60px rgba(47, 65, 86, 0.12);
 }
 
+#registrationForm { gap: 22px; }
+.registration-form-header h2 {
+  margin-bottom: 8px;
+  font-size: clamp(1.65rem, 2.7vw, 2.2rem);
+  line-height: 1.1;
+  letter-spacing: -.025em;
+}
+.registration-form-header .muted { margin: 0; font-size: 1rem; }
+.registration-fields { display: grid; gap: 18px; }
+.registration-field-group {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 14px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.registration-field-group > legend {
+  width: 100%;
+  margin-bottom: 12px;
+  padding: 0 0 8px;
+  border-bottom: 1px solid rgba(86, 124, 141, .18);
+  color: var(--blue);
+  font-family: var(--font-body);
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+.registration-fields .full-width { grid-column: 1 / -1; }
+.registration-fields .field { min-width: 0; gap: 5px; }
+#registrationForm .field > span,
+.attendance-choice legend {
+  font-family: var(--font-body);
+  font-size: .82rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+#registrationForm .field input,
+#registrationForm .field select,
+#registrationForm .field textarea {
+  min-width: 0;
+  min-height: 44px;
+  padding: 10px 12px;
+  border-radius: 9px;
+  font-family: var(--font-body);
+  font-size: .9rem;
+  font-weight: 400;
+}
+#registrationForm .field textarea { min-height: 76px; }
+#registrationForm [hidden] { display: none; }
+.attendance-choice { min-width: 0; margin: 0; padding: 0; border: 0; }
+.attendance-choice legend {
+  margin-bottom: 7px;
+  padding: 0;
+  color: var(--navy);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+.attendance-options { display: flex; flex-wrap: wrap; gap: 8px; }
+.attendance-options label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 9px 12px;
+  border: 1px solid rgba(86, 124, 141, .34);
+  border-radius: 9px;
+  font-family: var(--font-body);
+  font-size: .82rem;
+  cursor: pointer;
+}
+.attendance-options label:has(input:checked) { background: #edf4f8; border-color: var(--blue); }
+.attendance-options input { accent-color: var(--navy); }
+.registration-message summary { color: var(--blue); font-size: .95rem; cursor: pointer; }
+.registration-message summary span { font-weight: 400; }
+.registration-message[open] summary { margin-bottom: 12px; }
+#registrationForm .registration-fields > .muted {
+  margin: -6px 0 0;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+@media (max-width: 479px) {
+  .registration-fields .contact-field { grid-column: 1 / -1; }
+}
+
 #register .field label,
 #register .field span {
   font-family: var(--font-display);
@@ -3721,7 +3812,7 @@ td {
   display: grid;
   gap: 18px;
   width: 100%;
-  max-width: 480px;
+  max-width: none;
   box-sizing: border-box;
   margin: 22px 0 4px;
   padding: 22px;

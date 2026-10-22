@@ -108,13 +108,23 @@ test('public navigation hides admin and dashboard access requires an admin sessi
     await expect(page.locator('#loginForm')).toBeVisible();
     expect((await page.request.get(`${base}/api/admin`)).status()).toBe(401);
     await page.goto(`${base}/register/test-event`);
-    await expect(page.locator('#registrationForm')).toContainText('After registration, you will be taken to WhatsApp.');
+    await expect(page.locator('#registrationForm')).toContainText("After registration, you will be taken to the WhatsApp group for this month's Suhbah gathering.");
     await expect(page.locator('#registrationForm .community-group-link')).toHaveCount(0);
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
     for (const [name, value] of Object.entries({ name: 'Test Attendee', email: 'attendee@example.test', phone: '9876543210', age: '23' })) {
       await page.locator(`#registrationForm [name="${name}"]`).fill(value);
     }
-    for (const [name, value] of Object.entries({ gender: 'Female', profile: 'Student', attendedBefore: 'No', receivedQuran: 'Not applicable', source: 'WhatsApp' })) {
+    await expect(page.locator('#receivedQuranField')).toBeHidden();
+    await page.locator('[name="attendedBefore"][value="Yes"]').check();
+    await expect(page.locator('#receivedQuranField')).toBeVisible();
+    await expect(page.locator('[name="receivedQuran"]')).toHaveAttribute('required', '');
+    await expect(page.locator('[name="receivedQuran"]')).toHaveValue('');
+    await page.locator('[name="receivedQuran"]').selectOption('Yes');
+    await page.locator('[name="attendedBefore"][value="No"]').check();
+    await expect(page.locator('#receivedQuranField')).toBeHidden();
+    await expect(page.locator('[name="receivedQuran"]')).toHaveValue('Not applicable');
+    await expect(page.locator('[name="receivedQuran"]')).not.toHaveAttribute('required');
+    for (const [name, value] of Object.entries({ gender: 'Female', profile: 'Student', source: 'WhatsApp' })) {
       await page.locator(`#registrationForm [name="${name}"]`).selectOption(value);
     }
     await page.route('**/api/registrations', (route) => route.fulfill({ status: 500, contentType: 'application/json', body: JSON.stringify({ error: 'Please try again.' }) }));
