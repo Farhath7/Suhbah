@@ -772,10 +772,10 @@ h3 {
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, .95);
   border-radius: 28px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, .25), transparent 26% 65%, rgba(191, 218, 245, .12)), rgba(237, 246, 255, .025);
-  box-shadow: 0 26px 70px rgba(47, 65, 86, .19), 0 3px 12px rgba(47, 65, 86, .08), inset 0 3px 3px rgba(255, 255, 255, .95), inset 3px 0 7px rgba(255, 255, 255, .8), inset -3px -3px 8px rgba(111, 154, 186, .25), inset 0 0 0 6px rgba(255, 255, 255, .13);
-  backdrop-filter: blur(5px) saturate(175%);
-  -webkit-backdrop-filter: blur(5px) saturate(175%);
+  background: linear-gradient(135deg, rgba(255, 255, 255, .32), transparent 30% 65%, rgba(191, 218, 245, .14)), rgba(237, 246, 255, .08);
+  box-shadow: 0 24px 60px rgba(47, 65, 86, .14), inset 0 2px 2px rgba(255, 255, 255, .95), inset 2px 0 5px rgba(255, 255, 255, .7), inset -2px -2px 5px rgba(111, 154, 186, .2), inset 0 0 0 5px rgba(255, 255, 255, .1);
+  backdrop-filter: blur(18px) saturate(135%);
+  -webkit-backdrop-filter: blur(18px) saturate(135%);
   transform: perspective(1200px) rotateX(.8deg) rotateY(-1.1deg) translateZ(0);
 }
 
@@ -987,22 +987,78 @@ h3 {
 }
 
 .event-card .meta-item {
-  background: linear-gradient(135deg, rgba(255, 255, 255, .27), rgba(255, 255, 255, .04));
+  background: linear-gradient(135deg, rgba(255, 255, 255, .18), rgba(255, 255, 255, .025));
   border-color: rgba(255, 255, 255, .85);
   box-shadow: inset 1px 1px 2px rgba(255, 255, 255, .8), inset -1px -1px 3px rgba(97, 140, 175, .12), 0 5px 14px rgba(47, 65, 86, .05);
   backdrop-filter: blur(2px) saturate(140%);
   -webkit-backdrop-filter: blur(2px) saturate(140%);
 }
 .event-card .count-unit {
-  background: #263b50;
+  background: linear-gradient(145deg, rgba(255, 255, 255, .35), rgba(215, 233, 249, .14));
   border-color: rgba(255, 255, 255, .9);
-  color: #fff;
-  box-shadow: 0 5px 14px rgba(25, 45, 65, .18), inset 0 1px 0 rgba(255, 255, 255, .16);
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
+  color: #20364b;
+  box-shadow: 0 5px 14px rgba(25, 45, 65, .06), inset 0 1px 1px rgba(255, 255, 255, .85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
-.event-card .count-value { color: #fff; font-variant-numeric: tabular-nums; line-height: 1.2; }
-.event-card .count-label { margin-top: 5px; color: #fff; letter-spacing: .035em; }
+.event-card .count-value { color: #20364b; font-variant-numeric: tabular-nums; line-height: 1.2; }
+.event-card .count-label { margin-top: 5px; color: #344d62; letter-spacing: .035em; }
+
+.hero .event-card { transform: none; }
+.hero .event-title {
+  color: #20364b;
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -.025em;
+  line-height: 1.08;
+  text-wrap: balance;
+  text-shadow: none;
+}
+.hero .event-description,
+.hero .meta-value,
+.hero .venue-address {
+  color: #2b4257;
+  font-family: var(--font-display);
+  font-size: 1.08rem;
+  font-weight: 600;
+  line-height: 1.45;
+  text-shadow: none;
+}
+.hero .meta-label,
+.hero .event-kicker,
+.hero .event-section-label {
+  color: #3c5368;
+  font-family: var(--font-body);
+  font-size: .68rem;
+  font-weight: 600;
+  letter-spacing: .09em;
+}
+.hero .event-kicker { margin-top: 4px; font-size: .75rem; }
+.hero .venue-name { color: #20364b; text-shadow: none; }
+
+.event-heading-meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+.event-heading-meta .event-section-label,
+.hero .event-heading-meta .event-kicker { margin: 0; }
+.event-card .event-title { margin: 12px 0 10px; text-align: left; }
+.event-upcoming-status {
+  display: inline-block;
+  margin-bottom: 6px;
+  padding: 4px 10px;
+  border: 1px solid rgba(47, 65, 86, .22);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .18);
+  color: #344d62;
+  font-family: var(--font-body);
+  font-size: .7rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
 
 
 .meta-label {
@@ -3859,7 +3915,7 @@ td {
   }
 
   .hero .event-title {
-    font-size: clamp(2rem, 2.8vw, 2.5rem);
+    font-size: clamp(2rem, 2.6vw, 2.4rem);
   }
 
   .hero .event-meta {
@@ -3877,16 +3933,8 @@ td {
   }
 
   .hero .venue-address {
-    font-size: .95rem;
-    line-height: 1.4;
-  }
-
-  .hero .venue-address-line {
-    display: inline;
-  }
-
-  .hero .venue-address-line + .venue-address-line::before {
-    content: ', ';
+    font-size: 1rem;
+    line-height: 1.5;
   }
 
   .hero .event-map-link {

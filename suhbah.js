@@ -595,15 +595,16 @@
 
   function eventCard(event) {
     if (!event) return '<article class="event-card fade-in"><div class="event-card-body"><h2>The next Suhbah is coming soon.</h2><p class="lead">Watch this space for our next gathering.</p></div></article>';
+    const titleParts = event.theme.match(/^(.*?)\s*-\s*(Upcoming)$/i);
     return `
       <article class="event-card fade-in" id="upcoming-banner" aria-label="Upcoming Suhbah event">
         <div class="event-card-media" ${mediaStyle(event.image || '/assets/suhbah-quran.jpg')}>
           ${registrationStatus(event.registrationStatus)}
         </div>
         <div class="event-card-body">
-          <span class="event-section-label">The Next Suhbah</span>
-          <span class="event-kicker">${html(event.number)}</span>
-          <h2 class="event-title">${html(event.theme)}</h2>
+          <div class="event-heading-meta"><span class="event-section-label">The Next Suhbah</span><span class="event-kicker">${html(event.number)}</span></div>
+          <h2 class="event-title">${html(titleParts ? titleParts[1] : event.theme)}</h2>
+          ${titleParts ? `<span class="event-upcoming-status">${html(titleParts[2])}</span>` : ''}
           <p class="event-description">${html(event.description)}</p>
           <div class="event-meta">${meta('Date', dateLabel(event.date))}${meta('Time', event.time)}${meta('Location', event.location, event.mapUrl)}</div>
           <div class="countdown" data-countdown="${html(event.date)}T17:00:00+05:30">
