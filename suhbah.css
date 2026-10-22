@@ -3792,3 +3792,61 @@ td {
   letter-spacing: 0;
   line-height: 1.65;
 }
+
+@media (min-width: 900px) {
+  .hero {
+    padding-bottom: 40px;
+  }
+
+  .hero-grid {
+    align-items: center;
+  }
+
+  .hero .event-card-media {
+    min-height: 160px;
+  }
+
+  .hero .event-card-body {
+    padding: 18px 20px;
+  }
+
+  .hero .event-title {
+    font-size: clamp(2rem, 2.8vw, 2.5rem);
+  }
+
+  .hero .event-meta {
+    gap: 10px;
+    margin: 16px 0;
+  }
+
+  .hero .meta-item {
+    padding: 12px 14px;
+  }
+
+  .hero .venue-name {
+    margin-bottom: 4px;
+    font-size: 1.35rem;
+  }
+
+  .hero .venue-address {
+    font-size: .95rem;
+    line-height: 1.4;
+  }
+
+  .hero .venue-address-line {
+    display: inline;
+  }
+
+  .hero .venue-address-line + .venue-address-line::before {
+    content: ', ';
+  }
+
+  .hero .event-map-link {
+    margin-top: 8px;
+    padding: 6px 10px;
+  }
+
+  .about-section {
+    padding-top: 40px;
+  }
+}
