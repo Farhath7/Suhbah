@@ -795,7 +795,7 @@
   function communityGroupLink(event) {
     const link = communityGroupUrl(event);
     if (!link) return '';
-    return `<div class="community-group-link"><p class="muted">Join the community group for ${html(event.number)} for updates and reminders.</p><a class="button secondary" href="${html(link)}" target="_blank" rel="noopener noreferrer">Join this Suhbah's community group</a></div>`;
+    return `<div class="community-group-link"><p class="muted">Join the WhatsApp group for ${html(event.number)} for this month's gathering updates and reminders.</p><a class="button secondary" href="${html(link)}" target="_blank" rel="noopener noreferrer">Join this month's Suhbah WhatsApp group</a></div>`;
   }
 
   function registrationForm(event) {
@@ -859,7 +859,7 @@
           </label>
           <label class="field"><span>Optional message</span><textarea name="message" placeholder="Anything you want us to know?"></textarea></label>
           <button class="button primary" type="submit">${waitlist ? 'Join Waitlist' : 'Reserve My Spot'}</button>
-          ${communityGroupUrl(event) ? '<p class="muted">After registration, you will be taken to WhatsApp. Tap Join to join this Suhbah\'s community group.</p>' : ''}
+          ${communityGroupUrl(event) ? '<p class="muted">After registration, you will be taken to the WhatsApp group for this month\'s Suhbah gathering.</p>' : ''}
         </div>
       </form>
     `;
