@@ -17,6 +17,11 @@ function createConfirmationSender(env = process.env, transport) {
       const url = new URL(event.communityGroupLink);
       if (['https:', 'http:'].includes(url.protocol)) groupLink = url.href;
     } catch {}
+    let mapUrl = event.location ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}` : '';
+    try {
+      const exact = new URL(event.mapUrl);
+      if (['https:', 'http:'].includes(exact.protocol)) mapUrl = exact.href;
+    } catch {}
     const text = [
       `Assalamu alaikum ${registration.name},`,
       '',
@@ -25,6 +30,7 @@ function createConfirmationSender(env = process.env, transport) {
       `Date: ${event.date}`,
       `Time: ${event.time}`,
       `Location: ${event.location}`,
+      ...(mapUrl ? [`Google Maps: ${mapUrl}`] : []),
       ...(groupLink ? ['', `Join this Suhbah's WhatsApp group for updates and reminders: ${groupLink}`, 'Open the invite and tap Join in WhatsApp.'] : []),
       '',
       'Questions? Reply to this email.',

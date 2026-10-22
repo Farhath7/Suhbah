@@ -539,7 +539,14 @@
         <div class="galaxy-backdrop" aria-hidden="true">${Array.from({ length: 110 }, () => `<i style="left:${Math.random() * 100}%;top:${Math.random() * 100}%;--star-size:${.7 + Math.random() * 1.5}px;--twinkle-time:${2 + Math.random() * 4}s;--twinkle-delay:-${Math.random() * 8}s"></i>`).join('')}</div>
         ${ambientSparkles(42)}
         <span class="event-kicker">${html(event.number)} · ${html(event.registrationStatus)}</span>
-        <h3>${html(event.theme)}</h3><p class="muted">${html(dateLabel(event.date))} · ${html(event.time)} · ${html(event.location)}</p>
+        <div class="galaxy-event-summary">
+          <h3>${html(event.theme)}</h3>
+          <div class="galaxy-event-schedule">
+            <div><span class="detail-caption">Date</span><span>${html(dateLabel(event.date))}</span></div>
+            <div><span class="detail-caption">Time</span><span>${html(event.time)}</span></div>
+          </div>
+        </div>
+        <div class="galaxy-venue-card"><span class="detail-caption">Location</span>${locationDetails(event.location, event.mapUrl)}</div>
         <a class="button secondary" href="${registrationUrl(event)}" data-route>${registrationIsOpen(event) ? (event.registrationStatus === 'Waitlist' ? 'Join Waitlist' : 'Register for this Suhbah') : 'View Suhbah'}</a>
       </article>`).join('')}</div>`;
   }
@@ -556,9 +563,11 @@
               <p class="registration-subtitle">${registrationIsOpen(event) ? (event.registrationStatus === 'Waitlist' ? 'Join the waitlist' : 'Reserve your spot') : 'Registrations closed'}</p>
               <${standalone ? 'h1' : 'h3'} class="lead registration-event-title">${html(event.number)}: ${html(event.theme)}</${standalone ? 'h1' : 'h3'}>
               <div class="registration-event-strip">
-                <span>${html(dateLabel(event.date))}</span>
-                <span>${html(event.time)}</span>
-                <span>${html(event.location)}</span>
+                <div class="registration-schedule">
+                  <div><span class="detail-caption">Date</span><span class="schedule-value">${html(dateLabel(event.date))}</span></div>
+                  <div><span class="detail-caption">Time</span><span class="schedule-value">${html(event.time)}</span></div>
+                </div>
+                <div class="registration-venue"><span class="detail-caption">Location</span>${locationDetails(event.location, event.mapUrl)}</div>
               </div>
               <div class="registration-note" aria-label="What to expect at Suhbah">
                 <span class="registration-note-kicker">Inside the gathering</span>
@@ -593,7 +602,7 @@
           <span class="event-kicker">${html(event.number)}</span>
           <h2 class="event-title">${html(event.theme)}</h2>
           <p class="event-description">${html(event.description)}</p>
-          <div class="event-meta">${meta('Date', dateLabel(event.date))}${meta('Time', event.time)}${meta('Location', event.location)}</div>
+          <div class="event-meta">${meta('Date', dateLabel(event.date))}${meta('Time', event.time)}${meta('Location', event.location, event.mapUrl)}</div>
           <div class="countdown" data-countdown="${html(event.date)}T17:00:00+05:30">
             ${['Days', 'Hours', 'Minutes', 'Seconds'].map((label) => `<div class="count-unit"><span class="count-value">00</span><span class="count-label">${label}</span></div>`).join('')}
           </div>
@@ -603,8 +612,28 @@
     `;
   }
 
-  function meta(label, value) {
-    return `<div class="meta-item"><span class="meta-label">${html(label)}</span><span class="meta-value">${html(value)}</span></div>`;
+  function locationDetails(location, mapUrl) {
+    const parts = String(location || '').split(',').map((part) => part.trim());
+    if (parts.length < 3) return `${html(location)}${mapLink(location, mapUrl)}`;
+    const venue = parts.shift();
+    const street = parts.splice(0, 2).join(', ');
+    const landmark = /^behind\b/i.test(parts[0] || '') ? parts.shift() : '';
+    const lines = [street, landmark, parts.join(', ')].filter(Boolean);
+    return `<span class="venue-name">${html(venue)}</span><span class="venue-address">${lines.map((line) => `<span class="venue-address-line">${html(line)}</span>`).join('')}</span>${mapLink(location, mapUrl)}`;
+  }
+
+  function mapLink(location, mapUrl) {
+    if (!location) return '';
+    let url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`;
+    try {
+      const exact = new URL(mapUrl);
+      if (['https:', 'http:'].includes(exact.protocol)) url = exact.href;
+    } catch {}
+    return `<a class="event-map-link" href="${html(url)}" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M20 10c0 6-8 11-8 11S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg>View on Google Maps <span aria-hidden="true">&#8599;</span></a>`;
+  }
+
+  function meta(label, value, mapUrl) {
+    return `<div class="meta-item${label === 'Location' ? ' location-meta' : ''}"><span class="meta-label">${html(label)}</span><span class="meta-value">${label === 'Location' ? locationDetails(value, mapUrl) : html(value)}</span></div>`;
   }
 
   function registrationStatus(status = 'Open') {
