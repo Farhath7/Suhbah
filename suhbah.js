@@ -553,21 +553,24 @@
 
   function registrationSection(event, standalone = false) {
     if (!event) return `<section class="section white" id="register"><div class="container"><h2>Registrations will open soon</h2><p class="lead">Check back for the next Suhbah.</p></div></section>`;
+    const titleParts = event.theme.match(/^(.*?)\s*-\s*(Upcoming)$/i);
     return `<section class="section white" id="register">
           ${standalone ? '<div class="container registration-back"><a href="/#events">← All Suhbahs</a></div>' : ''}
           <div class="container registration-grid">
             <div class="registration-story">
             <div class="registration-copy fade-in">
               <p class="registration-label-text">Event registration</p>
-              <h2 class="registration-brand">Suhbah</h2>
+              <h2 class="registration-brand">Next Suhbah</h2>
               <p class="registration-subtitle">${registrationIsOpen(event) ? (event.registrationStatus === 'Waitlist' ? 'Join the waitlist' : 'Reserve your spot') : 'Registrations closed'}</p>
-              <${standalone ? 'h1' : 'h3'} class="lead registration-event-title">${html(event.number)}: ${html(event.theme)}</${standalone ? 'h1' : 'h3'}>
+              <${standalone ? 'h1' : 'h3'} class="lead registration-event-title"><span class="registration-event-number">${html(event.number)}</span><span class="registration-event-name">${html(titleParts ? titleParts[1] : event.theme)}</span>${titleParts ? `<span class="registration-event-status">${html(titleParts[2])}</span>` : ''}</${standalone ? 'h1' : 'h3'}>
+              <div class="registration-details">
               <div class="registration-event-strip">
                 <div class="registration-schedule">
                   <div><span class="detail-caption">Date</span><span class="schedule-value">${html(dateLabel(event.date))}</span></div>
                   <div><span class="detail-caption">Time</span><span class="schedule-value">${html(event.time)}</span></div>
                 </div>
                 <div class="registration-venue"><span class="detail-caption">Location</span>${locationDetails(event.location, event.mapUrl)}</div>
+              </div>
               </div>
               <div class="registration-note" aria-label="What to expect at Suhbah">
                 <span class="registration-note-kicker">Inside the gathering</span>

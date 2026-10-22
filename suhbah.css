@@ -2139,6 +2139,7 @@ body.modal-open {
 #registrationMount {
   display: flex;
   min-width: 0;
+  align-self: start;
 }
 
 .registration-copy {
@@ -2158,15 +2159,19 @@ body.modal-open {
 
 .registration-copy::after {
   position: absolute;
-  right: -10%;
-  bottom: -16%;
-  color: rgba(255, 255, 255, 0.07);
-  content: "SUHBAH";
-  font-family: var(--font-display);
-  font-size: clamp(6rem, 14vw, 11rem);
-  font-weight: 700;
-  line-height: 0.8;
+  inset: 0;
+  z-index: 0;
+  content: "";
+  background: url('/assets/arabic-pattern-dense.svg') right -40px top -30px / 260px 260px repeat;
+  opacity: .34;
+  -webkit-mask-image: linear-gradient(to right, transparent 10%, #000 85%);
+  mask-image: linear-gradient(to right, transparent 10%, #000 85%);
   pointer-events: none;
+}
+
+.registration-copy > * {
+  position: relative;
+  z-index: 1;
 }
 
 .registration-label-text {
@@ -2212,6 +2217,12 @@ body.modal-open {
   margin: 14px 0 4px;
   padding-left: 16px;
   border-left: 3px solid rgba(200, 217, 230, 0.56);
+}
+
+.registration-details {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
 }
 
 .registration-event-strip span {
@@ -3747,25 +3758,62 @@ td {
 
 .registration-copy .registration-brand {
   font-family: var(--font-display);
-  font-size: clamp(4rem, 8vw, 6rem);
+  font-size: clamp(2.8rem, 5vw, 4.5rem);
   font-weight: 600;
-  letter-spacing: -.045em;
-  line-height: 1;
+  letter-spacing: -.035em;
+  line-height: 1.05;
 }
 
 .registration-copy .registration-subtitle {
-  margin: 10px 0 24px;
-  font-family: var(--font-body);
-  font-size: 1rem;
-  font-weight: 400;
-  letter-spacing: .01em;
-  line-height: 1.5;
+  margin: 8px 0 26px;
+  font-family: var(--font-display);
+  font-size: clamp(1.05rem, 1.4vw, 1.25rem);
+  font-weight: 600;
+  letter-spacing: -.015em;
+  line-height: 1.2;
 }
 
 .registration-copy .registration-event-title {
   margin: 0;
-  font-size: clamp(1.55rem, 2.4vw, 2rem);
-  max-width: 28ch;
+  font-size: clamp(1.8rem, 2.8vw, 2.5rem);
+  line-height: 1.12;
+  letter-spacing: -.025em;
+  width: 100%;
+  max-width: 480px;
+  text-align: left;
+  text-wrap: pretty;
+}
+
+.registration-event-number {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--mist);
+  font-family: var(--font-body);
+  font-size: .78rem;
+  font-weight: 600;
+  letter-spacing: .08em;
+  line-height: 1.4;
+}
+
+.registration-event-name {
+  display: block;
+  max-width: 22ch;
+  text-wrap: balance;
+}
+
+.registration-event-status {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 5px 10px;
+  border: 1px solid rgba(200, 217, 230, .35);
+  border-radius: 999px;
+  color: var(--mist);
+  font-family: var(--font-body);
+  font-size: .7rem;
+  font-weight: 500;
+  letter-spacing: .02em;
+  line-height: 1.4;
+  vertical-align: top;
 }
 
 .registration-event-strip .schedule-value {
