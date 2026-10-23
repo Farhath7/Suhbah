@@ -566,7 +566,6 @@
     return `<section class="section white" id="register">
           ${standalone ? '<div class="container registration-back"><a href="/#events">← All Suhbahs</a></div>' : ''}
           <div class="container registration-grid">
-            <div class="registration-story">
             <div class="registration-copy fade-in">
               <p class="registration-label-text">Event registration</p>
               <h2 class="registration-brand">Next Suhbah</h2>
@@ -581,6 +580,10 @@
                 <div class="registration-venue"><span class="detail-caption">Location</span>${locationDetails(event.location, event.mapUrl)}</div>
               </div>
               </div>
+
+            </div>
+            <div class="registration-art" aria-hidden="true"><img src="/assets/registration-still-life.png" alt="" loading="eager" fetchpriority="high" /></div>
+            <div id="registrationMount" class="fade-in">${registrationForm(event)}</div>
               <div class="registration-note" aria-label="What to expect at Suhbah">
                 <span class="registration-note-kicker">Inside the gathering</span>
                 <h3>What to expect</h3>
@@ -593,10 +596,6 @@
                 </ul>
                 <p class="registration-note-closing">Come as you are. Bring a notebook if you like, and bring a friend if someone comes to mind.</p>
               </div>
-            </div>
-            <div class="registration-art" aria-hidden="true"><img src="/assets/registration-still-life.png" alt="" loading="eager" fetchpriority="high" /></div>
-            </div>
-            <div id="registrationMount" class="fade-in">${registrationForm(event)}</div>
           </div>
         </section>
     `;

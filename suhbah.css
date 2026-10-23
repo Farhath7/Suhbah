@@ -4013,3 +4013,19 @@ td {
     padding-top: 40px;
   }
 }
+
+/* Balance registration content around the form and keep the closing gap compact. */
+#register { padding-block: clamp(32px, 4vw, 56px); }
+.registration-grid { align-items: start; grid-template-areas: "overview" "form" "notes" "art"; }
+.registration-grid > .registration-copy { grid-area: overview; }
+#registrationMount { grid-area: form; }
+.registration-grid > .registration-note { grid-area: notes; margin-top: 0; }
+.registration-grid > .registration-art { grid-area: art; min-height: 0; margin-top: 0; padding: 8px 12px; }
+.registration-grid > .registration-art img { max-height: 220px; }
+@media (min-width: 640px) {
+  .registration-grid { grid-template-areas: "overview form" "art form" "notes notes"; row-gap: 20px; }
+  .registration-grid > .registration-note { grid-template-columns: 1fr 1.2fr; column-gap: 28px; }
+  .registration-grid > .registration-note > :is(.registration-note-kicker, h3, .registration-note-intro) { grid-column: 1; }
+  .registration-grid > .registration-note > ul { grid-column: 2; grid-row: 1 / 5; margin: 0; }
+  .registration-grid > .registration-note > .registration-note-closing { grid-column: 1; padding: 12px 0 0; font-size: 1.05rem; }
+}
