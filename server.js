@@ -49,7 +49,7 @@ const initialDb = {
         'A space to pause, reflect, and explore what the Quran has to say about finding direction when life feels uncertain.',
       status: 'upcoming',
       registrationStatus: 'Open',
-      image: '',
+      image: '/assets/suhbah-03-trials-that-define-us.webp',
       createdAt: '2026-09-28T00:00:00.000Z',
       updatedAt: '2026-09-28T00:00:00.000Z',
     },
