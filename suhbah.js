@@ -491,9 +491,30 @@
               <div class="quran-library-head">
                 <span class="quran-eyebrow">Read. Reflect. Reconnect.</span>
                 <h2>Quran Library</h2>
-                <p>A little time with the Quran.<br />A meaningful part of your day.</p>
-                <div class="quran-library-stats"><span>30 Juz</span><span>114 Surahs</span></div>
+                <p>A little time with the Quran, every day.</p>
               </div>
+              <span class="quran-library-stats">30 Chapters <span aria-hidden="true">&middot;</span> 114 Surahs</span>
+            </div>
+            <div class="quran-workspace">
+              <div class="quran-navigator">
+            <div class="quran-browse-bar">
+              <div><h3>Find your place</h3><p>Select a Chapter or search for a surah.</p></div>
+              <label class="quran-search" for="quranSearch">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" /><path d="m16 16 4.5 4.5" /></svg>
+                <input id="quranSearch" type="search" placeholder="Search Chapter or surah" aria-label="Search by Chapter number or surah name" autocomplete="off" />
+              </label>
+            </div>
+                <p class="quran-results" id="quranResults" role="status" aria-live="polite" aria-atomic="true">Choose from 30 Chapters</p>
+                <div class="quran-juz-selector" role="group" aria-label="Choose a Chapter">
+                  ${QuranLibrary.juz.map(({ number }) => `<button type="button" class="quran-juz-button" data-juz="${number}" aria-controls="quran-juz-${number}" aria-pressed="${number === 1}"><span>Chapter</span> ${String(number)}</button>`).join('')}
+                </div>
+                <div class="quran-empty" id="quranEmpty" hidden><p>No matching Chapter or surah.</p><button type="button" id="quranClear">Clear search</button></div>
+              </div>
+              <div class="quran-reading-panel" id="quranReadingPanel">
+                ${quranParaLinks()}
+              </div>
+            </div>
+            <div class="quran-reminder">
               <figure class="quran-hadith">
               <blockquote lang="ar" dir="rtl">عَنْ عُثْمَانَ ـ رضى الله عنه ـ عَنِ النَّبِيِّ صلى الله عليه وسلم قَالَ "خَيْرُكُمْ مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ"</blockquote>
               <figcaption>
@@ -502,18 +523,6 @@
               </figcaption>
               </figure>
             </div>
-            <div class="quran-browse-bar">
-              <div><h3>Find your place</h3><p>Choose a Juz to explore its surahs, or open the full PDF.</p></div>
-              <label class="quran-search" for="quranSearch">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" /><path d="m16 16 4.5 4.5" /></svg>
-                <input id="quranSearch" type="search" placeholder="Search Juz or surah" aria-label="Search by Juz number or surah name" autocomplete="off" />
-              </label>
-            </div>
-            <p class="quran-results" id="quranResults" role="status" aria-live="polite" aria-atomic="true">Showing all 30 Juz</p>
-            <div class="quran-grid">
-              ${quranParaLinks()}
-            </div>
-            <div class="quran-empty" id="quranEmpty" hidden><h3>No matching Juz found</h3><p>Try a Juz number from 1 to 30 or a surah name, such as Al-Kahf.</p><button type="button" id="quranClear">Clear search</button></div>
           </div>
         </section>
         <section class="section cta">
@@ -691,30 +700,29 @@
     ];
 
     return QuranLibrary.juz.map(({ number, surahs }, index) => {
-      const label = String(number).padStart(2, '0');
+      const label = String(number);
       return `
-        <details class="quran-juz" id="quran-juz-${number}">
-          <summary class="quran-card" aria-label="Juz ${label}: ${surahs.length} surah${surahs.length === 1 ? '' : 's'}">
+        <article class="quran-juz" id="quran-juz-${number}" aria-labelledby="quran-title-${number}" ${number === 1 ? '' : 'hidden'}>
+          <header class="quran-card">
             <span class="quran-card-number" aria-hidden="true">${label}</span>
-            <div class="quran-juz-title"><span class="quran-juz-label">Juz ${label}</span><strong lang="ar" dir="rtl">${paraNames[index]}</strong><span class="quran-juz-meta">${surahs.length} surah${surahs.length === 1 ? '' : 's'}</span></div>
-            <span class="quran-expand" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="m6 9 6 6 6-6" /></svg></span>
-          </summary>
+            <div class="quran-juz-title"><h3 class="quran-juz-label" id="quran-title-${number}">Chapter ${label}</h3><strong lang="ar" dir="rtl">${paraNames[index]}</strong><span class="quran-juz-meta">${surahs.length} surah${surahs.length === 1 ? '' : 's'}</span></div>
+          </header>
           <div class="quran-juz-content">
-            <a class="quran-open-juz" href="${QuranLibrary.pdfUrl(number)}" target="_blank" rel="noreferrer">Open full Juz ${label} <span aria-hidden="true">↗</span></a>
-            <ul class="quran-surahs">
+            <a class="quran-open-juz" href="${QuranLibrary.pdfUrl(number)}" target="_blank" rel="noreferrer">Open full Chapter ${label} <span aria-hidden="true">↗</span></a>
+            <ul class="quran-surahs" tabindex="0" aria-label="Surahs in Chapter ${number}">
               ${surahs.map((surah) => `
                 <li>
-                  <a class="quran-surah-link" href="${QuranLibrary.pdfUrl(surah.juz, surah.page)}" target="_blank" rel="noreferrer" aria-label="Open Surah ${html(surah.name)} from the beginning, Juz ${surah.juz}, PDF page ${surah.page}">
+                  <a class="quran-surah-link" href="${QuranLibrary.pdfUrl(surah.juz, surah.page)}" target="_blank" rel="noreferrer" aria-label="Open Surah ${html(surah.name)} from the beginning, Chapter ${surah.juz}, PDF page ${surah.page}">
                     <span class="quran-surah-number">${surah.number}</span>
-                    <span><strong>${html(surah.name)}</strong><small>Starts in Juz ${surah.juz} · PDF page ${surah.page}</small></span>
+                    <span><strong>${html(surah.name)}</strong><small>Starts in Chapter ${surah.juz} · PDF page ${surah.page}</small></span>
                     <span aria-hidden="true">↗</span>
                   </a>
-                  ${surah.juz < number ? `<a class="quran-surah-continue" href="${QuranLibrary.pdfUrl(number)}" target="_blank" rel="noreferrer" aria-label="Continue Surah ${html(surah.name)} in Juz ${number}">Continue in this Juz ↗</a>` : ''}
+                  ${surah.juz < number ? `<a class="quran-surah-continue" href="${QuranLibrary.pdfUrl(number)}" target="_blank" rel="noreferrer" aria-label="Continue Surah ${html(surah.name)} in Chapter ${number}">Continue in this Chapter ↗</a>` : ''}
                 </li>
               `).join('')}
             </ul>
           </div>
-        </details>
+        </article>
       `;
     }).join('');
   }
@@ -1171,19 +1179,41 @@
     if (quranSearch) {
       const normalizeSearch = (value) => value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9\u0600-\u06ff]/g, '');
       const cards = [...document.querySelectorAll('.quran-juz')];
+      const buttons = [...document.querySelectorAll('.quran-juz-button')];
+      let selectedJuz = 1;
+      let matchingJuz = QuranLibrary.juz;
+      let surahQuery = '';
+      const selectJuz = (number) => {
+        selectedJuz = number;
+        cards.forEach((card, index) => {
+          const selected = index + 1 === number;
+          card.hidden = !selected;
+          if (selected) {
+            card.querySelector('.quran-surahs').scrollTop = 0;
+            card.querySelectorAll('.quran-surahs li').forEach((row, rowIndex) => {
+              row.hidden = !!surahQuery && !normalizeSearch(QuranLibrary.juz[index].surahs[rowIndex].name).includes(surahQuery);
+            });
+          }
+        });
+        buttons.forEach((button) => button.setAttribute('aria-pressed', String(Number(button.dataset.juz) === number)));
+      };
       const filterQuran = () => {
         const query = normalizeSearch(quranSearch.value);
-        const juzNumber = query.match(/^(?:juz|para)?0*(\d+)$/)?.[1];
-        let count = 0;
-        cards.forEach((card, index) => {
-          const juz = QuranLibrary.juz[index];
-          const matches = !query || (juzNumber ? juz.number === Number(juzNumber) : normalizeSearch(card.textContent).includes(query));
-          card.hidden = !matches;
-          if (matches) count += 1;
-        });
-        document.getElementById('quranResults').textContent = query ? `${count} matching Juz` : 'Showing all 30 Juz';
-        document.getElementById('quranEmpty').hidden = count > 0;
+        const juzNumber = query.match(/^(?:chapter|juz|para)?0*(\d+)$/)?.[1];
+        surahQuery = query && !juzNumber ? query : '';
+        matchingJuz = QuranLibrary.juz.filter((juz, index) => !query || (juzNumber
+          ? juz.number === Number(juzNumber)
+          : normalizeSearch(cards[index].querySelector('[lang="ar"]').textContent).includes(query)
+            || juz.surahs.some((surah) => normalizeSearch(surah.name).includes(query))));
+        // Arabic Chapter names should display all the surahs in that Chapter.
+        if (surahQuery && !matchingJuz.some((juz) => juz.surahs.some((surah) => normalizeSearch(surah.name).includes(surahQuery)))) surahQuery = '';
+        buttons.forEach((button) => { button.hidden = !matchingJuz.some((juz) => juz.number === Number(button.dataset.juz)); });
+        document.getElementById('quranResults').textContent = query ? `${matchingJuz.length} matching chapter${matchingJuz.length === 1 ? '' : 's'}` : 'Choose from 30 Chapters';
+        document.getElementById('quranEmpty').hidden = matchingJuz.length > 0;
+        document.getElementById('quranReadingPanel').hidden = matchingJuz.length === 0;
+        if (matchingJuz.length) selectJuz(matchingJuz.some((juz) => juz.number === selectedJuz) ? selectedJuz : matchingJuz[0].number);
       };
+      buttons.forEach((button) => button.addEventListener('click', () => selectJuz(Number(button.dataset.juz))));
       quranSearch.addEventListener('input', filterQuran);
       document.getElementById('quranClear').addEventListener('click', () => {
         quranSearch.value = '';

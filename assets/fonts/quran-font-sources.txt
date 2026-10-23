@@ -1,0 +1,10 @@
+Fonts used for the Quran panel, matching Quran.com typography.
+
+Figtree (variable font, 100-900)
+Source: https://quran.com/fonts/lang/Figtree/Figtree.ttf
+Project and OFL license: https://github.com/erikdkennedy/figtree
+
+Uthmanic Hafs, version 18
+Source: https://quran.com/fonts/quran/hafs/uthmanic_hafs/UthmanicHafs1Ver18.woff2
+Documentation: https://api-docs.quran.com/docs/tutorials/fonts/font-rendering/
+Font files are distributed unchanged; embedded copyright and license metadata are preserved.
