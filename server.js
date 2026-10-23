@@ -40,13 +40,14 @@ const initialDb = {
     {
       id: 'event-7',
       number: 'Suhbah 03',
-      theme: 'Finding Your Way Back - Upcoming',
+      theme: 'Trials That Define US',
       date: '2026-11-01',
       time: '3:00 - 5:00 PM',
       location: 'Aspire Tutorials, #46, 4th Main “A” Cross, behind R.T. Nagar Old Police Station, Kousar Nagar, Bangalore – 560032',
       mapUrl: 'https://www.google.com/maps/place/Al+Noor,+123%2F1,+10th+Cross+St,+Kauser+Nagar,+Dinnur,+Hebbal,+Bengaluru,+Karnataka+560032/@13.0269684,77.5953935,20.14z/data=!4m6!3m5!1s0x3bae17bb262479e3:0x31fa4b696c672705!8m2!3d13.026833!4d77.5955563!16s%2Fg%2F11y3sywh_m?entry=ttu&g_ep=EgoyMDI2MTAxOS4wIKXMDSoASAFQAw%3D%3D',
       description:
-        'A space to pause, reflect, and explore what the Quran has to say about finding direction when life feels uncertain.',
+        "The well, the prison, and the long waiting did not write Yusuf's (A.S) ending; Allah did, and He is writing yours too.",
+      speaker: 'Zaina Malak',
       status: 'upcoming',
       registrationStatus: 'Open',
       image: '/assets/suhbah-03-trials-that-define-us.webp',
