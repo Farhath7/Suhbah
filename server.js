@@ -11,10 +11,11 @@ const sendConfirmation = createConfirmationSender();
 
 const PORT = Number(process.env.PORT || 4173);
 const ROOT = __dirname;
-const DATA_DIR = path.join(ROOT, 'data');
+const LEGACY_DB_PATH = path.join(ROOT, 'data', 'suhbah-db.json');
+const DATA_DIR = path.resolve(process.env.SUHBAH_DATA_DIR || path.join(ROOT, 'data'));
 const DB_PATH = path.join(DATA_DIR, 'suhbah-db.json');
 const ASSETS_DIR = path.join(ROOT, 'assets');
-const SPEECH_DIR = path.join(ASSETS_DIR, 'speeches');
+const SPEECH_DIR = path.join(DATA_DIR, 'uploads', 'speeches');
 const SESSION_COOKIE = 'suhbah_session';
 const SESSION_TTL_MS = 1000 * 60 * 60 * 8;
 const DEMO_ADMIN_EMAIL = 'admin@suhbah.local';
@@ -134,9 +135,12 @@ const initialDb = {
 function ensureDb() {
   if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
   if (!fs.existsSync(DB_PATH)) {
-    migrateSpeechLinks(initialDb);
-    writeDb(initialDb);
-    return;
+    // Import existing data only once. Later releases must never replace saved edits.
+    const seed = DB_PATH !== LEGACY_DB_PATH && fs.existsSync(LEGACY_DB_PATH)
+      ? JSON.parse(fs.readFileSync(LEGACY_DB_PATH, 'utf8'))
+      : structuredClone(initialDb);
+    migrateSpeechLinks(seed);
+    writeDb(seed);
   }
 
   const db = JSON.parse(fs.readFileSync(DB_PATH, 'utf8'));
@@ -168,7 +172,9 @@ function readDb() {
 }
 
 function writeDb(db) {
-  fs.writeFileSync(DB_PATH, JSON.stringify(db, null, 2));
+  const temporaryPath = `${DB_PATH}.${process.pid}.tmp`;
+  fs.writeFileSync(temporaryPath, JSON.stringify(db, null, 2), { mode: 0o600 });
+  fs.renameSync(temporaryPath, DB_PATH);
 }
 
 function uid(prefix) {
@@ -189,12 +195,24 @@ function saveSpeechPdf(dataUrl, eventId) {
   const base64 = dataUrl.split(',', 2)[1] || '';
   const fileName = `${safeFilePart(eventId)}-${Date.now()}.pdf`;
   fs.writeFileSync(path.join(SPEECH_DIR, fileName), Buffer.from(base64, 'base64'));
-  return `/assets/speeches/${fileName}`;
+  return `/uploads/speeches/${fileName}`;
 }
 
 function migrateSpeechLinks(db) {
   let changed = false;
   for (const event of db.events || []) {
+    // Keep previously uploaded PDFs on the same persistent volume as the database.
+    const legacyName = String(event.speechLink || '').match(/^\/assets\/speeches\/([^/\\]+\.pdf)$/)?.[1];
+    if (legacyName && DB_PATH !== LEGACY_DB_PATH) {
+      const original = path.join(ASSETS_DIR, 'speeches', legacyName);
+      const saved = path.join(SPEECH_DIR, legacyName);
+      if (fs.existsSync(original) || fs.existsSync(saved)) {
+        fs.mkdirSync(SPEECH_DIR, { recursive: true });
+        if (!fs.existsSync(saved)) fs.copyFileSync(original, saved);
+        event.speechLink = `/uploads/speeches/${legacyName}`;
+        changed = true;
+      }
+    }
     if (String(event.speechLink || '').startsWith('data:application/pdf;base64,')) {
       event.speechLink = saveSpeechPdf(event.speechLink, event.id);
       changed = true;
@@ -299,6 +317,9 @@ function serveFile(res, filePath) {
 }
 
 async function handleApi(req, res, url) {
+  // Read the latest data after the request body arrives, so overlapping saves do
+  // not write an older snapshot over another completed Admin edit or registration.
+  const body = ['POST', 'PUT', 'DELETE'].includes(req.method) ? await parseBody(req) : {};
   const db = readDb();
 
   if (req.method === 'GET' && url.pathname === '/api/public') {
@@ -307,7 +328,6 @@ async function handleApi(req, res, url) {
   }
 
   if (req.method === 'POST' && url.pathname === '/api/login') {
-    const body = await parseBody(req);
     const user = db.adminUsers.find((admin) => admin.email === body.email);
     if (!user || user.passwordHash !== hash(body.password || '')) {
       sendJson(res, 401, { error: 'Invalid credentials' });
@@ -332,7 +352,6 @@ async function handleApi(req, res, url) {
   }
 
   if (req.method === 'POST' && url.pathname === '/api/registrations') {
-    const body = await parseBody(req);
     const event = db.events.find((item) => item.id === body.eventId);
     if (!event) {
       sendJson(res, 404, { error: 'This Suhbah was not found.' });
@@ -416,7 +435,6 @@ async function handleApi(req, res, url) {
 
   if (url.pathname === '/api/admin/events') {
     if (!requireAdmin(req, res)) return;
-    const body = await parseBody(req);
     if (req.method === 'POST') {
       const event = { ...body, id: uid('event'), createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
       event.speechLink = saveSpeechPdf(event.speechLink, event.id);
@@ -426,7 +444,7 @@ async function handleApi(req, res, url) {
       return;
     }
     if (req.method === 'PUT') {
-      body.speechLink = saveSpeechPdf(body.speechLink, body.id);
+      if (Object.hasOwn(body, 'speechLink')) body.speechLink = saveSpeechPdf(body.speechLink, body.id);
       db.events = db.events.map((event) =>
         event.id === body.id ? { ...event, ...body, updatedAt: new Date().toISOString() } : event,
       );
@@ -444,7 +462,6 @@ async function handleApi(req, res, url) {
 
   if (url.pathname === '/api/admin/testimonials') {
     if (!requireAdmin(req, res)) return;
-    const body = await parseBody(req);
     if (req.method === 'POST') {
       const testimonial = { ...body, id: uid('test'), createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
       db.testimonials.unshift(testimonial);
@@ -472,7 +489,7 @@ async function handleApi(req, res, url) {
 
   if (req.method === 'PUT' && url.pathname === '/api/admin/statistics') {
     if (!requireAdmin(req, res)) return;
-    db.communityStats = { ...(await parseBody(req)), updatedAt: new Date().toISOString() };
+    db.communityStats = { ...body, updatedAt: new Date().toISOString() };
     writeDb(db);
     sendJson(res, 200, { communityStats: db.communityStats });
     return;
@@ -480,7 +497,7 @@ async function handleApi(req, res, url) {
 
   if (req.method === 'PUT' && url.pathname === '/api/admin/social') {
     if (!requireAdmin(req, res)) return;
-    db.socialLinks = { ...(await parseBody(req)), updatedAt: new Date().toISOString() };
+    db.socialLinks = { ...body, updatedAt: new Date().toISOString() };
     writeDb(db);
     sendJson(res, 200, { socialLinks: db.socialLinks });
     return;
@@ -494,6 +511,17 @@ const server = http.createServer(async (req, res) => {
     const url = new URL(req.url, `http://${req.headers.host}`);
     if (url.pathname.startsWith('/api/')) {
       await handleApi(req, res, url);
+      return;
+    }
+
+    if (url.pathname.startsWith('/uploads/speeches/')) {
+      const name = decodeURIComponent(url.pathname.slice('/uploads/speeches/'.length));
+      if (!/^[a-zA-Z0-9_-]+\.pdf$/.test(name)) {
+        res.writeHead(404);
+        res.end('Not found');
+        return;
+      }
+      serveFile(res, path.join(SPEECH_DIR, name));
       return;
     }
 
@@ -520,6 +548,9 @@ const server = http.createServer(async (req, res) => {
 });
 
 ensureDb();
+if (process.env.RENDER && !process.env.SUHBAH_DATA_DIR) {
+  console.warn('Persistent storage is not configured: attach a Render disk and set SUHBAH_DATA_DIR to a directory on that disk.');
+}
 server.listen(PORT, () => {
   console.log(`Suhbah running at http://localhost:${PORT}`);
   if (!sendConfirmation) console.log('Confirmation emails are disabled until GMAIL_APP_PASSWORD is configured.');
