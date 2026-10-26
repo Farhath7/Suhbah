@@ -1,5 +1,5 @@
 function createConfirmationSender(env = process.env, transport) {
-  const user = env.GMAIL_USER || 'suhbah.connect@gmail.com';
+  const user = env.GMAIL_USER || 'suhbahconnects@gmail.com';
   const password = String(env.GMAIL_APP_PASSWORD || '').replace(/\s/g, '');
   if (!password && !transport) return null;
   const mailer = transport || require('nodemailer').createTransport({

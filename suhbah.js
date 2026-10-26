@@ -897,7 +897,7 @@
           <div class="footer-grid">
             <div><a class="brand footer-brand" href="/" data-route><img class="brand-logo" src="/assets/suhbah-logo.png" alt="Suhbah" /></a><p>Reconnecting young people with the Quran, one gathering at a time.</p></div>
             <div><h3>Links</h3><div class="footer-links"><a href="${homeAnchor('#home')}">Home</a><a href="${homeAnchor('#about')}">About</a><a href="${homeAnchor('#events')}">Events</a><a href="${homeAnchor('#community')}">Community</a></div></div>
-            <div><h3>Connect</h3><div class="social-links"><a href="${html(db.socialLinks.instagram)}" target="_blank" rel="noreferrer">Instagram</a><a href="${html(db.socialLinks.whatsapp)}" target="_blank" rel="noreferrer">WhatsApp</a></div><div class="footer-email"><a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=suhbah.connect%40gmail.com" target="_blank" rel="noopener noreferrer">Write to us<span class="footer-email-address">suhbah.connect@gmail.com</span></a></div></div>
+            <div><h3>Connect</h3><div class="social-links"><a href="${html(db.socialLinks.instagram)}" target="_blank" rel="noreferrer">Instagram</a><a href="${html(db.socialLinks.whatsapp)}" target="_blank" rel="noreferrer">WhatsApp</a></div><div class="footer-email"><a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=suhbahconnects%40gmail.com" target="_blank" rel="noopener noreferrer">Write to us<span class="footer-email-address">suhbahconnects@gmail.com</span></a></div></div>
           </div>
           <div class="footer-bottom">© 2026 Suhbah. All rights reserved.</div>
         </div>

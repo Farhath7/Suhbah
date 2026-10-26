@@ -11,7 +11,7 @@ test('confirmation contains event details, the right group and sender', async ()
     return { accepted: [registration.email], messageId: 'test-message' };
   } });
   await expect(sender(registration, event)).resolves.toBe('test-message');
-  expect(message.from.address).toBe('suhbah.connect@gmail.com');
+  expect(message.from.address).toBe('suhbahconnects@gmail.com');
   expect(message.to.address).toBe(registration.email);
   for (const value of [registration.name, event.number, event.theme, event.date, event.time, event.location, event.communityGroupLink]) {
     expect(message.text).toContain(value);
