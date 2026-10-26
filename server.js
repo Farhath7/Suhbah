@@ -185,6 +185,8 @@ function sendJson(res, status, payload) {
   res.writeHead(status, {
     'Content-Type': 'application/json; charset=utf-8',
     'Cache-Control': 'no-store',
+    'X-Suhbah-Release': process.env.VERCEL_GIT_COMMIT_SHA || 'local',
+    'X-Suhbah-Storage': store.persistent ? 'postgres' : 'file',
   });
   res.end(JSON.stringify(payload));
 }
