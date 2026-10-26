@@ -1,5 +1,6 @@
 {
   "scripts": {
+    "build:vercel": "node scripts/build-vercel.js",
     "start": "node server.js"
   },
   "dependencies": {
