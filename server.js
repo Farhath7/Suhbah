@@ -21,7 +21,7 @@ const SESSION_COOKIE = 'suhbah_session';
 const SESSION_TTL_MS = 1000 * 60 * 60 * 8;
 const DEMO_ADMIN_EMAIL = 'admin@suhbah.local';
 const DEMO_ADMIN_PASSWORD_HASH = 'f9446b93b773c95118d6dcd454839738844f600264c10a2a474b0c55f2da30f3';
-const adminEmail = process.env.ADMIN_EMAIL || DEMO_ADMIN_EMAIL;
+const adminEmail = (process.env.ADMIN_EMAIL || DEMO_ADMIN_EMAIL).trim().toLowerCase();
 const adminPassword = process.env.ADMIN_PASSWORD || crypto.randomBytes(24).toString('base64url');
 const adminPasswordHash = hash(adminPassword);
 
@@ -299,7 +299,15 @@ async function handleApiWithDb(req, res, url, db, body, afterCommit) {
   }
 
   if (req.method === 'POST' && url.pathname === '/api/login') {
-    const user = db.adminUsers.find((admin) => admin.email === body.email);
+    if (store.persistent && db.adminUsers.every((admin) => admin.email === DEMO_ADMIN_EMAIL)) {
+      const missing = ['ADMIN_EMAIL', 'ADMIN_PASSWORD'].filter((key) => !process.env[key]?.trim());
+      if (missing.length) {
+        sendJson(res, 503, { error: `Admin setup is incomplete: ${missing.join(' and ')} is missing from this deployment. Add the value in Vercel Production and redeploy.` });
+        return;
+      }
+    }
+    const email = String(body.email || '').trim().toLowerCase();
+    const user = db.adminUsers.find((admin) => admin.email.toLowerCase() === email);
     if (!user || user.passwordHash !== hash(body.password || '') ||
         (store.persistent && user.email === DEMO_ADMIN_EMAIL && user.passwordHash === DEMO_ADMIN_PASSWORD_HASH)) {
       sendJson(res, 401, { error: 'Invalid credentials' });

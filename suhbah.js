@@ -1294,7 +1294,7 @@
         await api('/api/login', { method: 'POST', body: JSON.stringify(formData(event.target)) });
         await render();
       } catch (error) {
-        app.innerHTML = adminLogin('Invalid admin credentials.');
+        app.innerHTML = adminLogin(error.message === 'Invalid credentials' ? 'Invalid admin credentials.' : error.message || 'Sign in failed. Please try again.');
         bindCommon();
         bindAdmin();
       }

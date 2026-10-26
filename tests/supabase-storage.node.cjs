@@ -26,9 +26,10 @@ test('shared database preserves concurrent registrations, sessions, edits and PD
   const children = [];
   let pdfName;
   const store = createStore({ filePath: 'unused' });
-  async function start(port) {
+  async function start(port, extraEnv = {}) {
     const child = spawn(process.execPath, ['server.js'], { cwd: root, env: { ...process.env,
       PORT: String(port), ADMIN_EMAIL: 'admin@example.test', ADMIN_PASSWORD: 'test-password', GMAIL_APP_PASSWORD: '', GMAIL_USER: '',
+      ...extraEnv,
     }, stdio: ['ignore', 'pipe', 'pipe'] });
     children.push(child);
     await new Promise((resolve, reject) => {
@@ -49,7 +50,7 @@ test('shared database preserves concurrent registrations, sessions, edits and PD
     await pool.query(`INSERT INTO ${schema}.app_state VALUES (1, $1, now())`, [JSON.stringify(fixture)]);
     const first = await start(4817);
     const second = await start(4818);
-    const login = await request(first, '/api/login', 'POST', { email: 'admin@example.test', password: 'test-password' });
+    const login = await request(first, '/api/login', 'POST', { email: ' ADMIN@EXAMPLE.TEST ', password: 'test-password' });
     assert.equal(login.response.status, 200);
     const cookie = login.response.headers.get('set-cookie').split(';')[0];
     assert.equal((await request(second, '/api/admin', 'GET', null, cookie)).response.status, 200);
@@ -86,6 +87,11 @@ test('shared database preserves concurrent registrations, sessions, edits and PD
     await new Promise((resolve) => children[0].once('exit', resolve));
     const restarted = await start(4817);
     assert.equal((await request(restarted, '/api/public')).data.events[0].theme, 'Persisted edit');
+    await store.withDb((db) => { db.adminUsers[0].email = 'admin@suhbah.local'; });
+    const unconfigured = await start(4819, { ADMIN_EMAIL: '', ADMIN_PASSWORD: '' });
+    const missing = await request(unconfigured, '/api/login', 'POST', { email: 'admin@suhbah.local', password: 'test-password' });
+    assert.equal(missing.response.status, 503);
+    assert.match(missing.data.error, /ADMIN_EMAIL and ADMIN_PASSWORD/);
   } finally {
     for (const child of children) if (child.exitCode === null && !child.killed) child.kill();
     await store.close();
