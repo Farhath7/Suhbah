@@ -11,7 +11,7 @@ test('public navigation hides admin and dashboard access requires an admin sessi
   const temporaryRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'suhbah-admin-test-'));
   let server;
   try {
-    for (const file of ['server.js', 'registration-email.js', 'index.html', 'suhbah.js', 'suhbah.css', 'quran-library.js']) {
+    for (const file of ['server.js', 'storage.js', 'registration-email.js', 'index.html', 'suhbah.js', 'suhbah.css', 'quran-library.js']) {
       fs.copyFileSync(path.join(root, file), path.join(temporaryRoot, file));
     }
     fs.mkdirSync(path.join(temporaryRoot, 'data'));
@@ -37,7 +37,7 @@ test('public navigation hides admin and dashboard access requires an admin sessi
     });
     server = spawn(process.execPath, ['server.js'], {
       cwd: temporaryRoot,
-      env: { ...process.env, GMAIL_APP_PASSWORD: '', PORT: String(port), ADMIN_EMAIL: email, ADMIN_PASSWORD: password },
+      env: { ...process.env, NODE_PATH: path.join(root, 'node_modules'), POSTGRES_URL: '', DATABASE_URL: '', VERCEL: '', GMAIL_APP_PASSWORD: '', PORT: String(port), ADMIN_EMAIL: email, ADMIN_PASSWORD: password },
       windowsHide: true,
       stdio: ['ignore', 'pipe', 'pipe'],
     });

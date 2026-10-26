@@ -3,7 +3,7 @@
   "buildCommand": "npm run build:vercel",
   "functions": {
     "server.js": {
-      "includeFiles": "{suhbah.js,suhbah.css,quran-library.js}"
+      "includeFiles": "{suhbah.js,suhbah.css,quran-library.js,certs/supabase-ca.crt}"
     }
   }
 }

@@ -1315,16 +1315,28 @@
 
     document.getElementById('eventForm')?.addEventListener('submit', async (event) => {
       event.preventDefault();
-      const data = formData(event.target);
-      const file = event.target.imageFile.files[0];
-      if (file) data.image = await fileToDataUrl(file);
-      const speechPdfFile = event.target.speechPdfFile.files[0];
-      if (speechPdfFile) data.speechLink = await fileToDataUrl(speechPdfFile);
-      delete data.imageFile;
-      delete data.speechPdfFile;
-      await api('/api/admin/events', { method: data.id ? 'PUT' : 'POST', body: JSON.stringify(data) });
-      editing = {};
-      await render();
+      document.getElementById('eventFormError')?.remove();
+      try {
+        const data = formData(event.target);
+        const file = event.target.imageFile.files[0];
+        if (file) data.image = await fileToDataUrl(file);
+        const speechPdfFile = event.target.speechPdfFile.files[0];
+        if (speechPdfFile?.size > 3_000_000) throw new Error('Please choose a PDF smaller than 3 MB.');
+        if (speechPdfFile) data.speechLink = await fileToDataUrl(speechPdfFile);
+        delete data.imageFile;
+        delete data.speechPdfFile;
+        const body = JSON.stringify(data);
+        if (new TextEncoder().encode(body).length > 4_200_000) throw new Error('Files are too large. Please use a smaller image or PDF.');
+        await api('/api/admin/events', { method: data.id ? 'PUT' : 'POST', body });
+        editing = {};
+        await render();
+      } catch (error) {
+        const message = document.createElement('p');
+        message.id = 'eventFormError';
+        message.setAttribute('role', 'alert');
+        message.textContent = error.message || 'Could not save the event. Please try again.';
+        event.target.append(message);
+      }
     });
 
     document.querySelectorAll('[data-edit-event]').forEach((button) => {

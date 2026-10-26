@@ -4,6 +4,8 @@ const http = require('http');
 const path = require('path');
 const { URL } = require('url');
 const { createConfirmationSender } = require('./registration-email');
+const { createStore, uploadPdf, downloadPdf, storageConfig } = require('./storage');
+const { waitUntil } = require('@vercel/functions');
 
 const envPath = path.join(__dirname, '.env');
 if (fs.existsSync(envPath)) process.loadEnvFile(envPath);
@@ -11,7 +13,7 @@ const sendConfirmation = createConfirmationSender();
 
 const PORT = Number(process.env.PORT || 4173);
 const ROOT = __dirname;
-const DATA_DIR = path.join(ROOT, 'data');
+const DATA_DIR = path.resolve(process.env.SUHBAH_DATA_DIR || path.join(ROOT, 'data'));
 const DB_PATH = path.join(DATA_DIR, 'suhbah-db.json');
 const ASSETS_DIR = path.join(ROOT, 'assets');
 const SPEECH_DIR = path.join(ASSETS_DIR, 'speeches');
@@ -23,7 +25,6 @@ const adminEmail = process.env.ADMIN_EMAIL || DEMO_ADMIN_EMAIL;
 const adminPassword = process.env.ADMIN_PASSWORD || crypto.randomBytes(24).toString('base64url');
 const adminPasswordHash = hash(adminPassword);
 
-const sessions = new Map();
 
 const initialDb = {
   adminUsers: [
@@ -131,44 +132,24 @@ const initialDb = {
   },
 };
 
-function ensureDb() {
-  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-  if (!fs.existsSync(DB_PATH)) {
-    migrateSpeechLinks(initialDb);
-    writeDb(initialDb);
-    return;
-  }
+const store = createStore({ filePath: DB_PATH, seed: initialDb, prepare: prepareDb });
 
-  const db = JSON.parse(fs.readFileSync(DB_PATH, 'utf8'));
-  let changed = migrateSpeechLinks(db);
+function prepareDb(db) {
   const demoAdmin = db.adminUsers?.find(
     (admin) => admin.email === DEMO_ADMIN_EMAIL && admin.passwordHash === DEMO_ADMIN_PASSWORD_HASH,
   );
-  if (demoAdmin) {
+  // Never activate a known demo password in production.
+  if (demoAdmin && (!store.persistent || (process.env.ADMIN_EMAIL && process.env.ADMIN_PASSWORD))) {
     demoAdmin.email = adminEmail;
     demoAdmin.passwordHash = adminPasswordHash;
-    changed = true;
   }
-
   if (process.env.ADMIN_EMAIL && process.env.ADMIN_PASSWORD) {
-    const primaryAdmin = db.adminUsers?.find((admin) => admin.id === 'admin-1') || db.adminUsers?.[0];
-    if (primaryAdmin && (primaryAdmin.email !== adminEmail || primaryAdmin.passwordHash !== adminPasswordHash)) {
-      primaryAdmin.email = adminEmail;
-      primaryAdmin.passwordHash = adminPasswordHash;
-      changed = true;
+    const admin = db.adminUsers?.find((item) => item.id === 'admin-1') || db.adminUsers?.[0];
+    if (admin) {
+      admin.email = adminEmail;
+      admin.passwordHash = adminPasswordHash;
     }
   }
-
-  if (changed) writeDb(db);
-}
-
-function readDb() {
-  ensureDb();
-  return JSON.parse(fs.readFileSync(DB_PATH, 'utf8'));
-}
-
-function writeDb(db) {
-  fs.writeFileSync(DB_PATH, JSON.stringify(db, null, 2));
 }
 
 function uid(prefix) {
@@ -183,24 +164,17 @@ function safeFilePart(value) {
     .slice(0, 80) || 'speech';
 }
 
-function saveSpeechPdf(dataUrl, eventId) {
+async function saveSpeechPdf(dataUrl, eventId) {
   if (!String(dataUrl || '').startsWith('data:application/pdf;base64,')) return dataUrl || '';
-  if (!fs.existsSync(SPEECH_DIR)) fs.mkdirSync(SPEECH_DIR, { recursive: true });
-  const base64 = dataUrl.split(',', 2)[1] || '';
-  const fileName = `${safeFilePart(eventId)}-${Date.now()}.pdf`;
-  fs.writeFileSync(path.join(SPEECH_DIR, fileName), Buffer.from(base64, 'base64'));
+  const bytes = Buffer.from(dataUrl.split(',', 2)[1] || '', 'base64');
+  if (bytes.length > 3_000_000) throw new Error('PDF must be smaller than 3 MB');
+  if (!bytes.subarray(0, 5).equals(Buffer.from('%PDF-'))) throw new Error('Please upload a valid PDF');
+  const fileName = `${safeFilePart(eventId)}-${crypto.randomUUID()}.pdf`;
+  if (storageConfig()) return uploadPdf(bytes, fileName);
+  if (store.persistent) throw new Error('PDF storage is not configured');
+  fs.mkdirSync(SPEECH_DIR, { recursive: true });
+  fs.writeFileSync(path.join(SPEECH_DIR, fileName), bytes);
   return `/assets/speeches/${fileName}`;
-}
-
-function migrateSpeechLinks(db) {
-  let changed = false;
-  for (const event of db.events || []) {
-    if (String(event.speechLink || '').startsWith('data:application/pdf;base64,')) {
-      event.speechLink = saveSpeechPdf(event.speechLink, event.id);
-      changed = true;
-    }
-  }
-  return changed;
 }
 
 function hash(value) {
@@ -244,19 +218,19 @@ function getCookie(req, name) {
     .find(([key]) => key === name)?.[1];
 }
 
-function getSession(req) {
+function getSession(db, req) {
   const token = getCookie(req, SESSION_COOKIE);
   if (!token) return null;
-  const session = sessions.get(token);
+  const session = db.sessions?.[hash(token)];
   if (!session || session.expiresAt < Date.now()) {
-    sessions.delete(token);
+    if (db.sessions) delete db.sessions[hash(token)];
     return null;
   }
   return session;
 }
 
-function requireAdmin(req, res) {
-  const session = getSession(req);
+function requireAdmin(db, req, res) {
+  const session = getSession(db, req);
   if (!session) {
     sendJson(res, 401, { error: 'Authentication required' });
     return null;
@@ -299,7 +273,25 @@ function serveFile(res, filePath) {
 }
 
 async function handleApi(req, res, url) {
-  const db = readDb();
+  // Read slow request bodies before taking the row lock.
+  const body = ['POST', 'PUT', 'DELETE'].includes(req.method) ? await parseBody(req) : {};
+  const pending = { status: 200, headers: {}, body: '' };
+  const afterCommit = [];
+  const deferred = {
+    setHeader: (name, value) => { pending.headers[name] = value; },
+    writeHead: (status, headers) => { pending.status = status; Object.assign(pending.headers, headers); },
+    end: (value) => { pending.body = value; },
+  };
+  await store.withDb((db) => handleApiWithDb(req, deferred, url, db, body, afterCommit), {
+    write: !['GET', 'HEAD'].includes(req.method),
+  });
+  // Do not report success until the database has committed.
+  res.writeHead(pending.status, pending.headers);
+  res.end(pending.body);
+  for (const task of afterCommit) waitUntil(task().catch(() => console.warn('Confirmation email processing failed')));
+}
+
+async function handleApiWithDb(req, res, url, db, body, afterCommit) {
 
   if (req.method === 'GET' && url.pathname === '/api/public') {
     sendJson(res, 200, publicDb(db));
@@ -307,17 +299,21 @@ async function handleApi(req, res, url) {
   }
 
   if (req.method === 'POST' && url.pathname === '/api/login') {
-    const body = await parseBody(req);
     const user = db.adminUsers.find((admin) => admin.email === body.email);
-    if (!user || user.passwordHash !== hash(body.password || '')) {
+    if (!user || user.passwordHash !== hash(body.password || '') ||
+        (store.persistent && user.email === DEMO_ADMIN_EMAIL && user.passwordHash === DEMO_ADMIN_PASSWORD_HASH)) {
       sendJson(res, 401, { error: 'Invalid credentials' });
       return;
     }
     const token = crypto.randomBytes(32).toString('hex');
-    sessions.set(token, { userId: user.id, expiresAt: Date.now() + SESSION_TTL_MS });
+    db.sessions ||= {};
+    for (const [key, session] of Object.entries(db.sessions)) {
+      if (session.expiresAt < Date.now()) delete db.sessions[key];
+    }
+    db.sessions[hash(token)] = { userId: user.id, expiresAt: Date.now() + SESSION_TTL_MS };
     res.setHeader(
       'Set-Cookie',
-      `${SESSION_COOKIE}=${token}; HttpOnly; SameSite=Lax; Path=/; Max-Age=${SESSION_TTL_MS / 1000}`,
+      `${SESSION_COOKIE}=${token}; HttpOnly; SameSite=Lax; Path=/; Max-Age=${SESSION_TTL_MS / 1000}${process.env.VERCEL ? '; Secure' : ''}`,
     );
     sendJson(res, 200, { ok: true, user: { id: user.id, name: user.name, email: user.email } });
     return;
@@ -325,14 +321,13 @@ async function handleApi(req, res, url) {
 
   if (req.method === 'POST' && url.pathname === '/api/logout') {
     const token = getCookie(req, SESSION_COOKIE);
-    if (token) sessions.delete(token);
+    if (token && db.sessions) delete db.sessions[hash(token)];
     res.setHeader('Set-Cookie', `${SESSION_COOKIE}=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0`);
     sendJson(res, 200, { ok: true });
     return;
   }
 
   if (req.method === 'POST' && url.pathname === '/api/registrations') {
-    const body = await parseBody(req);
     const event = db.events.find((item) => item.id === body.eventId);
     if (!event) {
       sendJson(res, 404, { error: 'This Suhbah was not found.' });
@@ -382,11 +377,11 @@ async function handleApi(req, res, url) {
       confirmationEmailStatus: sendConfirmation ? 'pending' : 'not_configured',
     };
     db.registrations.unshift(registration);
-    writeDb(db);
+
     sendJson(res, 201, { registration });
     if (sendConfirmation) {
       // Email delivery must never prevent a saved registration or the WhatsApp redirect.
-      void (async () => {
+      afterCommit.push(async () => {
         let status;
         try {
           await sendConfirmation(registration, event);
@@ -395,60 +390,58 @@ async function handleApi(req, res, url) {
           status = 'failed';
           console.warn(`Confirmation email failed for registration ${registration.id}`);
         }
-        const latest = readDb();
-        const saved = latest.registrations.find((item) => item.id === registration.id);
-        if (saved) {
-          saved.confirmationEmailStatus = status;
-          saved.confirmationEmailUpdatedAt = new Date().toISOString();
-          writeDb(latest);
-        }
-      })().catch(() => console.warn(`Could not record confirmation email status for ${registration.id}`));
+        await store.withDb((latest) => {
+          const saved = latest.registrations.find((item) => item.id === registration.id);
+          if (saved) {
+            saved.confirmationEmailStatus = status;
+            saved.confirmationEmailUpdatedAt = new Date().toISOString();
+          }
+        });
+      });
     }
     return;
   }
 
   if (url.pathname === '/api/admin') {
-    if (!requireAdmin(req, res)) return;
-    const { adminUsers, ...dashboardDb } = db;
+    if (!requireAdmin(db, req, res)) return;
+    const { adminUsers, sessions, ...dashboardDb } = db;
     sendJson(res, 200, dashboardDb);
     return;
   }
 
   if (url.pathname === '/api/admin/events') {
-    if (!requireAdmin(req, res)) return;
-    const body = await parseBody(req);
+    if (!requireAdmin(db, req, res)) return;
     if (req.method === 'POST') {
       const event = { ...body, id: uid('event'), createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
-      event.speechLink = saveSpeechPdf(event.speechLink, event.id);
+      event.speechLink = await saveSpeechPdf(event.speechLink, event.id);
       db.events.unshift(event);
-      writeDb(db);
+
       sendJson(res, 201, { event });
       return;
     }
     if (req.method === 'PUT') {
-      body.speechLink = saveSpeechPdf(body.speechLink, body.id);
+      if (Object.hasOwn(body, 'speechLink')) body.speechLink = await saveSpeechPdf(body.speechLink, body.id);
       db.events = db.events.map((event) =>
         event.id === body.id ? { ...event, ...body, updatedAt: new Date().toISOString() } : event,
       );
-      writeDb(db);
+
       sendJson(res, 200, { events: db.events });
       return;
     }
     if (req.method === 'DELETE') {
       db.events = db.events.filter((event) => event.id !== body.id);
-      writeDb(db);
+
       sendJson(res, 200, { events: db.events });
       return;
     }
   }
 
   if (url.pathname === '/api/admin/testimonials') {
-    if (!requireAdmin(req, res)) return;
-    const body = await parseBody(req);
+    if (!requireAdmin(db, req, res)) return;
     if (req.method === 'POST') {
       const testimonial = { ...body, id: uid('test'), createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
       db.testimonials.unshift(testimonial);
-      writeDb(db);
+
       sendJson(res, 201, { testimonial });
       return;
     }
@@ -458,30 +451,30 @@ async function handleApi(req, res, url) {
           ? { ...testimonial, ...body, updatedAt: new Date().toISOString() }
           : testimonial,
       );
-      writeDb(db);
+
       sendJson(res, 200, { testimonials: db.testimonials });
       return;
     }
     if (req.method === 'DELETE') {
       db.testimonials = db.testimonials.filter((testimonial) => testimonial.id !== body.id);
-      writeDb(db);
+
       sendJson(res, 200, { testimonials: db.testimonials });
       return;
     }
   }
 
   if (req.method === 'PUT' && url.pathname === '/api/admin/statistics') {
-    if (!requireAdmin(req, res)) return;
-    db.communityStats = { ...(await parseBody(req)), updatedAt: new Date().toISOString() };
-    writeDb(db);
+    if (!requireAdmin(db, req, res)) return;
+    db.communityStats = { ...body, updatedAt: new Date().toISOString() };
+
     sendJson(res, 200, { communityStats: db.communityStats });
     return;
   }
 
   if (req.method === 'PUT' && url.pathname === '/api/admin/social') {
-    if (!requireAdmin(req, res)) return;
-    db.socialLinks = { ...(await parseBody(req)), updatedAt: new Date().toISOString() };
-    writeDb(db);
+    if (!requireAdmin(db, req, res)) return;
+    db.socialLinks = { ...body, updatedAt: new Date().toISOString() };
+
     sendJson(res, 200, { socialLinks: db.socialLinks });
     return;
   }
@@ -494,6 +487,20 @@ const server = http.createServer(async (req, res) => {
     const url = new URL(req.url, `http://${req.headers.host}`);
     if (url.pathname.startsWith('/api/')) {
       await handleApi(req, res, url);
+      return;
+    }
+
+    if (url.pathname.startsWith('/uploads/speeches/')) {
+      const name = decodeURIComponent(url.pathname.slice('/uploads/speeches/'.length));
+      if (!/^[a-zA-Z0-9_-]+\.pdf$/.test(name)) {
+        res.writeHead(404); res.end('Not found'); return;
+      }
+      const response = await downloadPdf(name);
+      if (!response.ok) {
+        res.writeHead(response.status === 404 ? 404 : 502); res.end('PDF unavailable'); return;
+      }
+      res.writeHead(200, { 'Content-Type': 'application/pdf', 'Cache-Control': 'public, max-age=86400', 'X-Content-Type-Options': 'nosniff' });
+      res.end(Buffer.from(await response.arrayBuffer()));
       return;
     }
 
@@ -519,7 +526,6 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
-ensureDb();
 server.listen(PORT, () => {
   console.log(`Suhbah running at http://localhost:${PORT}`);
   if (!sendConfirmation) console.log('Confirmation emails are disabled until GMAIL_APP_PASSWORD is configured.');
