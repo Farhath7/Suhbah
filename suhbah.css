@@ -298,6 +298,22 @@ img {
   backdrop-filter: blur(18px);
 }
 
+/* Carry the animated sky behind the navigation for one continuous fade. */
+.site:has(.sky-intro) .header {
+  background: linear-gradient(to bottom, rgba(220, 224, 251, .28), rgba(220, 224, 251, .06));
+  border-bottom-color: transparent;
+  backdrop-filter: blur(12px);
+}
+
+.site:has(.sky-intro) .sky-intro {
+  margin-top: -73px;
+  padding-top: 73px;
+}
+
+.site:has(.sky-intro) .menu-button {
+  background: rgba(220, 224, 251, .45);
+}
+
 .nav {
   display: flex;
   align-items: center;
@@ -2777,6 +2793,11 @@ td {
 @media (max-width: 639px) {
   .container {
     width: min(100% - 28px, 420px);
+  }
+
+  .site:has(.sky-intro) .sky-intro {
+    margin-top: -67px;
+    padding-top: 67px;
   }
 
   .nav {
