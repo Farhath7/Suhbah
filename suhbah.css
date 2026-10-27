@@ -2102,8 +2102,8 @@ body.modal-open {
 .quran-hadith { display: grid; grid-template-columns: 1fr 1fr; grid-template-areas: "translation arabic"; align-items: center; gap: 28px; margin: 0; padding: 20px 0; }
 .quran-hadith blockquote { grid-area: arabic; margin: 0; font-family: "Uthmanic Hafs", "Traditional Arabic", serif; font-size: 1.5rem; font-weight: 700; line-height: 1.85; text-align: right; }
 .quran-hadith figcaption { grid-area: translation; font-weight: 700; }
-.quran-hadith .hadith-translation { display: block; font-weight: 700; color: var(--blue); font-size: .8rem; line-height: 1.7; }
-.quran-hadith .hadith-source { display: block; font-weight: 700; margin-top: 10px; color: var(--blue); font-size: .68rem; }
+.quran-hadith .hadith-translation { display: block; font-weight: 700; color: var(--blue); font-size: clamp(1.05rem, 2vw, 1.2rem); line-height: 1.7; }
+.quran-hadith .hadith-source { display: block; font-weight: 700; margin-top: 10px; color: var(--blue); font-size: .85rem; }
 .quran-library [hidden] { display: none; }
 @media (max-width: 899px) {
   .quran-navigator, .quran-reading-panel { padding: 22px; }
