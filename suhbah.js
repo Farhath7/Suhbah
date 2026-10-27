@@ -11,6 +11,52 @@
   let donationCollapsed = false;
   try { donationCollapsed = localStorage.getItem('suhbah-donation-collapsed') === 'true'; } catch {}
 
+  // Arabic and The Clear Quran translations verified against the linked Quran.com verses.
+  const weeklyVerses = [
+    { reference: '94:6', surah: 'Ash-Sharh', arabic: 'إِنَّ مَعَ ٱلْعُسْرِ يُسْرًا', translation: 'Surely with ˹that˺ hardship comes ˹more˺ ease.' },
+    { reference: '2:152', surah: 'Al-Baqarah', arabic: 'فَٱذْكُرُونِىٓ أَذْكُرْكُمْ وَٱشْكُرُوا۟ لِى وَلَا تَكْفُرُونِ', translation: 'remember Me; I will remember you. And thank Me, and never be ungrateful.' },
+    { reference: '93:5', surah: 'Ad-Duhaa', arabic: 'وَلَسَوْفَ يُعْطِيكَ رَبُّكَ فَتَرْضَىٰٓ', translation: 'And ˹surely˺ your Lord will give so much to you that you will be pleased.' },
+    { reference: '112:1', surah: 'Al-Ikhlas', arabic: 'قُلْ هُوَ ٱللَّهُ أَحَدٌ', translation: 'Say, ˹O Prophet,˺ “He is Allah—One ˹and Indivisible˺;' },
+  ];
+
+  function verseOfTheWeek(now = new Date()) {
+    const parts = Object.fromEntries(new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Asia/Kolkata', year: 'numeric', month: '2-digit', day: '2-digit',
+    }).formatToParts(now).map(({ type, value }) => [type, value]));
+    const day = Date.UTC(Number(parts.year), Number(parts.month) - 1, Number(parts.day));
+    const week = Math.floor((day - Date.UTC(2026, 9, 26)) / (7 * 86400000));
+    return weeklyVerses[((week % weeklyVerses.length) + weeklyVerses.length) % weeklyVerses.length];
+  }
+
+  function weeklyVerseSection() {
+    const verse = verseOfTheWeek();
+    const url = `https://quran.com/${verse.reference.replace(':', '/')}`;
+    return `<section class="section weekly-verse" id="verse-of-the-week" aria-labelledby="weeklyVerseTitle">
+      <div class="container">
+        <div class="weekly-verse-card fade-in">
+          <div class="weekly-verse-intro">
+            <span class="weekly-verse-eyebrow">A reminder to carry with you</span>
+            <h2 id="weeklyVerseTitle">Verse of <br />the Week</h2>
+            <p>One verse. A little space to pause, reflect, and reconnect.</p>
+            <span class="weekly-verse-schedule">A new reminder every Monday</span>
+          </div>
+          <div class="weekly-verse-reading">
+            <p class="weekly-verse-reference">Surah ${html(verse.surah)} <span aria-hidden="true">&middot;</span> ${html(verse.reference)}</p>
+            <p class="weekly-verse-arabic" lang="ar" dir="rtl">${html(verse.arabic)}</p>
+            <blockquote class="weekly-verse-translation">${html(verse.translation)}</blockquote>
+            <p class="weekly-verse-credit">Dr. Mustafa Khattab, The Clear Quran</p>
+            <div class="weekly-verse-actions">
+              <a class="button secondary" href="${url}" target="_blank" rel="noopener noreferrer">Read on Quran.com</a>
+              <button class="button primary" id="shareWeeklyVerse" type="button">Share verse</button>
+            </div>
+            <p class="weekly-verse-share-status" id="weeklyVerseShareStatus" role="status" aria-live="polite"></p>
+            <textarea class="weekly-verse-share-text" id="weeklyVerseShareText" aria-label="Verse text to copy and share" readonly hidden></textarea>
+          </div>
+        </div>
+      </div>
+    </section>`;
+  }
+
   async function api(path, options = {}) {
     const response = await fetch(path, {
       credentials: 'same-origin',
@@ -408,6 +454,7 @@
           </div>
         </section>
         </div>
+        ${weeklyVerseSection()}
         <section class="section about-section" id="about">
           <div class="container">
             <div class="section-head fade-in">
@@ -474,15 +521,6 @@
           <div class="container">
             <div class="section-head fade-in"><h2>What the community says</h2></div>
             <div class="testimonials">${db.testimonials.map(testimonial).join('')}</div>
-          </div>
-        </section>
-        <section class="section reflection">
-          <div class="container fade-in">
-            <h2>A moment to reflect</h2>
-            <div class="arabic" lang="ar" dir="rtl">أَلَا بِذِكْرِ ٱللَّهِ تَطْمَئِنُّ ٱلْقُلُوبُ</div>
-            <p class="translation">"Indeed, in the remembrance of Allah do hearts find rest."</p>
-            <p class="muted">Quran 13:28</p>
-            <a class="button secondary" href="#quran-library">Explore the Quran</a>
           </div>
         </section>
         <section class="section quran-library" id="quran-library">
@@ -1170,6 +1208,44 @@
   }
 
   function bindPublic() {
+    document.getElementById('shareWeeklyVerse')?.addEventListener('click', async (event) => {
+      const button = event.currentTarget;
+      const status = document.getElementById('weeklyVerseShareStatus');
+      const card = button.closest('.weekly-verse-reading');
+      // Share exactly the verse displayed, even if the week changed since the page loaded.
+      const url = card.querySelector('a').href;
+      const text = ['Verse of the Week | Suhbah', card.querySelector('.weekly-verse-arabic').textContent,
+        card.querySelector('.weekly-verse-translation').textContent,
+        card.querySelector('.weekly-verse-reference').textContent,
+        'Translation: Dr. Mustafa Khattab, The Clear Quran'].join('\n\n');
+      const fullText = `${text}\n\n${url}`;
+      button.disabled = true;
+      status.textContent = '';
+      try {
+        if (navigator.share) {
+          try {
+            await navigator.share({ title: 'Verse of the Week | Suhbah', text, url });
+            status.textContent = 'Share menu opened.';
+            return;
+          } catch (error) {
+            if (error.name === 'AbortError') return;
+          }
+        }
+        if (!navigator.clipboard?.writeText) throw new Error('Clipboard unavailable');
+        await navigator.clipboard.writeText(fullText);
+        status.textContent = 'Verse and Quran.com link copied. Ready to share.';
+      } catch {
+        const field = document.getElementById('weeklyVerseShareText');
+        field.value = fullText;
+        field.hidden = false;
+        field.focus();
+        field.select();
+        status.textContent = 'Select and copy the verse below to share it.';
+      } finally {
+        button.disabled = false;
+      }
+    });
+
     bindBookmark();
     bindConversationSparkles();
     const quranSearch = document.getElementById('quranSearch');
