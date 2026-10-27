@@ -147,7 +147,7 @@
             <a class="nav-link" href="${homeAnchor('#about')}">About</a>
             <a class="nav-link" href="${homeAnchor('#events')}">Gatherings</a>
             <details class="nav-resources">
-              <summary class="nav-link">Resources<svg class="nav-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m4 6 4 4 4-4" /></svg></summary>
+              <summary class="nav-link">Resources</summary>
               <div class="nav-resource-links">
                 <a class="nav-link" href="${homeAnchor('#quran-library')}">Quran</a>
                 <a class="nav-link" href="/bookmarks" data-route>Bookmarks</a>
@@ -157,7 +157,7 @@
             <a class="button primary nav-mobile-join" href="${registrationUrl(upcomingEvent())}" data-route>Join Next Suhbah</a>
           </div>
           <div class="nav-actions"><a class="button primary" href="${registrationUrl(upcomingEvent())}" data-route>Join Next Suhbah</a></div>
-          <button class="menu-button" type="button" aria-label="Open menu" aria-controls="navLinks" aria-expanded="false"><span class="menu-icon"></span></button>
+          <button class="menu-button" type="button" aria-label="Open menu" aria-controls="navLinks" aria-expanded="false">Menu</button>
         </nav>
       </header>
     `;
@@ -500,7 +500,6 @@
             <div class="quran-browse-bar">
               <div><h3>Find your place</h3><p>Select a Chapter or search for a surah.</p></div>
               <label class="quran-search" for="quranSearch">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" /><path d="m16 16 4.5 4.5" /></svg>
                 <input id="quranSearch" type="search" placeholder="Search Chapter or surah" aria-label="Search by Chapter number or surah name" autocomplete="off" />
               </label>
             </div>
@@ -564,7 +563,7 @@
     if (!event) return `<section class="section white" id="register"><div class="container"><h2>Registrations will open soon</h2><p class="lead">Check back for the next Suhbah.</p></div></section>`;
     const titleParts = event.theme.match(/^(.*?)\s*-\s*(Upcoming)$/i);
     return `<section class="section white" id="register">
-          ${standalone ? '<div class="container registration-back"><a href="/#events">← All Suhbahs</a></div>' : ''}
+          ${standalone ? '<div class="container registration-back"><a href="/#events">All Suhbahs</a></div>' : ''}
           <div class="container registration-grid">
             <div class="registration-copy fade-in">
               <p class="registration-label-text">Event registration</p>
@@ -641,7 +640,7 @@
       const exact = new URL(mapUrl);
       if (['https:', 'http:'].includes(exact.protocol)) url = exact.href;
     } catch {}
-    return `<a class="event-map-link" href="${html(url)}" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M20 10c0 6-8 11-8 11S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg>View on Google Maps <span aria-hidden="true">&#8599;</span></a>`;
+    return `<a class="event-map-link" href="${html(url)}" target="_blank" rel="noopener noreferrer">View on Google Maps</a>`;
   }
 
   function meta(label, value, mapUrl) {
@@ -707,16 +706,15 @@
             <div class="quran-juz-title"><h3 class="quran-juz-label" id="quran-title-${number}">Chapter ${label}</h3><strong lang="ar" dir="rtl">${paraNames[index]}</strong><span class="quran-juz-meta">${surahs.length} surah${surahs.length === 1 ? '' : 's'}</span></div>
           </header>
           <div class="quran-juz-content">
-            <a class="quran-open-juz" href="${QuranLibrary.pdfUrl(number)}" target="_blank" rel="noreferrer">Open full Chapter ${label} <span aria-hidden="true">↗</span></a>
+            <a class="quran-open-juz" href="${QuranLibrary.pdfUrl(number)}" target="_blank" rel="noreferrer">Open full Chapter ${label}</a>
             <ul class="quran-surahs" tabindex="0" aria-label="Surahs in Chapter ${number}">
               ${surahs.map((surah) => `
                 <li>
                   <a class="quran-surah-link" href="${QuranLibrary.pdfUrl(surah.juz, surah.page)}" target="_blank" rel="noreferrer" aria-label="Open Surah ${html(surah.name)} from the beginning, Chapter ${surah.juz}, PDF page ${surah.page}">
                     <span class="quran-surah-number">${surah.number}</span>
                     <span><strong>${html(surah.name)}</strong><small>Starts in Chapter ${surah.juz} · PDF page ${surah.page}</small></span>
-                    <span aria-hidden="true">↗</span>
                   </a>
-                  ${surah.juz < number ? `<a class="quran-surah-continue" href="${QuranLibrary.pdfUrl(number)}" target="_blank" rel="noreferrer" aria-label="Continue Surah ${html(surah.name)} in Chapter ${number}">Continue in this Chapter ↗</a>` : ''}
+                  ${surah.juz < number ? `<a class="quran-surah-continue" href="${QuranLibrary.pdfUrl(number)}" target="_blank" rel="noreferrer" aria-label="Continue Surah ${html(surah.name)} in Chapter ${number}">Continue in this Chapter</a>` : ''}
                 </li>
               `).join('')}
             </ul>
@@ -760,7 +758,7 @@
       `
         <div class="recap-overlay" role="presentation">
           <section class="recap-dialog" role="dialog" aria-modal="true" aria-labelledby="recapTitle">
-            <button class="recap-close" type="button" aria-label="Close recap">&times;</button>
+            <button class="recap-close" type="button" aria-label="Close recap">Close</button>
             <div class="recap-heading">
               ${session.image ? `<img class="recap-thumbnail" src="${html(session.image)}" alt="${html(session.number)}: ${html(session.theme)}" />` : ''}
               <div><span class="event-kicker">${html(session.number)}</span><h2 id="recapTitle">${html(session.theme)}</h2></div>
@@ -880,11 +878,11 @@
     if (!donationContact) return '';
     return `
       <aside class="donation-banner${donationCollapsed ? ' is-collapsed' : ''}" aria-label="Support Suhbah">
-        <button class="donation-toggle" type="button" aria-expanded="${!donationCollapsed}" aria-controls="donationCard" aria-label="${donationCollapsed ? 'Show donation banner' : 'Hide donation banner'}"><span>Support Suhbah</span><span class="donation-toggle-action">${donationCollapsed ? 'Show' : 'Hide'}</span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m4 6 4 4 4-4" /></svg></button>
+        <button class="donation-toggle" type="button" aria-expanded="${!donationCollapsed}" aria-controls="donationCard" aria-label="${donationCollapsed ? 'Show donation banner' : 'Hide donation banner'}"><span>Support Suhbah</span><span class="donation-toggle-action">${donationCollapsed ? 'Show' : 'Hide'}</span></button>
         <a id="donationCard" class="donation-button" ${donationCollapsed ? 'inert' : ''} href="${html(donationContact)}" target="_blank" rel="noopener noreferrer" aria-label="Support Suhbah - ${db.socialLinks.instagram ? 'DM us on Instagram' : 'message us'} to donate (opens in a new tab)">
           <span class="donation-heart" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z" /></svg></span>
           <span class="donation-label"><strong>Keep Suhbah growing.</strong><small>Your generosity helps bring young hearts together around the Quran.<span class="donation-message">Help us create more moments of reflection, connection, and good company.</span><span class="donation-signoff">Every little contribution matters.</span></small></span>
-          <span class="donation-cta">DM to donate <span aria-hidden="true">&#8599;</span></span>
+          <span class="donation-cta">DM to donate</span>
         </a>
       </aside>
     `;
@@ -935,7 +933,7 @@
         <header class="admin-header"><div class="container admin-header-inner">
           <a class="brand" href="/" data-route><img class="brand-logo" src="/assets/suhbah-logo.png" alt="Suhbah" /></a>
           <a class="admin-workspace-label" href="/admin" data-route>Admin workspace</a>
-          <div class="admin-header-actions"><a class="small-button" href="/" target="_blank" rel="noreferrer">View website &nearr;</a><button class="small-button" id="logoutButton" type="button">Log out</button></div>
+          <div class="admin-header-actions"><a class="small-button" href="/" target="_blank" rel="noreferrer">View website</a><button class="small-button" id="logoutButton" type="button">Log out</button></div>
         </div></header>
         <main class="container admin-shell">
           <div class="admin-top">
@@ -994,7 +992,7 @@
               <h3>${html(event.theme)}</h3>
               <p class="admin-event-details">${html(event.date ? shortDate(`${event.date}T00:00:00`) : 'Date to be confirmed')}${event.time ? ` &middot; ${html(event.time)}` : ''}<br>${html(event.location || 'Location to be confirmed')}</p>
               <div class="admin-event-registration"><span>Registration <strong>${html(event.registrationStatus)}</strong></span><span>${db.registrations.filter((reg) => reg.eventId === event.id).length} registered</span></div>
-              <div class="row-actions"><button class="small-button" data-edit-event="${html(event.id)}" type="button">Edit event</button><a class="small-button" href="${registrationUrl(event)}" target="_blank" rel="noreferrer">Registration page &nearr;</a><button class="small-button admin-delete" data-delete-event="${html(event.id)}" type="button" aria-label="Delete ${html(event.number)}">Delete</button></div>
+              <div class="row-actions"><button class="small-button" data-edit-event="${html(event.id)}" type="button">Edit event</button><a class="small-button" href="${registrationUrl(event)}" target="_blank" rel="noreferrer">Registration page</a><button class="small-button admin-delete" data-delete-event="${html(event.id)}" type="button" aria-label="Delete ${html(event.number)}">Delete</button></div>
             </article>
           `).join('') || '<div class="admin-empty"><h3>Your first gathering starts here</h3><p>Create an event using the form. It will appear here, ready to manage.</p></div>'}
         </div>
