@@ -17,7 +17,7 @@
 .bookmark-controls {
   display: grid;
   gap: 0;
-  padding: clamp(20px, 3vw, 30px);
+  padding: 24px;
   background: #fffefa;
   border: 1px solid #dce3dd;
   border-radius: 22px;
@@ -25,21 +25,14 @@
   font-family: var(--font-body);
   font-weight: 400;
 }
-.bookmark-controls-heading { padding-bottom: 24px; }
-.bookmark-controls-kicker { color: #66806c; font-size: .65rem; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; }
-.bookmark-controls h2 { margin: 8px 0 6px; font: 600 2rem/1.1 var(--font-display); letter-spacing: -.035em; }
+.bookmark-controls-heading { padding-bottom: 18px; }
+.bookmark-controls h2 { margin: 0 0 4px; font: 600 1.8rem/1.1 var(--font-display); letter-spacing: -.035em; }
 .bookmark-controls-heading p { margin: 0; color: #738078; font-size: .78rem; line-height: 1.5; }
-.bookmark-templates { border: 0; padding: 0; margin: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
-.bookmark-templates legend, .bookmark-finish legend, .bookmark-section-label { margin-bottom: 14px; color: #30443b; font-size: .8rem; font-weight: 650; }
-.bookmark-step { display: inline-grid; place-items: center; width: 23px; height: 23px; margin-right: 7px; border: 1px solid #dde5dc; border-radius: 50%; color: #758772; font: 600 .6rem/1 var(--font-body); vertical-align: middle; }
-.bookmark-templates label { position: relative; cursor: pointer; }
-.bookmark-templates input { position: absolute; opacity: 0; width: 1px; height: 1px; }
-.bookmark-template-card { position: relative; display: flex; height: 70px; align-items: center; gap: 9px; padding: 8px 18px 8px 9px; border: 1px solid #e1e6df; border-radius: 11px; background: white; color: #526257; font-size: .68rem; font-weight: 550; line-height: 1.4; transition: border-color 150ms ease, background 150ms ease; }
-.bookmark-template-card:hover { border-color: #9aaa99; background: #f8faf6; }
-.bookmark-templates input:checked + .bookmark-template-card { border-color: #61785c; background: #edf2e9; color: #30472d; box-shadow: inset 0 0 0 1px #61785c; }
-.bookmark-templates input:checked + .bookmark-template-card::after { content: '✓'; position: absolute; top: 5px; right: 6px; color: #61785c; font: 700 .65rem/1 var(--font-body); }
-.bookmark-templates input:focus-visible + .bookmark-template-card { outline: 3px solid var(--blue); outline-offset: 3px; }
-.bookmark-swatch { width: 25px; height: 50px; border-radius: 3px; flex-shrink: 0; box-shadow: 0 2px 5px #23332518; }
+.bookmark-template-select { display: flex; align-items: center; gap: 12px; min-width: 0; height: 54px; padding: 5px 10px; border: 1px solid #dce3d9; border-radius: 10px; background: white; }
+.bookmark-template-select:focus-within { outline: 2px solid #879d79; outline-offset: 3px; }
+.bookmark-controls .bookmark-template-select select { flex: 1; min-width: 0; min-height: 42px; padding: 6px 0; border: 0; border-radius: 0; background: transparent; font-size: .85rem; }
+.bookmark-controls .bookmark-template-select select:focus-visible { outline: 0; }
+.bookmark-swatch { width: 20px; height: 40px; border-radius: 3px; flex-shrink: 0; box-shadow: 0 2px 5px #23332518; }
 .bookmark-swatch-palestine { background: url('/assets/bookmark-palestine.jpg') center / cover; }
 .bookmark-swatch-palestine-olives { background: url('/assets/bookmark-palestine-olives.jpg') center / cover; }
 .bookmark-swatch-heritage { background: url('/assets/bookmark-olive-heritage.png') center / cover; }
@@ -48,17 +41,16 @@
 .bookmark-swatch-olive { background: #f6f3e6; border: 4px solid #87966b; }
 .bookmark-swatch-midnight { background: #172c3b; border: 3px double #e9cb86; }
 .bookmark-swatch-rose { background: #fff8ef; border: 5px solid #b8818d; border-radius: 15px; }
-.bookmark-name-section { margin-top: 24px; padding-top: 22px; border-top: 1px solid #e5e8df; }
-.bookmark-controls .field { min-width: 0; gap: 9px; }
+.bookmark-name-section { margin-top: 16px; }
+.bookmark-controls .field { min-width: 0; gap: 7px; }
 .bookmark-controls .field > span { font-size: .73rem; font-weight: 550; color: #526257; }
 .bookmark-controls .field > .bookmark-section-label { margin-bottom: 3px; color: #30443b; font-size: .8rem; font-weight: 650; }
 .bookmark-controls input[type="text"], .bookmark-controls select { width: 100%; min-width: 0; border: 1px solid #dce3d9; border-radius: 10px; background: white; color: #30443b; }
-.bookmark-controls #bookmarkName { height: 64px; padding: 10px 16px; border-color: #d9e1d5; background: #f5f7f1; font: 400 1.9rem/1.3 "Traditional Arabic", "Times New Roman", serif; }
+.bookmark-controls #bookmarkName { height: 52px; padding: 7px 14px; border-color: #d9e1d5; background: #f5f7f1; font: 400 1.9rem/1.3 "Traditional Arabic", "Times New Roman", serif; }
 .bookmark-controls #bookmarkName::placeholder { color: #9aa793; opacity: 1; }
 .bookmark-controls input:focus-visible, .bookmark-controls select:focus-visible { outline: 2px solid #879d79; outline-offset: 3px; }
-.bookmark-hint { margin: 9px 0 0; color: #7b867d; font-size: .69rem; line-height: 1.6; }
-.bookmark-finish { min-width: 0; margin: 22px 0 0; padding: 0; border: 0; }
-.bookmark-finish legend { margin-bottom: 16px; }
+.bookmark-hint { margin: 6px 0 0; color: #7b867d; font-size: .69rem; line-height: 1.6; }
+.bookmark-finish { min-width: 0; margin: 16px 0 0; padding: 0; border: 0; }
 .bookmark-style-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
 .bookmark-controls select { min-height: 46px; padding: 10px 12px; font: 500 .8rem var(--font-body); }
 .bookmark-color-control { display: flex; min-width: 0; height: 46px; align-items: center; gap: 9px; padding: 5px 9px; border: 1px solid #dce3d9; border-radius: 10px; background: white; cursor: pointer; }
@@ -67,19 +59,19 @@
 #bookmarkColor::-webkit-color-swatch-wrapper { padding: 3px 0; }
 #bookmarkColor::-webkit-color-swatch { border: 0; border-radius: 5px; }
 #bookmarkColor::-moz-color-swatch { border: 0; border-radius: 5px; }
-.bookmark-controls .bookmark-size-field { margin-top: 18px; }
+.bookmark-controls .bookmark-size-field { margin-top: 12px; }
 #bookmarkSizeValue { float: right; min-width: 32px; padding: 2px 6px; border-radius: 6px; background: #edf2e9; color: #5e7655; font: 600 .7rem/1.4 var(--font-body); font-variant-numeric: tabular-nums; text-align: center; }
 .bookmark-size-control { display: flex; align-items: center; gap: 12px; }
 .bookmark-size-control > span:first-child { color: #8e9a89; font-size: .75rem; }
 .bookmark-size-control > span:last-child { color: #52654b; font-size: 1.25rem; }
 .bookmark-controls #bookmarkSize { flex: 1; min-width: 0; width: 100%; height: 24px; padding: 0; border: 0; background: transparent; accent-color: #61785c; cursor: pointer; }
-.bookmark-download-section { margin-top: 22px; padding-top: 22px; border-top: 1px solid #e5e8df; }
-.bookmark-controls #bookmarkDownload { display: flex; width: 100%; min-height: 50px; justify-content: center; gap: 10px; padding: 12px; border-radius: 11px; background: #304b3c; border-color: #304b3c; color: #fffef8; font: 600 .8rem var(--font-body); }
+.bookmark-download-section { margin-top: 14px; padding-top: 16px; border-top: 1px solid #e5e8df; }
+.bookmark-controls #bookmarkDownload { display: flex; width: 100%; min-height: 46px; justify-content: center; gap: 10px; padding: 12px; border-radius: 11px; background: #304b3c; border-color: #304b3c; color: #fffef8; font: 600 .8rem var(--font-body); }
 #bookmarkDownload svg { width: 18px; height: 18px; }
 .bookmark-file-type { margin-left: auto; padding: 3px 6px; border: 1px solid #ffffff40; border-radius: 4px; font-size: .6rem; letter-spacing: .06em; }
 .bookmark-controls button:disabled { opacity: .55; cursor: not-allowed; }
 .bookmark-status { margin: 10px 0 0; color: #687a67; font-size: .68rem; line-height: 1.5; text-align: center; }
-.bookmark-privacy { display: flex; justify-content: center; align-items: flex-start; gap: 6px; margin: 16px 0 0; color: #8a9388; font-size: .61rem; line-height: 1.6; text-align: left; }
+.bookmark-privacy { display: flex; justify-content: center; align-items: flex-start; gap: 6px; margin: 9px 0 0; color: #8a9388; font-size: .61rem; line-height: 1.6; text-align: left; }
 .bookmark-privacy svg { flex-shrink: 0; width: 13px; height: 13px; margin-top: 1px; }
 .bookmark-preview { margin: 0; padding: 24px; border-radius: var(--radius); background: #e4e9df; text-align: center; }
 .bookmark-preview-heading { display: flex; justify-content: space-between; gap: 12px; font-size: .95rem; margin-bottom: 24px; }
