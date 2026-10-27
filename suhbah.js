@@ -40,13 +40,12 @@
             <p>One verse. A little space to pause, reflect, and reconnect.</p>
             <span class="weekly-verse-schedule">A new reminder every Monday</span>
           </div>
-          <div class="weekly-verse-reading">
+          <div class="weekly-verse-reading" data-verse-url="${html(url)}">
             <p class="weekly-verse-reference">Surah ${html(verse.surah)} <span aria-hidden="true">&middot;</span> ${html(verse.reference)}</p>
             <p class="weekly-verse-arabic" lang="ar" dir="rtl">${html(verse.arabic)}</p>
             <blockquote class="weekly-verse-translation">${html(verse.translation)}</blockquote>
             <p class="weekly-verse-credit">Dr. Mustafa Khattab, The Clear Quran</p>
             <div class="weekly-verse-actions">
-              <a class="button secondary" href="${url}" target="_blank" rel="noopener noreferrer">Read on Quran.com</a>
               <button class="button primary" id="shareWeeklyVerse" type="button">Share verse</button>
             </div>
             <p class="weekly-verse-share-status" id="weeklyVerseShareStatus" role="status" aria-live="polite"></p>
@@ -1213,7 +1212,7 @@
       const status = document.getElementById('weeklyVerseShareStatus');
       const card = button.closest('.weekly-verse-reading');
       // Share exactly the verse displayed, even if the week changed since the page loaded.
-      const url = card.querySelector('a').href;
+      const url = card.dataset.verseUrl;
       const text = ['Verse of the Week | Suhbah', card.querySelector('.weekly-verse-arabic').textContent,
         card.querySelector('.weekly-verse-translation').textContent,
         card.querySelector('.weekly-verse-reference').textContent,
