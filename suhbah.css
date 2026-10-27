@@ -2563,8 +2563,11 @@ body.modal-open {
 }
 .registration-form-header .muted { margin: 0; font-size: 1rem; }
 .registration-fields { display: grid; gap: 18px; }
-.registration-calendar { display: flex; justify-content: center; margin: -10px 0 0; }
-.registration-calendar a { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; color: var(--blue); font: 700 .95rem/1.3 var(--font-display); text-align: center; text-underline-offset: 3px; }
+.registration-actions { display: flex; align-items: stretch; gap: 10px; }
+.registration-actions > * { flex: 1; min-width: 0; }
+.registration-calendar { display: flex; justify-content: center; margin: 0; }
+.registration-calendar a { display: inline-flex; align-items: center; justify-content: center; width: 100%; min-height: 44px; font: 700 .95rem/1.3 var(--font-display); text-align: center; }
+.registration-actions .button { display: flex; align-items: center; justify-content: center; min-height: 50px; padding: 10px 8px; font: 700 .95rem/1.3 var(--font-display); text-align: center; }
 .registration-field-group {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

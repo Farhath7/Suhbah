@@ -867,7 +867,7 @@
   function eventCalendarOption(event) {
     const url = googleCalendarUrl(event);
     if (!url) return '';
-    return `<div class="registration-calendar"><a href="${html(url)}" target="_blank" rel="noopener noreferrer" aria-label="Add to Google Calendar (opens in a new tab)">Add to Google Calendar</a></div>`;
+    return `<div class="registration-calendar"><a class="button secondary" href="${html(url)}" target="_blank" rel="noopener noreferrer" aria-label="Add to Google Calendar (opens in a new tab)">Add to Google Calendar</a></div>`;
   }
 
   function registrationForm(event) {
@@ -929,8 +929,10 @@
           </label>
           </fieldset>
           <details class="registration-message"><summary>Add a message <span>(optional)</span></summary><label class="field"><span>Anything you want us to know?</span><textarea name="message" rows="2"></textarea></label></details>
-          <button class="button primary" type="submit">${waitlist ? 'Join Waitlist' : 'Reserve My Spot'}</button>
-          ${eventCalendarOption(event)}
+          <div class="registration-actions">
+            <button class="button primary" type="submit">${waitlist ? 'Join Waitlist' : 'Reserve My Spot'}</button>
+            ${eventCalendarOption(event)}
+          </div>
           ${communityGroupUrl(event) ? '<p class="muted">After registration, you will be taken to the WhatsApp group for this month\'s Suhbah gathering.</p>' : ''}
         </div>
       </form>
