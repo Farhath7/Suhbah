@@ -867,7 +867,7 @@
   function eventCalendarOption(event) {
     const url = googleCalendarUrl(event);
     if (!url) return '';
-    return `<div class="registration-calendar"><a class="button secondary" href="${html(url)}" target="_blank" rel="noopener noreferrer">Add to Google Calendar</a><p class="muted">Opens in a new tab. Review the event details and save your reminder.</p></div>`;
+    return `<div class="registration-calendar"><a href="${html(url)}" target="_blank" rel="noopener noreferrer" aria-label="Add to Google Calendar (opens in a new tab)">Add to Google Calendar</a></div>`;
   }
 
   function registrationForm(event) {
