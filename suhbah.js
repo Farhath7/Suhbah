@@ -39,7 +39,6 @@
         <p class="weekly-verse-arabic" lang="ar" dir="rtl">${html(verse.arabic)}</p>
         <blockquote class="weekly-verse-translation">${html(verse.translation)}</blockquote>
         <p class="weekly-verse-reference">Surah ${html(verse.surah)} <span aria-hidden="true">&middot;</span> ${html(verse.reference)}</p>
-        <p class="weekly-verse-credit">Dr. Mustafa Khattab, The Clear Quran</p>
         <div class="weekly-verse-actions"><button class="small-button" id="shareWeeklyVerse" type="button">Share verse</button></div>
         <p class="weekly-verse-share-status" id="weeklyVerseShareStatus" role="status" aria-live="polite"></p>
         <textarea class="weekly-verse-share-text" id="weeklyVerseShareText" aria-label="Verse text to copy and share" readonly hidden></textarea>
