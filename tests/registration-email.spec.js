@@ -17,11 +17,38 @@ test('confirmation contains event details, the right group and sender', async ()
     expect(message.text).toContain(value);
   }
   expect(message.subject).toContain('Registration confirmed');
+  expect(message.html).toContain('Your registration is confirmed');
+  expect(message.html).toContain(`href="${event.communityGroupLink}"`);
+  expect(message.html).toContain('Join WhatsApp group</a>');
+  expect(message.html).toContain('View location on Google Maps</a>');
+  expect(message.html).not.toContain(`>${event.communityGroupLink}`);
   await sender({ ...registration, registrationStatus: 'Waitlist' }, { ...event, communityGroupLink: 'javascript:alert(1)' });
   expect(message.subject).toContain('Waitlist confirmation');
   expect(message.text).toContain('We will contact you if a spot opens.');
   expect(message.text).not.toContain('Your spot is reserved');
   expect(message.text).not.toContain('javascript:');
+  expect(message.html).toContain('You’re on the waitlist');
+  expect(message.html).not.toContain('Your spot is reserved');
+  expect(message.html).not.toContain('javascript:');
+  expect(message.html).not.toContain('Join WhatsApp group');
+});
+
+test('HTML escapes attendee and event content and preserves safe map destinations', async () => {
+  let message;
+  const sender = createConfirmationSender({}, { sendMail: async (mail) => {
+    message = mail;
+    return { accepted: [registration.email], messageId: 'escaped-message' };
+  } });
+  await sender({ ...registration, name: '<img src=x onerror=alert(1)>' }, {
+    ...event, theme: 'Faith & Friendship <Together>',
+    mapUrl: 'https://maps.google.com/?q=venue&z=15',
+  });
+  expect(message.html).toContain('&lt;img src=x onerror=alert(1)&gt;');
+  expect(message.html).not.toContain('<img');
+  expect(message.html).toContain('Faith &amp; Friendship &lt;Together&gt;');
+  expect(message.html).toContain('href="https://maps.google.com/?q=venue&amp;z=15"');
+  await sender(registration, { ...event, location: '', mapUrl: 'javascript:alert(1)', communityGroupLink: '' });
+  expect(message.html).not.toContain('href=');
 });
 
 test('email is disabled without credentials and rejects unaccepted mail', async () => {
