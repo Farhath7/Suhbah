@@ -32,11 +32,11 @@
     const verse = verseOfTheWeek();
     const url = `https://quran.com/${verse.reference.replace(':', '/')}`;
     return `<aside class="weekly-verse" id="verse-of-the-week" aria-labelledby="weeklyVerseTitle">
+      <div class="weekly-verse-header">
+        <h2 id="weeklyVerseTitle">Verse of the Week</h2>
+        <button class="small-button" id="shareWeeklyVerse" type="button">Share verse</button>
+      </div>
       <div class="weekly-verse-reading" data-verse-url="${html(url)}">
-        <div class="weekly-verse-header">
-          <h2 id="weeklyVerseTitle">Verse of the Week</h2>
-          <button class="small-button" id="shareWeeklyVerse" type="button">Share verse</button>
-        </div>
         <p class="weekly-verse-arabic" lang="ar" dir="rtl">${html(verse.arabic)}</p>
         <blockquote class="weekly-verse-translation">${html(verse.translation)}</blockquote>
         <p class="weekly-verse-reference">Surah ${html(verse.surah)} <span aria-hidden="true">&middot;</span> ${html(verse.reference)}</p>
@@ -1201,7 +1201,7 @@
     document.getElementById('shareWeeklyVerse')?.addEventListener('click', async (event) => {
       const button = event.currentTarget;
       const status = document.getElementById('weeklyVerseShareStatus');
-      const card = button.closest('.weekly-verse-reading');
+      const card = button.closest('.weekly-verse').querySelector('.weekly-verse-reading');
       // Share exactly the verse displayed, even if the week changed since the page loaded.
       const url = card.dataset.verseUrl;
       const text = ['Verse of the Week | Suhbah', card.querySelector('.weekly-verse-arabic').textContent,

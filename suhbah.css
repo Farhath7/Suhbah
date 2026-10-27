@@ -1814,8 +1814,8 @@ h3 {
 .weekly-verse-section { padding: 32px 0; background: #f6f8fa; }
 .weekly-verse { margin-top: 0; font-family: Figtree, sans-serif; scroll-margin-top: 100px; text-align: left; }
 .weekly-verse-reading { min-width: 0; padding: 28px 32px; border: 1px solid #dce4e8; border-radius: 18px; background: #fffdf8d9; box-shadow: 0 8px 30px #29435a08; backdrop-filter: blur(12px); }
-.weekly-verse-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.weekly-verse-header h2 { margin: 0; color: #526e7d; font: 700 1.25rem/1.5 Figtree, sans-serif; letter-spacing: normal; }
+.weekly-verse-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px; text-align: left; }
+.weekly-verse-header h2 { margin: 0; color: var(--navy); font: 700 32px/1.25 Figtree, sans-serif; letter-spacing: normal; text-transform: none; text-align: left; }
 .weekly-verse-header .small-button { flex-shrink: 0; min-height: 40px; font-size: .73rem; background: transparent; }
 .weekly-verse-arabic { margin: 12px 0; font-family: 'Uthmanic Hafs', serif; font-size: clamp(1.7rem, 2.4vw, 2.25rem); font-weight: 400; line-height: 1.8; text-align: right; color: var(--navy); overflow-wrap: anywhere; }
 .weekly-verse-translation { margin: 0; color: var(--navy); font-family: Figtree, sans-serif; font-size: 1.1rem; font-weight: 500; line-height: 1.4; text-wrap: pretty; }
@@ -1827,7 +1827,8 @@ h3 {
 @media (max-width: 700px) {
   .weekly-verse-section { padding: 20px 0; }
   .weekly-verse-reading { padding: 18px 20px; }
-  .weekly-verse-header h2 { font-size: 1.1rem; }
+  .weekly-verse-header { margin-bottom: 16px; align-items: flex-start; }
+  .weekly-verse-header h2 { font-size: 26px; }
   .weekly-verse-arabic { font-size: 1.9rem; }
 }
 
