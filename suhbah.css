@@ -450,7 +450,7 @@ img {
 
 .hero {
   position: relative;
-  padding: 38px 0 58px;
+  padding: 24px 0 58px;
   overflow: hidden;
   background: transparent;
   isolation: isolate;
@@ -4014,11 +4014,13 @@ td {
 
 @media (min-width: 900px) {
   .hero {
+    padding-top: 32px;
     padding-bottom: 40px;
   }
 
   .hero-copy {
-    top: -36px;
+    top: 0;
+    align-self: start;
   }
 
   .hero-grid {
