@@ -31,28 +31,20 @@
   function weeklyVerseSection() {
     const verse = verseOfTheWeek();
     const url = `https://quran.com/${verse.reference.replace(':', '/')}`;
-    return `<section class="section weekly-verse" id="verse-of-the-week" aria-labelledby="weeklyVerseTitle">
-      <div class="container">
-        <div class="weekly-verse-card fade-in">
-          <div class="weekly-verse-intro">
-            <span class="weekly-verse-eyebrow">A reminder to carry with you</span>
-            <h2 id="weeklyVerseTitle">Verse of <br />the Week</h2>
-            <span class="weekly-verse-schedule">A new reminder every Monday</span>
-          </div>
-          <div class="weekly-verse-reading" data-verse-url="${html(url)}">
-            <p class="weekly-verse-reference">Surah ${html(verse.surah)} <span aria-hidden="true">&middot;</span> ${html(verse.reference)}</p>
-            <p class="weekly-verse-arabic" lang="ar" dir="rtl">${html(verse.arabic)}</p>
-            <blockquote class="weekly-verse-translation">${html(verse.translation)}</blockquote>
-            <p class="weekly-verse-credit">Dr. Mustafa Khattab, The Clear Quran</p>
-            <div class="weekly-verse-actions">
-              <button class="button primary" id="shareWeeklyVerse" type="button">Share verse</button>
-            </div>
-            <p class="weekly-verse-share-status" id="weeklyVerseShareStatus" role="status" aria-live="polite"></p>
-            <textarea class="weekly-verse-share-text" id="weeklyVerseShareText" aria-label="Verse text to copy and share" readonly hidden></textarea>
-          </div>
+    return `<aside class="weekly-verse" id="verse-of-the-week" aria-labelledby="weeklyVerseTitle">
+      <div class="weekly-verse-reading" data-verse-url="${html(url)}">
+        <div class="weekly-verse-header">
+          <h2 id="weeklyVerseTitle">Verse of the Week</h2>
+          <button class="small-button" id="shareWeeklyVerse" type="button">Share verse</button>
         </div>
+        <p class="weekly-verse-arabic" lang="ar" dir="rtl">${html(verse.arabic)}</p>
+        <blockquote class="weekly-verse-translation">${html(verse.translation)}</blockquote>
+        <p class="weekly-verse-reference">Surah ${html(verse.surah)} <span aria-hidden="true">&middot;</span> ${html(verse.reference)}</p>
+        <p class="weekly-verse-credit">Dr. Mustafa Khattab, The Clear Quran</p>
+        <p class="weekly-verse-share-status" id="weeklyVerseShareStatus" role="status" aria-live="polite"></p>
+        <textarea class="weekly-verse-share-text" id="weeklyVerseShareText" aria-label="Verse text to copy and share" readonly hidden></textarea>
       </div>
-    </section>`;
+    </aside>`;
   }
 
   async function api(path, options = {}) {
@@ -430,7 +422,6 @@
       <main>
         <div class="sky-intro">
           <div class="live-sky" aria-hidden="true"><div class="sky-clouds-right"></div></div>
-        ${weeklyVerseSection()}
         <section class="tagline-band" aria-label="Quranic community tagline">
           <div class="container tagline-inner fade-in">
             <span class="tagline-reference">Quran 81:26</span>
@@ -448,6 +439,7 @@
                 <a class="button primary" href="${registrationUrl(event)}" data-route>Join the Next Suhbah</a>
                 <a class="button ghost" href="#about">Learn About Suhbah</a>
               </div>
+              ${weeklyVerseSection()}
             </div>
             ${eventCard(event)}
           </div>
