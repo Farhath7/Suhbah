@@ -1211,7 +1211,6 @@
       facebook: '<path fill="currentColor" stroke="none" d="M14 22v-9h3l.5-4H14V7c0-1 .3-2 2-2h2V1.5A25 25 0 0 0 15 1c-3 0-5 2-5 5v3H7v4h3v9z"/>',
       x: '<path d="m4 3 16 18M20 3 4 21M4 3h5l11 18h-5z"/>',
       whatsapp: '<path d="M21 11.5a9 9 0 0 1-13.4 7.8L3 21l1.5-4.7A9 9 0 1 1 21 11.5Z"/><path d="M8 7c-2 3 3 8 6 8l2-2-3-2-1 1-2-2 1-1-2-3Z"/>',
-      embed: '<path d="m8 6-6 6 6 6m8-12 6 6-6 6m-3-16-2 20"/>',
       image: '<rect x="3" y="3" width="18" height="18" rx="1"/><circle cx="8" cy="8" r="1"/><path d="m3 18 6-6 4 4 3-3 5 5"/>',
     };
     const icon = (name) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">${icons[name]}</svg>`;
@@ -1233,7 +1232,6 @@
         <a data-share-social="facebook" target="_blank" rel="noopener noreferrer">${icon('facebook')}<span>Facebook</span></a>
         <a data-share-social="x" target="_blank" rel="noopener noreferrer">${icon('x')}<span>X</span></a>
         <a data-share-social="whatsapp" target="_blank" rel="noopener noreferrer">${icon('whatsapp')}<span>WhatsApp</span></a>
-        <button type="button" data-share-action="embed">${icon('embed')}<span>Copy Embed</span></button>
         <button type="button" data-share-action="image">${icon('image')}<span>Copy/Download</span></button>
       </div>
       <section class="verse-share-media" aria-label="Verse image" hidden>
@@ -1336,10 +1334,6 @@
       try {
         const action = actionButton.dataset.shareAction;
         if (action === 'link') await copy(selectedUrl(), 'Link copied. Ready to share.');
-        if (action === 'embed') {
-          const content = `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><body style="margin:0;padding:24px;color:#082344;background:#fffdf8;font:18px/1.7 system-ui"><p lang="ar" dir="rtl" style="font:30px/1.9 serif">${html(arabic)}</p><blockquote style="margin:20px 0">${html(translation)}</blockquote><p>${html(reference)}</p><p style="font-size:12px">${html(credit)}</p><a href="${html(selectedUrl())}" target="_blank" rel="noopener noreferrer">Read on Quran.com</a></body></html>`;
-          await copy(`<iframe title="${html(reference)}" srcdoc="${html(content)}" width="100%" height="600" style="border:1px solid #dce4e8;border-radius:12px" loading="lazy" sandbox="allow-popups allow-popups-to-escape-sandbox"></iframe>`, 'Embed code copied. Paste it into your website HTML.');
-        }
         if (action === 'image') {
           status.textContent = 'Preparing image…';
           try { await limit(document.fonts.load('48px "Uthmanic Hafs"')); } catch {}
