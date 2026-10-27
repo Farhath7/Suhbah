@@ -494,6 +494,7 @@ img {
 
 .hero-copy {
   position: relative;
+  top: -20px;
   z-index: 1;
   min-width: 0;
   max-width: 680px;
@@ -4014,6 +4015,10 @@ td {
 @media (min-width: 900px) {
   .hero {
     padding-bottom: 40px;
+  }
+
+  .hero-copy {
+    top: -36px;
   }
 
   .hero-grid {
