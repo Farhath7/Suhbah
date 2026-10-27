@@ -37,7 +37,6 @@
           <div class="weekly-verse-intro">
             <span class="weekly-verse-eyebrow">A reminder to carry with you</span>
             <h2 id="weeklyVerseTitle">Verse of <br />the Week</h2>
-            <p>One verse. A little space to pause, reflect, and reconnect.</p>
             <span class="weekly-verse-schedule">A new reminder every Monday</span>
           </div>
           <div class="weekly-verse-reading" data-verse-url="${html(url)}">
@@ -431,6 +430,7 @@
       <main>
         <div class="sky-intro">
           <div class="live-sky" aria-hidden="true"><div class="sky-clouds-right"></div></div>
+        ${weeklyVerseSection()}
         <section class="tagline-band" aria-label="Quranic community tagline">
           <div class="container tagline-inner fade-in">
             <span class="tagline-reference">Quran 81:26</span>
@@ -453,7 +453,6 @@
           </div>
         </section>
         </div>
-        ${weeklyVerseSection()}
         <section class="section about-section" id="about">
           <div class="container">
             <div class="section-head fade-in">
