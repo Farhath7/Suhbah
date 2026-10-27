@@ -2563,6 +2563,9 @@ body.modal-open {
 }
 .registration-form-header .muted { margin: 0; font-size: 1rem; }
 .registration-fields { display: grid; gap: 18px; }
+.registration-calendar { display: grid; gap: 8px; margin: 0 0 4px; }
+.registration-calendar .button { width: 100%; min-width: 0; text-align: center; }
+.registration-calendar .muted { margin: 0; font: 400 .8rem/1.5 var(--font-body); text-align: center; }
 .registration-field-group {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

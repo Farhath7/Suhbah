@@ -832,6 +832,44 @@
     return `<div class="community-group-link"><p class="muted">Join the WhatsApp group for ${html(event.number)} for this month's gathering updates and reminders.</p><a class="button secondary" href="${html(link)}" target="_blank" rel="noopener noreferrer">Join this month's Suhbah WhatsApp group</a></div>`;
   }
 
+  function googleCalendarUrl(event) {
+    if (!event || !/^\d{4}-\d{2}-\d{2}$/.test(event.date || '')) return '';
+    const day = new Date(`${event.date}T00:00:00Z`);
+    if (Number.isNaN(day.getTime()) || day.toISOString().slice(0, 10) !== event.date) return '';
+    // Admin times may share a trailing meridiem ("3:00 - 5:00 PM").
+    const range = String(event.time || '').trim().match(/^(\d{1,2})(?::(\d{2}))?\s*(AM|PM)?\s*[-–—]\s*(\d{1,2})(?::(\d{2}))?\s*(AM|PM)?$/i);
+    if (!range) return '';
+    const [, startHour, startMinute = '0', startPeriod, endHour, endMinute = '0', endPeriod] = range;
+    const minutes = (hour, minute, period) => {
+      const h = Number(hour), m = Number(minute);
+      if (m > 59 || (period ? h < 1 || h > 12 : h > 23)) return NaN;
+      return (period ? h % 12 + (period.toUpperCase() === 'PM' ? 12 : 0) : h) * 60 + m;
+    };
+    let start = minutes(startHour, startMinute, startPeriod || endPeriod);
+    let end = minutes(endHour, endMinute, endPeriod || startPeriod);
+    if (!Number.isFinite(start) || !Number.isFinite(end) || start === end) return '';
+    // "11 - 1 PM" crosses noon; explicit "11 PM - 1 AM" crosses midnight.
+    if (!startPeriod && endPeriod && start > end) start = (start + 720) % 1440;
+    if (end <= start) end += 1440;
+    const stamp = (offset) => new Date(day.getTime() + offset * 60000).toISOString().slice(0, 19).replace(/[-:]/g, '');
+    const url = new URL('https://calendar.google.com/calendar/render');
+    url.search = new URLSearchParams({
+      action: 'TEMPLATE',
+      text: `${event.number}: ${event.theme}`,
+      dates: `${stamp(start)}/${stamp(end)}`,
+      ctz: 'Asia/Kolkata',
+      location: event.location || '',
+      details: [event.description, `Event details and registration: ${new URL(registrationUrl(event), window.location.origin).href}`, event.mapUrl ? `Venue map: ${event.mapUrl}` : ''].filter(Boolean).join('\n\n'),
+    }).toString();
+    return url.href;
+  }
+
+  function eventCalendarOption(event) {
+    const url = googleCalendarUrl(event);
+    if (!url) return '';
+    return `<div class="registration-calendar"><a class="button secondary" href="${html(url)}" target="_blank" rel="noopener noreferrer">Add to Google Calendar</a><p class="muted">Opens in a new tab. Review the event details and save your reminder.</p></div>`;
+  }
+
   function registrationForm(event) {
     if (!registrationIsOpen(event)) return `<div class="form-panel"><h2>Registrations closed</h2><p class="lead">Registration for ${html(event.number)}: ${html(event.theme)} is closed.</p><a class="button secondary" href="/#events">See other Suhbahs</a></div>`;
     const waitlist = event.registrationStatus === 'Waitlist';
@@ -892,6 +930,7 @@
           </fieldset>
           <details class="registration-message"><summary>Add a message <span>(optional)</span></summary><label class="field"><span>Anything you want us to know?</span><textarea name="message" rows="2"></textarea></label></details>
           <button class="button primary" type="submit">${waitlist ? 'Join Waitlist' : 'Reserve My Spot'}</button>
+          ${eventCalendarOption(event)}
           ${communityGroupUrl(event) ? '<p class="muted">After registration, you will be taken to the WhatsApp group for this month\'s Suhbah gathering.</p>' : ''}
         </div>
       </form>
@@ -1459,6 +1498,7 @@
             <div>
               <h3>${waitlist ? "You're on the waitlist." : "You're in."}</h3>
               <p class="lead">${waitlist ? 'You joined the waitlist for' : 'Your spot is reserved for'} ${html(registration.eventNumber)}: ${html(registration.eventTheme)}.${waitlist ? ' We will contact you if a spot opens.' : ' We look forward to seeing you there.'}</p>
+              ${eventCalendarOption(db.events.find((item) => item.id === registration.eventId))}
               ${communityGroupLink(db.events.find((item) => item.id === registration.eventId))}
               <a class="button secondary" href="/">Back to Suhbah</a>
             </div>
