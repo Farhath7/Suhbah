@@ -1197,6 +1197,7 @@
   }
 
   function bindPublic() {
+    let nativeVerseSharePending = false;
     document.getElementById('shareWeeklyVerse')?.addEventListener('click', async (event) => {
       const button = event.currentTarget;
       const status = document.getElementById('weeklyVerseShareStatus');
@@ -1208,23 +1209,46 @@
         card.querySelector('.weekly-verse-reference').textContent,
         'Translation: Dr. Mustafa Khattab, The Clear Quran'].join('\n\n');
       const fullText = `${text}\n\n${url}`;
+      const field = document.getElementById('weeklyVerseShareText');
+      const withTimeout = async (operation, milliseconds) => {
+        let timer;
+        try {
+          return await Promise.race([operation, new Promise((_, reject) => {
+            timer = setTimeout(() => reject(new Error('Sharing timed out')), milliseconds);
+          })]);
+        } finally {
+          clearTimeout(timer);
+        }
+      };
       button.disabled = true;
-      status.textContent = '';
+      field.hidden = true;
+      status.textContent = 'Preparing verse…';
       try {
-        if (navigator.share) {
+        // Desktop native share dialogs can stall outside the page. Copy directly there.
+        const mobileDevice = navigator.userAgentData?.mobile
+          || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+          || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        if (mobileDevice && navigator.share && !nativeVerseSharePending) {
           try {
-            await navigator.share({ title: 'Verse of the Week | Suhbah', text, url });
-            status.textContent = 'Share menu opened.';
+            status.textContent = 'Opening share menu…';
+            nativeVerseSharePending = true;
+            const sharing = Promise.resolve().then(() => navigator.share({ title: 'Verse of the Week | Suhbah', text, url }))
+              .finally(() => { nativeVerseSharePending = false; });
+            await withTimeout(sharing, 8000);
+            status.textContent = 'Verse shared.';
             return;
           } catch (error) {
-            if (error.name === 'AbortError') return;
+            if (error.name === 'AbortError') {
+              status.textContent = 'Sharing cancelled. You can try again.';
+              return;
+            }
           }
         }
         if (!navigator.clipboard?.writeText) throw new Error('Clipboard unavailable');
-        await navigator.clipboard.writeText(fullText);
+        status.textContent = 'Copying verse…';
+        await withTimeout(navigator.clipboard.writeText(fullText), 2000);
         status.textContent = 'Verse and Quran.com link copied. Ready to share.';
       } catch {
-        const field = document.getElementById('weeklyVerseShareText');
         field.value = fullText;
         field.hidden = false;
         field.focus();
