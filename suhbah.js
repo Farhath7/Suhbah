@@ -1016,9 +1016,9 @@
         }).join('')}</select></label>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Age</th><th>Gender</th><th>Profile</th><th>Attended before</th><th>Quran received</th><th>Suhbah</th><th>Registration type</th><th>Registration date</th></tr></thead>
+            <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Age</th><th>Gender</th><th>Profile</th><th>Attended before</th><th>Quran received</th><th>Suhbah</th><th>Registration type</th><th>Registration date</th><th>Actions</th></tr></thead>
             <tbody>
-              ${registrations.map((reg) => `<tr><td>${html(reg.name)}</td><td>${html(reg.email)}</td><td>${html(reg.phone)}</td><td>${html(reg.age)}</td><td>${html(reg.gender || '')}</td><td>${html(reg.profile || '')}</td><td>${html(reg.attendedBefore || '')}</td><td>${html(reg.receivedQuran || '')}</td><td>${html(registrationEventLabel(reg))}</td><td>${html(reg.registrationStatus === 'Waitlist' ? 'Waitlist' : 'Reserved')}</td><td>${html(shortDate(reg.createdAt))}</td></tr>`).join('') || '<tr><td colspan="11">No registrations for this selection.</td></tr>'}
+              ${registrations.map((reg) => `<tr><td>${html(reg.name)}</td><td>${html(reg.email)}</td><td>${html(reg.phone)}</td><td>${html(reg.age)}</td><td>${html(reg.gender || '')}</td><td>${html(reg.profile || '')}</td><td>${html(reg.attendedBefore || '')}</td><td>${html(reg.receivedQuran || '')}</td><td>${html(registrationEventLabel(reg))}</td><td>${html(reg.registrationStatus === 'Waitlist' ? 'Waitlist' : 'Reserved')}</td><td>${html(shortDate(reg.createdAt))}</td><td><button class="small-button admin-delete" type="button" data-delete-registration="${html(reg.id)}" aria-label="Delete registration for ${html(reg.name)}">Delete</button></td></tr>`).join('') || '<tr><td colspan="12">No registrations for this selection.</td></tr>'}
             </tbody>
           </table>
         </div>
@@ -1389,6 +1389,27 @@
       event.preventDefault();
       await api('/api/admin/social', { method: 'PUT', body: JSON.stringify(formData(event.target)) });
       await render();
+    });
+
+    document.querySelectorAll('[data-delete-registration]').forEach((button) => {
+      button.addEventListener('click', async () => {
+        const registration = db.registrations.find((item) => item.id === button.dataset.deleteRegistration);
+        if (!registration || !window.confirm(`Delete ${registration.name}'s registration for ${registrationEventLabel(registration)}? This cannot be undone.`)) return;
+        button.disabled = true;
+        const panel = button.closest('.table-panel');
+        panel.querySelector('[data-delete-error]')?.remove();
+        try {
+          await api('/api/admin/registrations', { method: 'DELETE', body: JSON.stringify({ id: registration.id }) });
+          await render();
+        } catch (error) {
+          button.disabled = false;
+          const message = document.createElement('p');
+          message.dataset.deleteError = '';
+          message.setAttribute('role', 'alert');
+          message.textContent = error.message || 'Could not delete registration. Please try again.';
+          panel.prepend(message);
+        }
+      });
     });
 
     document.getElementById('exportCsv')?.addEventListener('click', exportCsv);

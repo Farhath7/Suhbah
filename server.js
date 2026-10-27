@@ -419,6 +419,26 @@ async function handleApiWithDb(req, res, url, db, body, afterCommit) {
     return;
   }
 
+  if (url.pathname === '/api/admin/registrations') {
+    if (!requireAdmin(db, req, res)) return;
+    if (req.method !== 'DELETE') {
+      sendJson(res, 405, { error: 'Method not allowed' });
+      return;
+    }
+    if (typeof body.id !== 'string' || !body.id.trim()) {
+      sendJson(res, 400, { error: 'Registration ID is required' });
+      return;
+    }
+    const index = db.registrations.findIndex((registration) => registration.id === body.id);
+    if (index === -1) {
+      sendJson(res, 404, { error: 'Registration not found' });
+      return;
+    }
+    db.registrations.splice(index, 1);
+    sendJson(res, 200, { deleted: true });
+    return;
+  }
+
   if (url.pathname === '/api/admin/events') {
     if (!requireAdmin(db, req, res)) return;
     if (req.method === 'POST') {

@@ -140,6 +140,38 @@ test('public navigation hides admin and dashboard access requires an admin sessi
     expect(savedDb.registrations).toHaveLength(1);
     expect(savedDb.registrations[0]).toMatchObject({ eventId: 'test-event', email: 'attendee@example.test' });
     expect(savedDb.registrations[0].confirmationEmailStatus).toBe('not_configured');
+    const registrationId = savedDb.registrations[0].id;
+    expect((await request.delete(`${base}/api/admin/registrations`, { data: { id: registrationId } })).status()).toBe(401);
+    await page.goto(`${base}/admin`);
+    await page.locator('[name="email"]').fill(email);
+    await page.locator('[name="password"]').fill(password);
+    await page.getByRole('button', { name: 'Sign in', exact: true }).click();
+    await page.locator('[data-tab="registrations"]').click();
+    const deleteButton = page.getByRole('button', { name: 'Delete registration for Test Attendee', exact: true });
+    page.once('dialog', async (dialog) => {
+      expect(dialog.message()).toContain('Test Attendee');
+      expect(dialog.message()).toContain('cannot be undone');
+      await dialog.dismiss();
+    });
+    await deleteButton.click();
+    await expect(deleteButton).toBeEnabled();
+    expect((await (await page.request.get(`${base}/api/admin`)).json()).registrations).toHaveLength(1);
+    expect((await page.request.delete(`${base}/api/admin/registrations`, { data: {} })).status()).toBe(400);
+    expect((await page.request.delete(`${base}/api/admin/registrations`, { data: { id: 'missing' } })).status()).toBe(404);
+    await page.route('**/api/admin/registrations', (route) => route.fulfill({ status: 500, contentType: 'application/json', body: JSON.stringify({ error: 'Deletion unavailable. Try again.' }) }));
+    page.once('dialog', (dialog) => dialog.accept());
+    await deleteButton.click();
+    await expect(page.getByRole('alert')).toHaveText('Deletion unavailable. Try again.');
+    await expect(deleteButton).toBeEnabled();
+    await page.unroute('**/api/admin/registrations');
+    page.once('dialog', (dialog) => dialog.accept());
+    await deleteButton.click();
+    await expect(deleteButton).toHaveCount(0);
+    await expect(page.locator('tbody')).toContainText('No registrations for this selection.');
+    await page.reload();
+    await page.locator('[data-tab="registrations"]').click();
+    await expect(page.locator('tbody')).toContainText('No registrations for this selection.');
+    expect(JSON.parse(fs.readFileSync(path.join(temporaryRoot, 'data', 'suhbah-db.json'), 'utf8')).registrations).toHaveLength(0);
     await page.goto(`${base}/register/past-event`);
     await expect(page.locator('#registrationMount .community-group-link')).toHaveCount(0);
   } finally {
