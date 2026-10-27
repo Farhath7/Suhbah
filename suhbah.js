@@ -210,8 +210,8 @@
       <div class="section-head"><span class="eyebrow">A little something for your next chapter</span><h1>Your name. Your bookmark.</h1><p class="lead">Choose a design and make it yours with your name in Arabic.</p></div>
       <div class="bookmark-layout">
         <form class="bookmark-controls" id="bookmarkForm">
-          <h2>Make it yours</h2>
-          <fieldset class="bookmark-templates"><legend>Choose your template</legend>
+          <div class="bookmark-controls-heading"><span class="bookmark-controls-kicker">A personal touch</span><h2>Make it yours</h2><p>A little keepsake, with your name on it.</p></div>
+          <fieldset class="bookmark-templates"><legend><span class="bookmark-step">01</span> Choose your template</legend>
             <label><input type="radio" name="bookmarkTemplate" value="palestine" checked /><span class="bookmark-template-card"><span class="bookmark-swatch bookmark-swatch-palestine"></span>Palestine</span></label>
             <label><input type="radio" name="bookmarkTemplate" value="palestine-olives" /><span class="bookmark-template-card"><span class="bookmark-swatch bookmark-swatch-palestine-olives"></span>Palestine &amp; olives</span></label>
             <label><input type="radio" name="bookmarkTemplate" value="heritage" /><span class="bookmark-template-card"><span class="bookmark-swatch bookmark-swatch-heritage"></span>Olive &amp; heritage</span></label>
@@ -221,14 +221,22 @@
             <label><input type="radio" name="bookmarkTemplate" value="midnight" /><span class="bookmark-template-card"><span class="bookmark-swatch bookmark-swatch-midnight"></span>Midnight gold</span></label>
             <label><input type="radio" name="bookmarkTemplate" value="rose" /><span class="bookmark-template-card"><span class="bookmark-swatch bookmark-swatch-rose"></span>Rose arch</span></label>
           </fieldset>
-          <label class="field" for="bookmarkName"><span>Your name in Arabic</span><input id="bookmarkName" type="text" lang="ar" dir="rtl" maxlength="48" placeholder="اسمك هنا" autocomplete="off" required aria-describedby="bookmarkHint" /></label>
-          <p class="bookmark-hint" id="bookmarkHint">Type or paste your Arabic name. It runs vertically through the design.</p>
-          <label class="field" for="bookmarkFont"><span>Name style</span><select id="bookmarkFont"><option value="serif">Classic</option><option value="sans-serif">Simple</option></select></label>
-          <label class="field" for="bookmarkSize"><span>Name size <output id="bookmarkSizeValue" for="bookmarkSize">84</output></span><input id="bookmarkSize" type="range" min="40" max="120" step="2" value="84" /></label>
-          <label class="field" for="bookmarkColor"><span>Name colour</span><input id="bookmarkColor" type="color" value="#762f2c" /></label>
-          <button class="button primary" id="bookmarkDownload" type="submit" disabled>Download bookmark · PNG</button>
-          <p class="bookmark-hint">Your name stays in your browser. Long names resize automatically to fit.</p>
-          <p class="bookmark-status" id="bookmarkStatus" role="status" aria-live="polite">Loading your design…</p>
+          <div class="bookmark-name-section">
+            <label class="field" for="bookmarkName"><span class="bookmark-section-label"><span class="bookmark-step">02</span> Your name in Arabic</span><input id="bookmarkName" type="text" lang="ar" dir="rtl" maxlength="48" placeholder="اسمك هنا" autocomplete="off" required aria-describedby="bookmarkHint" /></label>
+            <p class="bookmark-hint" id="bookmarkHint">Type or paste your Arabic name. It runs vertically through the design.</p>
+          </div>
+          <fieldset class="bookmark-finish"><legend><span class="bookmark-step">03</span> Finishing touches</legend>
+            <div class="bookmark-style-grid">
+              <label class="field" for="bookmarkFont"><span>Name style</span><select id="bookmarkFont"><option value="serif">Classic</option><option value="sans-serif">Simple</option></select></label>
+              <label class="field bookmark-color-field" for="bookmarkColor"><span>Name colour</span><span class="bookmark-color-control"><input id="bookmarkColor" type="color" value="#762f2c" /><span>Pick a shade</span></span></label>
+            </div>
+            <label class="field bookmark-size-field" for="bookmarkSize"><span>Name size <output id="bookmarkSizeValue" for="bookmarkSize">84</output></span><span class="bookmark-size-control"><span aria-hidden="true">A</span><input id="bookmarkSize" type="range" min="40" max="120" step="2" value="84" /><span aria-hidden="true">A</span></span></label>
+          </fieldset>
+          <div class="bookmark-download-section">
+            <button class="button primary" id="bookmarkDownload" type="submit" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/></svg><span>Download bookmark</span><span class="bookmark-file-type">PNG</span></button>
+            <p class="bookmark-status" id="bookmarkStatus" role="status" aria-live="polite">Loading your design…</p>
+            <p class="bookmark-privacy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Your name stays in your browser. Long names resize to fit.</p>
+          </div>
         </form>
         <figure class="bookmark-preview"><div class="bookmark-preview-heading"><span>Live preview</span><span id="bookmarkTemplateLabel">Palestine</span></div><canvas id="bookmarkCanvas" role="img" aria-label="Bookmark preview with a sample Arabic name"></canvas><figcaption>Your design, ready for the pages you love.</figcaption></figure>
       </div>
