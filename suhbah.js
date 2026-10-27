@@ -13,7 +13,7 @@
 
   // Arabic and The Clear Quran translations verified against the linked Quran.com verses.
   const weeklyVerses = [
-    { reference: '94:6', surah: 'Ash-Sharh', arabic: 'إِنَّ مَعَ ٱلْعُسْرِ يُسْرًا', translation: 'Surely with ˹that˺ hardship comes ˹more˺ ease.' },
+    { reference: '18:110', surah: 'Al-Kahf', arabic: 'قُلۡ إِنَّمَآ أَنَا۠ بَشَرٞ مِّثۡلُكُمۡ يُوحَىٰٓ إِلَيَّ أَنَّمَآ إِلَٰهُكُمۡ إِلَٰهٞ وَٰحِدٞۖ فَمَن كَانَ يَرۡجُواْ لِقَآءَ رَبِّهِۦ فَلۡيَعۡمَلۡ عَمَلٗا صَٰلِحٗا وَلَا يُشۡرِكۡ بِعِبَادَةِ رَبِّهِۦٓ أَحَدَۢا ١١٠', translation: 'Say, ˹O Prophet,˺ “I am only a man like you, ˹but˺ it has been revealed to me that your God is only One God. So whoever hopes for the meeting with their Lord, let them do good deeds and associate none in the worship of their Lord.”' },
     { reference: '2:152', surah: 'Al-Baqarah', arabic: 'فَٱذْكُرُونِىٓ أَذْكُرْكُمْ وَٱشْكُرُوا۟ لِى وَلَا تَكْفُرُونِ', translation: 'remember Me; I will remember you. And thank Me, and never be ungrateful.' },
     { reference: '93:5', surah: 'Ad-Duhaa', arabic: 'وَلَسَوْفَ يُعْطِيكَ رَبُّكَ فَتَرْضَىٰٓ', translation: 'And ˹surely˺ your Lord will give so much to you that you will be pleased.' },
     { reference: '112:1', surah: 'Al-Ikhlas', arabic: 'قُلْ هُوَ ٱللَّهُ أَحَدٌ', translation: 'Say, ˹O Prophet,˺ “He is Allah—One ˹and Indivisible˺;' },
@@ -439,7 +439,6 @@
                 <a class="button primary" href="${registrationUrl(event)}" data-route>Join the Next Suhbah</a>
                 <a class="button ghost" href="#about">Learn About Suhbah</a>
               </div>
-              ${weeklyVerseSection()}
             </div>
             ${eventCard(event)}
           </div>
@@ -562,6 +561,7 @@
             </div>
           </div>
         </section>
+        <div class="weekly-verse-section"><div class="container">${weeklyVerseSection()}</div></div>
         ${registrationSection(event)}
       </main>
     `;
