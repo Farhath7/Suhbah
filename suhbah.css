@@ -1661,6 +1661,27 @@ h3 {
   grid-template-columns: 1fr;
 }
 
+.past-swipe-hint { display: none; }
+
+@media (max-width: 899px) {
+  .section .past-grid {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: min(82vw, 340px);
+    gap: 16px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 6px 4px 20px;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 4px;
+    scrollbar-width: thin;
+    scrollbar-color: #8da4b5 #e8eef3;
+  }
+
+  .past-grid .past-card { scroll-snap-align: start; }
+  .past-swipe-hint { display: block; margin: 10px 0 0; color: #526879; font-size: .9rem; }
+}
+
 .past-card {
   display: flex;
   flex-direction: column;
@@ -1826,6 +1847,50 @@ h3 {
 .weekly-verse-share-status { margin: 0; color: #526879; font-size: .76rem; line-height: 1.5; }
 .weekly-verse-share-status:not(:empty) { margin-top: 12px; }
 .weekly-verse-share-text { width: 100%; min-height: 180px; margin-top: 12px; padding: 12px; border: 1px solid #ccd6db; border-radius: 8px; color: var(--navy); background: white; font: .9rem/1.6 var(--font-body); }
+.verse-share-dialog { position: fixed; inset: 0; width: min(600px, calc(100% - 28px)); max-height: calc(100dvh - 28px); margin: auto; padding: 42px 36px 30px; border: 0; border-radius: 18px; background: #f5f5f6; color: #061c40; font: 16px/1.5 var(--font-body); text-align: center; box-shadow: 0 24px 90px #00132940; overscroll-behavior: contain; }
+.verse-share-dialog::backdrop { background: #071b36a6; backdrop-filter: blur(3px); }
+body:has(.verse-share-dialog[open]) { overflow: hidden; }
+.verse-share-dialog [hidden] { display: none !important; }
+.verse-share-dialog button, .verse-share-dialog a { -webkit-tap-highlight-color: transparent; }
+.verse-share-dialog button { cursor: pointer; font: inherit; }
+.verse-share-dialog :focus-visible { outline: 3px solid #0085e7; outline-offset: 4px; }
+.verse-share-dialog .verse-share-close { position: absolute; top: 10px; right: 10px; display: grid; place-items: center; width: 42px; height: 42px; padding: 0; border: 0; background: transparent; color: inherit; font: 36px/1 Arial, sans-serif; }
+.verse-share-dialog h2 { margin: 0 0 10px; color: inherit; font: 750 clamp(1.7rem, 5vw, 2.35rem)/1.2 var(--font-body); letter-spacing: -.04em; }
+.verse-share-hadith { margin: 0; font-size: 1.12rem; line-height: 1.45; }
+.verse-share-hadith strong { font-weight: 600; }
+.verse-share-hadith span { color: #707070; }
+.verse-share-label { margin: 36px 0 14px; color: #707070; font-size: .95rem; }
+.verse-share-tabs { display: flex; gap: 8px; margin: 0 36px 30px; }
+.verse-share-tabs button { flex: 1; min-height: 44px; padding: 7px 12px; border: 0; border-radius: 28px; background: transparent; color: #707070; }
+.verse-share-tabs button[aria-pressed="true"] { background: white; color: #061c40; box-shadow: 0 0 7px #0002; }
+.verse-share-link { display: flex; min-width: 0; overflow: hidden; border: 1px solid #e6e9ec; border-radius: 15px; }
+.verse-share-link input { flex: 1; min-width: 0; padding: 10px 14px; border: 0; border-radius: 0; background: transparent; color: inherit; font: .95rem var(--font-body); }
+.verse-share-link button, .verse-share-media-actions button { flex-shrink: 0; min-height: 44px; padding: 10px 16px; border: 0; background: #061c40; color: white; font-weight: 600; }
+.verse-share-options { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 28px 12px; margin: 34px 0 4px; }
+.verse-share-options a, .verse-share-options button { grid-column: span 2; display: flex; min-width: 0; min-height: 86px; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 8px 0; border: 0; border-radius: 12px; background: transparent; color: #061c40; font: .85rem/1.4 var(--font-body); text-decoration: none; }
+.verse-share-options a:hover, .verse-share-options button:hover { background: #e9edf2; }
+.verse-share-options button { grid-column: span 3; }
+.verse-share-options svg { width: 27px; height: 27px; color: #0084e8; }
+.verse-share-media { margin-top: 24px; padding-top: 20px; border-top: 1px solid #dce4e8; }
+.verse-share-media h3 { margin: 0 0 16px; font: 700 1.1rem var(--font-body); }
+.verse-share-media canvas { display: block; width: 100%; height: auto; border-radius: 10px; }
+.verse-share-media-actions { display: flex; justify-content: center; gap: 10px; margin-top: 16px; }
+.verse-share-media-actions button { border-radius: 10px; font-size: .85rem; }
+.verse-share-status { margin: 16px 0 0; color: #526879; font-size: .85rem; }
+.verse-share-status:empty { display: none; }
+.verse-share-manual { width: 100%; min-height: 150px; margin-top: 14px; padding: 12px; border: 1px solid #ccd6db; border-radius: 10px; color: #061c40; background: white; font: .85rem/1.5 var(--font-body); }
+.verse-share-dialog button:disabled { cursor: wait; opacity: .65; }
+@media (max-width: 480px) {
+  .verse-share-dialog { padding: 48px 20px 24px; }
+  .verse-share-hadith { font-size: .98rem; }
+  .verse-share-label { margin-top: 28px; }
+  .verse-share-tabs { margin: 0 0 24px; }
+  .verse-share-tabs button { font-size: .9rem; }
+  .verse-share-link input { padding-left: 10px; font-size: .8rem; }
+  .verse-share-link button { padding: 10px 12px; font-size: .85rem; }
+  .verse-share-options { gap: 18px 8px; margin-top: 24px; }
+  .verse-share-options a, .verse-share-options button { font-size: .75rem; }
+}
 @media (max-width: 700px) {
   .weekly-verse-section { padding: 20px 0; }
   .weekly-verse-reading { padding: 18px 20px; }
@@ -3010,6 +3075,7 @@ td {
   .past-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
 
   .registration-grid,
   .admin-grid {

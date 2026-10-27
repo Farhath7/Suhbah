@@ -40,8 +40,6 @@
         <blockquote class="weekly-verse-translation">${html(verse.translation)}</blockquote>
         <p class="weekly-verse-reference">Surah ${html(verse.surah)} <span aria-hidden="true">&middot;</span> ${html(verse.reference)}</p>
         <div class="weekly-verse-actions"><button class="small-button" id="shareWeeklyVerse" type="button">Share verse</button></div>
-        <p class="weekly-verse-share-status" id="weeklyVerseShareStatus" role="status" aria-live="polite"></p>
-        <textarea class="weekly-verse-share-text" id="weeklyVerseShareText" aria-label="Verse text to copy and share" readonly hidden></textarea>
       </div>
     </aside>`;
   }
@@ -491,7 +489,7 @@
         <section class="section white" id="events">
           <div class="container">
             ${upcomingEventCards()}
-            <div class="section-head fade-in"><h2>Previous Suhbahs</h2></div>
+            <div class="section-head fade-in"><h2>Previous Suhbahs</h2><p class="past-swipe-hint">Swipe to explore previous gatherings &rarr;</p></div>
             <div class="past-grid">${past.map(pastCard).join('')}</div>
           </div>
         </section>
@@ -1196,68 +1194,178 @@
     }, { passive: true });
   }
 
-  function bindPublic() {
-    let nativeVerseSharePending = false;
-    document.getElementById('shareWeeklyVerse')?.addEventListener('click', async (event) => {
-      const button = event.currentTarget;
-      const status = document.getElementById('weeklyVerseShareStatus');
-      const card = button.closest('.weekly-verse').querySelector('.weekly-verse-reading');
-      // Share exactly the verse displayed, even if the week changed since the page loaded.
-      const url = card.dataset.verseUrl;
-      const text = ['Verse of the Week | Suhbah', card.querySelector('.weekly-verse-arabic').textContent,
-        card.querySelector('.weekly-verse-translation').textContent,
-        card.querySelector('.weekly-verse-reference').textContent,
-        'Translation: Dr. Mustafa Khattab, The Clear Quran'].join('\n\n');
-      const fullText = `${text}\n\n${url}`;
-      const field = document.getElementById('weeklyVerseShareText');
-      const withTimeout = async (operation, milliseconds) => {
-        let timer;
-        try {
-          return await Promise.race([operation, new Promise((_, reject) => {
-            timer = setTimeout(() => reject(new Error('Sharing timed out')), milliseconds);
-          })]);
-        } finally {
-          clearTimeout(timer);
-        }
-      };
-      button.disabled = true;
-      field.hidden = true;
-      status.textContent = 'Preparing verse…';
+  function openVerseShare(button) {
+    document.getElementById('verseShareDialog')?.remove();
+    const card = button.closest('.weekly-verse').querySelector('.weekly-verse-reading');
+    const verseUrl = card.dataset.verseUrl;
+    const [, surah, ayah] = new URL(verseUrl).pathname.split('/');
+    const arabic = card.querySelector('.weekly-verse-arabic').textContent;
+    const translation = card.querySelector('.weekly-verse-translation').textContent;
+    const reference = card.querySelector('.weekly-verse-reference').textContent;
+    const credit = 'Translation: Dr. Mustafa Khattab, The Clear Quran';
+    const icons = {
+      facebook: '<path fill="currentColor" stroke="none" d="M14 22v-9h3l.5-4H14V7c0-1 .3-2 2-2h2V1.5A25 25 0 0 0 15 1c-3 0-5 2-5 5v3H7v4h3v9z"/>',
+      x: '<path d="m4 3 16 18M20 3 4 21M4 3h5l11 18h-5z"/>',
+      whatsapp: '<path d="M21 11.5a9 9 0 0 1-13.4 7.8L3 21l1.5-4.7A9 9 0 1 1 21 11.5Z"/><path d="M8 7c-2 3 3 8 6 8l2-2-3-2-1 1-2-2 1-1-2-3Z"/>',
+      embed: '<path d="m8 6-6 6 6 6m8-12 6 6-6 6m-3-16-2 20"/>',
+      image: '<rect x="3" y="3" width="18" height="18" rx="1"/><circle cx="8" cy="8" r="1"/><path d="m3 18 6-6 4 4 3-3 5 5"/>',
+    };
+    const icon = (name) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">${icons[name]}</svg>`;
+    const dialog = document.createElement('dialog');
+    dialog.id = 'verseShareDialog';
+    dialog.className = 'verse-share-dialog';
+    dialog.setAttribute('aria-labelledby', 'verseShareTitle');
+    dialog.innerHTML = `
+      <button class="verse-share-close" type="button" aria-label="Close sharing dialog">&times;</button>
+      <h2 id="verseShareTitle">Share the Quran!</h2>
+      <p class="verse-share-hadith">The Prophet ﷺ said:<br><strong>‘Convey from me, even if it is one verse.’</strong><br><span>(Bukhari 3461)</span></p>
+      <p class="verse-share-label">Link opens</p>
+      <div class="verse-share-tabs" role="group" aria-label="Link opens">
+        <button type="button" data-verse-mode="verse" aria-pressed="true">Verse only</button>
+        <button type="button" data-verse-mode="surah" aria-pressed="false">Verse in surah</button>
+      </div>
+      <div class="verse-share-link"><input id="verseShareLink" aria-label="Verse link" readonly><button type="button" data-share-action="link">Copy Link</button></div>
+      <div class="verse-share-options">
+        <a data-share-social="facebook" target="_blank" rel="noopener noreferrer">${icon('facebook')}<span>Facebook</span></a>
+        <a data-share-social="x" target="_blank" rel="noopener noreferrer">${icon('x')}<span>X</span></a>
+        <a data-share-social="whatsapp" target="_blank" rel="noopener noreferrer">${icon('whatsapp')}<span>WhatsApp</span></a>
+        <button type="button" data-share-action="embed">${icon('embed')}<span>Copy Embed</span></button>
+        <button type="button" data-share-action="image">${icon('image')}<span>Copy/Download</span></button>
+      </div>
+      <section class="verse-share-media" aria-label="Verse image" hidden>
+        <h3>Your verse image</h3>
+        <canvas aria-label="Verse image with Arabic, translation and reference" role="img"></canvas>
+        <div class="verse-share-media-actions"><button type="button" data-share-action="copy-image">Copy Image</button><button type="button" data-share-action="download">Download PNG</button></div>
+      </section>
+      <p class="verse-share-status" role="status" aria-live="polite"></p>
+      <textarea class="verse-share-manual" aria-label="Content to copy" readonly hidden></textarea>`;
+    document.body.append(dialog);
+    const status = dialog.querySelector('.verse-share-status');
+    const manual = dialog.querySelector('.verse-share-manual');
+    const media = dialog.querySelector('.verse-share-media');
+    const canvas = dialog.querySelector('canvas');
+    const selectedUrl = () => dialog.querySelector('#verseShareLink').value;
+    const limit = async (operation, milliseconds = 2000) => {
+      let timer;
       try {
-        // Desktop native share dialogs can stall outside the page. Copy directly there.
-        const mobileDevice = navigator.userAgentData?.mobile
-          || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
-          || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-        if (mobileDevice && navigator.share && !nativeVerseSharePending) {
-          try {
-            status.textContent = 'Opening share menu…';
-            nativeVerseSharePending = true;
-            const sharing = Promise.resolve().then(() => navigator.share({ title: 'Verse of the Week | Suhbah', text, url }))
-              .finally(() => { nativeVerseSharePending = false; });
-            await withTimeout(sharing, 8000);
-            status.textContent = 'Verse shared.';
-            return;
-          } catch (error) {
-            if (error.name === 'AbortError') {
-              status.textContent = 'Sharing cancelled. You can try again.';
-              return;
-            }
-          }
-        }
+        return await Promise.race([operation, new Promise((_, reject) => {
+          timer = setTimeout(() => reject(new Error('Request timed out')), milliseconds);
+        })]);
+      } finally { clearTimeout(timer); }
+    };
+    const copy = async (value, message) => {
+      manual.hidden = true;
+      status.textContent = 'Copying…';
+      try {
         if (!navigator.clipboard?.writeText) throw new Error('Clipboard unavailable');
-        status.textContent = 'Copying verse…';
-        await withTimeout(navigator.clipboard.writeText(fullText), 2000);
-        status.textContent = 'Verse and Quran.com link copied. Ready to share.';
+        await limit(navigator.clipboard.writeText(value));
+        status.textContent = message;
       } catch {
-        field.value = fullText;
-        field.hidden = false;
-        field.focus();
-        field.select();
-        status.textContent = 'Select and copy the verse below to share it.';
-      } finally {
-        button.disabled = false;
+        manual.value = value;
+        manual.hidden = false;
+        manual.focus();
+        manual.select();
+        status.textContent = 'Select and copy the content below.';
       }
+    };
+    const paintImage = () => {
+      const ctx = canvas.getContext('2d');
+      canvas.width = 1080;
+      const wrap = (value, font, width) => {
+        ctx.font = font;
+        const lines = [];
+        let line = '';
+        for (const word of value.split(/\s+/)) {
+          const next = line ? `${line} ${word}` : word;
+          if (line && ctx.measureText(next).width > width) { lines.push(line); line = word; }
+          else line = next;
+        }
+        if (line) lines.push(line);
+        return lines;
+      };
+      const arabicFont = '48px "Uthmanic Hafs", serif';
+      const translationFont = '30px Arial, sans-serif';
+      const arabicLines = wrap(arabic, arabicFont, 900);
+      const translationLines = wrap(translation, translationFont, 900);
+      canvas.height = 390 + arabicLines.length * 90 + translationLines.length * 46;
+      const background = ctx.createLinearGradient(0, 0, 1080, canvas.height);
+      background.addColorStop(0, '#eff6ff'); background.addColorStop(1, '#fffdf5');
+      ctx.fillStyle = background; ctx.fillRect(0, 0, 1080, canvas.height);
+      ctx.strokeStyle = '#c9d8e2'; ctx.lineWidth = 2; ctx.strokeRect(34, 34, 1012, canvas.height - 68);
+      ctx.fillStyle = '#082344'; ctx.textAlign = 'center'; ctx.direction = 'ltr';
+      ctx.font = 'bold 28px Arial'; ctx.fillText('VERSE OF THE WEEK  |  SUHBAH', 540, 105);
+      ctx.font = arabicFont; ctx.direction = 'rtl';
+      let y = 205;
+      for (const line of arabicLines) { ctx.fillText(line, 540, y); y += 90; }
+      y += 20; ctx.font = translationFont; ctx.direction = 'ltr';
+      for (const line of translationLines) { ctx.fillText(line, 540, y); y += 46; }
+      ctx.font = 'bold 24px Arial'; ctx.fillText(reference, 540, y + 36);
+      ctx.fillStyle = '#526879'; ctx.font = '19px Arial'; ctx.fillText(credit, 540, y + 76);
+      ctx.fillText(selectedUrl(), 540, y + 112);
+    };
+    const updateLinks = (mode) => {
+      const url = mode === 'surah' ? `https://quran.com/${surah}?startingVerse=${ayah}` : verseUrl;
+      dialog.querySelector('#verseShareLink').value = url;
+      dialog.querySelectorAll('[data-verse-mode]').forEach((tab) => tab.setAttribute('aria-pressed', String(tab.dataset.verseMode === mode)));
+      const encoded = encodeURIComponent(url);
+      dialog.querySelector('[data-share-social="facebook"]').href = `https://www.facebook.com/sharer/sharer.php?u=${encoded}`;
+      dialog.querySelector('[data-share-social="x"]').href = `https://twitter.com/intent/tweet?url=${encoded}&text=${encodeURIComponent(reference)}`;
+      dialog.querySelector('[data-share-social="whatsapp"]').href = `https://wa.me/?text=${encodeURIComponent(`${arabic}\n\n${translation}\n\n${reference}\n${credit}\n\n${url}`)}`;
+      status.textContent = ''; manual.hidden = true;
+      if (!media.hidden) paintImage();
+    };
+    const imageBlob = () => limit(new Promise((resolve, reject) => canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error('Image unavailable')), 'image/png')));
+    let busy = false;
+    dialog.addEventListener('click', async (event) => {
+      if (event.target.closest('.verse-share-close')) { dialog.close(); return; }
+      if (event.target === dialog) {
+        const bounds = dialog.getBoundingClientRect();
+        if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) dialog.close();
+        return;
+      }
+      const tab = event.target.closest('[data-verse-mode]');
+      if (tab && !busy) { updateLinks(tab.dataset.verseMode); return; }
+      const actionButton = event.target.closest('[data-share-action]');
+      if (!actionButton || busy) return;
+      busy = true;
+      actionButton.disabled = true;
+      try {
+        const action = actionButton.dataset.shareAction;
+        if (action === 'link') await copy(selectedUrl(), 'Link copied. Ready to share.');
+        if (action === 'embed') {
+          const content = `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><body style="margin:0;padding:24px;color:#082344;background:#fffdf8;font:18px/1.7 system-ui"><p lang="ar" dir="rtl" style="font:30px/1.9 serif">${html(arabic)}</p><blockquote style="margin:20px 0">${html(translation)}</blockquote><p>${html(reference)}</p><p style="font-size:12px">${html(credit)}</p><a href="${html(selectedUrl())}" target="_blank" rel="noopener noreferrer">Read on Quran.com</a></body></html>`;
+          await copy(`<iframe title="${html(reference)}" srcdoc="${html(content)}" width="100%" height="600" style="border:1px solid #dce4e8;border-radius:12px" loading="lazy" sandbox="allow-popups allow-popups-to-escape-sandbox"></iframe>`, 'Embed code copied. Paste it into your website HTML.');
+        }
+        if (action === 'image') {
+          status.textContent = 'Preparing image…';
+          try { await limit(document.fonts.load('48px "Uthmanic Hafs"')); } catch {}
+          paintImage(); media.hidden = false;
+          status.textContent = 'Your image is ready to copy or download.';
+          media.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        }
+        if (action === 'download') {
+          const url = URL.createObjectURL(await imageBlob());
+          const link = document.createElement('a'); link.href = url; link.download = `suhbah-verse-${surah}-${ayah}.png`;
+          document.body.append(link); link.click(); link.remove();
+          setTimeout(() => URL.revokeObjectURL(url), 10000);
+          status.textContent = 'Image downloaded.';
+        }
+        if (action === 'copy-image') {
+          if (!navigator.clipboard?.write || !window.ClipboardItem) throw new Error('Image copying unavailable');
+          await limit(navigator.clipboard.write([new ClipboardItem({ 'image/png': imageBlob() })]));
+          status.textContent = 'Image copied. Paste it into your message.';
+        }
+      } catch {
+        status.textContent = 'Your browser could not copy or save the image. Use Download PNG, or save the preview image.';
+      } finally { busy = false; actionButton.disabled = false; }
     });
+    dialog.addEventListener('close', () => { dialog.remove(); button.focus({ preventScroll: true }); }, { once: true });
+    updateLinks('verse');
+    dialog.showModal();
+  }
+
+  function bindPublic() {
+    document.getElementById('shareWeeklyVerse')?.addEventListener('click', (event) => openVerseShare(event.currentTarget));
 
     bindBookmark();
     bindConversationSparkles();
