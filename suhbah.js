@@ -1500,9 +1500,11 @@
             <div>
               <h3>${waitlist ? "You're on the waitlist." : "You're in."}</h3>
               <p class="lead">${waitlist ? 'You joined the waitlist for' : 'Your spot is reserved for'} ${html(registration.eventNumber)}: ${html(registration.eventTheme)}.${waitlist ? ' We will contact you if a spot opens.' : ' We look forward to seeing you there.'}</p>
-              ${eventCalendarOption(db.events.find((item) => item.id === registration.eventId))}
               ${communityGroupLink(db.events.find((item) => item.id === registration.eventId))}
-              <a class="button secondary" href="/">Back to Suhbah</a>
+              <div class="success-actions">
+                ${eventCalendarOption(db.events.find((item) => item.id === registration.eventId))}
+                <a class="button secondary" href="/">Back to Suhbah</a>
+              </div>
             </div>
           </div>
         `;

@@ -2684,6 +2684,19 @@ body.modal-open {
   font-size: 3rem;
 }
 
+.success-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  max-width: 560px;
+  margin: 24px auto 0;
+}
+
+.success-actions > * { flex: 1 1 220px; }
+.success-actions .button { width: 100%; min-height: 52px; }
+.success-panel .community-group-link { margin-top: 24px; }
+
 .footer {
   background: var(--navy);
   color: var(--white);
