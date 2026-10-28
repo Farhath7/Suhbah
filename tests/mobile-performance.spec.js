@@ -75,3 +75,25 @@ test('desktop poster decodes and retains the animated sky', async ({ page }) => 
   expect(await page.locator('.live-sky').evaluate(el => getComputedStyle(el, '::before').animationName)).toBe('sky-cloud-drift');
   await page.screenshot({ path: 'test-results/optimized-desktop-home.png' });
 });
+
+
+test('mobile sparkles drift and stars twinkle while respecting reduced motion', async ({ page }) => {
+  test.skip(baseline);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.goto(base);
+  for (const [selector, animation] of [
+    ['.ambient-sparkle', 'conversation-ambient-drift'],
+    ['.galaxy-backdrop i', 'galaxy-twinkle'],
+  ]) {
+    const sparkle = page.locator(selector).first();
+    await sparkle.evaluate(el => el.scrollIntoView({ block: 'center', behavior: 'instant' }));
+    expect(await sparkle.evaluate(el => getComputedStyle(el).animationName)).toBe(animation);
+    const before = await sparkle.evaluate(el => getComputedStyle(el).transform);
+    await expect.poll(() => sparkle.evaluate(el => getComputedStyle(el).transform)).not.toBe(before);
+  }
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  for (const selector of ['.ambient-sparkle', '.galaxy-backdrop i']) {
+    expect(await page.locator(selector).first().evaluate(el => getComputedStyle(el).animationName)).toBe('none');
+  }
+});
