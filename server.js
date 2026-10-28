@@ -259,6 +259,8 @@ function serveFile(res, filePath) {
     '.png': 'image/png',
     '.jpg': 'image/jpeg',
     '.jpeg': 'image/jpeg',
+    '.webp': 'image/webp',
+    '.woff2': 'font/woff2',
     '.pdf': 'application/pdf',
     '.svg': 'image/svg+xml',
     '.ttf': 'font/ttf',

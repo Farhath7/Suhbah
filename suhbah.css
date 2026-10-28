@@ -4191,3 +4191,35 @@ td {
   .registration-grid > .registration-note > ul { grid-column: 2; grid-row: 1 / 5; margin: 0; }
   .registration-grid > .registration-note > .registration-note-closing { grid-column: 1; padding: 12px 0 0; font-size: 1.05rem; }
 }
+
+/* Let the browser prioritize the visible poster and decode it off the main thread. */
+.event-card-media > .event-poster {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Avoid continuously compositing full-screen clouds through glass on phones. */
+@media (max-width: 760px) {
+  .live-sky::before,
+  .sky-clouds-right,
+  .event-card::after,
+  .ambient-sparkle,
+  .galaxy-backdrop::before,
+  .galaxy-backdrop i,
+  .upcoming-registration-card::before,
+  .upcoming-registration-card::after,
+  .upcoming-registration-card .button.secondary {
+    animation: none;
+    will-change: auto;
+  }
+
+  .event-card {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    transform: none;
+  }
+}

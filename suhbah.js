@@ -175,7 +175,7 @@
     return `
       <header class="header">
         <nav class="container nav" aria-label="Primary navigation">
-          <a class="brand" href="/" data-route><img class="brand-logo" src="/assets/suhbah-logo.png" alt="Suhbah" /></a>
+          <a class="brand" href="/" data-route><img class="brand-logo" src="/assets/suhbah-logo-display.webp" alt="Suhbah" width="320" height="122" decoding="async" /></a>
           <div class="nav-links" id="navLinks">
             <a class="nav-link" href="${homeAnchor('#about')}">About</a>
             <a class="nav-link" href="${homeAnchor('#events')}">Gatherings</a>
@@ -610,7 +610,7 @@
               </div>
 
             </div>
-            <div class="registration-art" aria-hidden="true"><img src="/assets/registration-still-life.png" alt="" loading="eager" fetchpriority="high" /></div>
+            <div class="registration-art" aria-hidden="true"><img src="/assets/registration-still-life-display.webp" alt="" width="960" height="480" loading="lazy" decoding="async" /></div>
             <div id="registrationMount" class="fade-in">${registrationForm(event)}</div>
               <div class="registration-note" aria-label="What to expect at Suhbah">
                 <span class="registration-note-kicker">Inside the gathering</span>
@@ -634,7 +634,8 @@
     const titleParts = event.theme.match(/^(.*?)\s*-\s*(Upcoming)$/i);
     return `
       <article class="event-card fade-in" id="upcoming-banner" aria-label="Upcoming Suhbah event">
-        <div class="event-card-media" ${mediaStyle(event.image || '/assets/suhbah-quran.jpg')}>
+        <div class="event-card-media">
+          <img class="event-poster" src="${html(displayImage(event.image || '/assets/suhbah-quran.jpg'))}" alt="" decoding="async" fetchpriority="high" />
           ${registrationStatus(event.registrationStatus)}
         </div>
         <div class="event-card-body">
@@ -686,10 +687,16 @@
     return `<div class="registration-label" aria-label="Registration status"><span>${html(status)}</span>${html(title)}</div>`;
   }
 
-  function mediaStyle(image) {
-    return image
-      ? `style="background-image: url('${html(image)}')"`
-      : '';
+  // Keep stored event URLs and original artwork intact; use smaller display copies.
+  // Uploaded and external images pass through unchanged.
+  function displayImage(image) {
+    const copies = {
+      '/assets/suhbah-01-quran-changes-you.png': '/assets/suhbah-01-quran-changes-you-display.webp',
+      '/assets/suhbah-02-whos-in-your-cave.png': '/assets/suhbah-02-whos-in-your-cave-display.webp',
+      '/assets/suhbah-03-trials-that-define-us.webp': '/assets/suhbah-03-trials-that-define-us-display.webp',
+      '/assets/suhbah-quran.jpg': '/assets/suhbah-quran-display.webp',
+    };
+    return copies[image] || image;
   }
 
   function quranParaLinks() {
@@ -764,7 +771,7 @@
   function pastCard(event) {
     return `
       <article class="past-card fade-in" data-recap-id="${html(event.id)}" role="button" tabindex="0" aria-label="View recap for ${html(event.number)}: ${html(event.theme)}">
-        <div class="past-image">${event.image ? `<img src="${html(event.image)}" alt="${html(event.number)}: ${html(event.theme)}" loading="lazy" />` : ''}</div>
+        <div class="past-image">${event.image ? `<img src="${html(displayImage(event.image))}" alt="${html(event.number)}: ${html(event.theme)}" loading="lazy" decoding="async" />` : ''}</div>
         <div class="past-body">
           <span class="event-kicker">${html(event.number)}</span>
           <h3>${html(event.theme)}</h3>
@@ -789,7 +796,7 @@
           <section class="recap-dialog" role="dialog" aria-modal="true" aria-labelledby="recapTitle">
             <button class="recap-close" type="button" aria-label="Close recap">Close</button>
             <div class="recap-heading">
-              ${session.image ? `<img class="recap-thumbnail" src="${html(session.image)}" alt="${html(session.number)}: ${html(session.theme)}" />` : ''}
+              ${session.image ? `<img class="recap-thumbnail" src="${html(displayImage(session.image))}" decoding="async" alt="${html(session.number)}: ${html(session.theme)}" />` : ''}
               <div><span class="event-kicker">${html(session.number)}</span><h2 id="recapTitle">${html(session.theme)}</h2></div>
             </div>
             <p class="recap-meta">${html(dateLabel(session.date))} · ${html(session.time)} · ${html(session.location)}</p>
@@ -963,7 +970,7 @@
       <footer class="footer">
         <div class="container">
           <div class="footer-grid">
-            <div><a class="brand footer-brand" href="/" data-route><img class="brand-logo" src="/assets/suhbah-logo.png" alt="Suhbah" /></a><p>Reconnecting young people with the Quran, one gathering at a time.</p></div>
+            <div><a class="brand footer-brand" href="/" data-route><img class="brand-logo" src="/assets/suhbah-logo-display.webp" alt="Suhbah" width="320" height="122" decoding="async" /></a><p>Reconnecting young people with the Quran, one gathering at a time.</p></div>
             <div><h3>Links</h3><div class="footer-links"><a href="${homeAnchor('#home')}">Home</a><a href="${homeAnchor('#about')}">About</a><a href="${homeAnchor('#events')}">Events</a><a href="${homeAnchor('#community')}">Community</a></div></div>
             <div><h3>Connect</h3><div class="social-links"><a href="${html(db.socialLinks.instagram)}" target="_blank" rel="noreferrer">Instagram</a><a href="${html(db.socialLinks.whatsapp)}" target="_blank" rel="noreferrer">WhatsApp</a></div><div class="footer-email"><a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=suhbahconnects%40gmail.com" target="_blank" rel="noopener noreferrer">Write to us<span class="footer-email-address">suhbahconnects@gmail.com</span></a></div></div>
           </div>
@@ -977,7 +984,7 @@
     return `
       <div class="login-wrap">
         <form class="login-card" id="loginForm">
-          <a class="brand login-brand" href="/" data-route><img class="brand-logo" src="/assets/suhbah-logo.png" alt="Suhbah" /></a>
+          <a class="brand login-brand" href="/" data-route><img class="brand-logo" src="/assets/suhbah-logo-display.webp" alt="Suhbah" width="320" height="122" decoding="async" /></a>
           <h2 style="margin-top: 22px;">Admin sign in</h2>
           <p class="muted">Protected dashboard for managing events, registrations, testimonials, statistics, and social links.</p>
           ${message ? `<div class="notice">${html(message)}</div>` : ''}
@@ -1001,7 +1008,7 @@
     return `
       <div class="admin-layout">
         <header class="admin-header"><div class="container admin-header-inner">
-          <a class="brand" href="/" data-route><img class="brand-logo" src="/assets/suhbah-logo.png" alt="Suhbah" /></a>
+          <a class="brand" href="/" data-route><img class="brand-logo" src="/assets/suhbah-logo-display.webp" alt="Suhbah" width="320" height="122" decoding="async" /></a>
           <a class="admin-workspace-label" href="/admin" data-route>Admin workspace</a>
           <div class="admin-header-actions"><a class="small-button" href="/" target="_blank" rel="noreferrer">View website</a><button class="small-button" id="logoutButton" type="button">Log out</button></div>
         </div></header>
