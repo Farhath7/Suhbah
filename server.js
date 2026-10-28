@@ -367,6 +367,12 @@ async function handleApiWithDb(req, res, url, db, body, afterCommit) {
       sendJson(res, 400, { error: 'Please enter a valid email address.' });
       return;
     }
+    const email = body.email.trim().toLowerCase();
+    if (db.registrations.some((registration) => registration.eventId === event.id &&
+        String(registration.email || '').trim().toLowerCase() === email)) {
+      sendJson(res, 409, { error: "You're already registered for this Suhbah." });
+      return;
+    }
     const registration = {
       id: uid('reg'),
       eventId: body.eventId,
