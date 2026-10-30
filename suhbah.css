@@ -3399,6 +3399,11 @@ td {
 .admin-shell {
   gap: 26px;
   padding: 38px 0 64px;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.admin-content {
+  min-width: 0;
 }
 
 .admin-overline {
@@ -3679,6 +3684,17 @@ td {
   min-width: 0;
 }
 
+.admin-layout .table-wrap {
+  max-width: 100%;
+  -webkit-overflow-scrolling: touch;
+}
+
+.admin-table-hint {
+  margin: 0 0 12px;
+  color: var(--blue);
+  font-size: 0.8rem;
+}
+
 .admin-layout th {
   background: #f5f8fa;
   font-size: 0.65rem;
@@ -3708,6 +3724,11 @@ td {
 }
 
 @media (max-width: 539px) {
+  .table-panel .admin-top {
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+
   .admin-header-inner {
     min-height: 72px;
     gap: 8px;

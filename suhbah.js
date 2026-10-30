@@ -1089,7 +1089,8 @@
           const count = db.registrations.filter((item) => item.eventId === id).length;
           return `<option value="${html(id)}" ${registrationEventId === id ? 'selected' : ''}>${html(event ? `${event.number}: ${event.theme}` : `${registrationEventLabel(reg)} (archived)`)} (${count})</option>`;
         }).join('')}</select></label>
-        <div class="table-wrap">
+        <p class="admin-table-hint" id="registrationScrollHint">Scroll sideways to see all registration details and actions.</p>
+        <div class="table-wrap" role="region" aria-label="Registration details" aria-describedby="registrationScrollHint" tabindex="0">
           <table>
             <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Age</th><th>Gender</th><th>Profile</th><th>Attended before</th><th>Quran received</th><th>Suhbah</th><th>Registration type</th><th>Registration date</th><th>Actions</th></tr></thead>
             <tbody>

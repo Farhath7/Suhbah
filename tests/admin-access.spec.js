@@ -6,7 +6,7 @@ const path = require('path');
 const net = require('net');
 const { spawn } = require('child_process');
 
-test('public navigation hides admin and dashboard access requires an admin session', async ({ page, request }) => {
+test('public navigation hides admin and dashboard access requires an admin session', async ({ page, request, browserName }) => {
   const root = path.resolve(__dirname, '..');
   const temporaryRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'suhbah-admin-test-'));
   let server;
@@ -17,6 +17,7 @@ test('public navigation hides admin and dashboard access requires an admin sessi
     fs.mkdirSync(path.join(temporaryRoot, 'data'));
     fs.mkdirSync(path.join(temporaryRoot, 'assets'));
     fs.copyFileSync(path.join(root, 'assets', 'suhbah-logo.png'), path.join(temporaryRoot, 'assets', 'suhbah-logo.png'));
+    fs.copyFileSync(path.join(root, 'assets', 'suhbah-logo-display.webp'), path.join(temporaryRoot, 'assets', 'suhbah-logo-display.webp'));
     fs.writeFileSync(path.join(temporaryRoot, 'assets', 'test.txt'), 'public asset');
     const email = 'admin@example.test';
     const password = 'test-only-password';
@@ -148,6 +149,45 @@ test('public navigation hides admin and dashboard access requires an admin sessi
     await page.getByRole('button', { name: 'Sign in', exact: true }).click();
     await page.locator('[data-tab="registrations"]').click();
     const deleteButton = page.getByRole('button', { name: 'Delete registration for Test Attendee', exact: true });
+    for (const width of [320, 390, 430, 768, 1440]) {
+      await page.setViewportSize({ width, height: 844 });
+      const table = page.locator('.table-wrap');
+      const bounds = await table.boundingBox();
+      expect(bounds.x).toBeGreaterThanOrEqual(0);
+      expect(bounds.x + bounds.width).toBeLessThanOrEqual(width);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+      const overflows = await table.evaluate((element) => element.scrollWidth > element.clientWidth);
+      if (width <= 768) expect(overflows).toBe(true);
+      await table.focus();
+      if (overflows) {
+        await page.keyboard.press('ArrowRight');
+        await expect.poll(() => table.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
+        await table.evaluate((element) => { element.scrollLeft = element.scrollWidth; });
+        await expect.poll(() => table.evaluate((element) => element.scrollLeft + element.clientWidth >= element.scrollWidth - 1)).toBe(true);
+      }
+      const actionBounds = await deleteButton.boundingBox();
+      expect(actionBounds.x).toBeGreaterThanOrEqual(bounds.x);
+      expect(actionBounds.x + actionBounds.width).toBeLessThanOrEqual(bounds.x + bounds.width + 1);
+      if (width === 390) await page.screenshot({ path: test.info().outputPath('admin-registrations-mobile.png'), fullPage: true });
+      await table.evaluate((element) => { element.scrollLeft = 0; });
+    }
+    await page.setViewportSize({ width: 390, height: 844 });
+    if (browserName === 'chromium') {
+      const table = page.locator('.table-wrap');
+      await table.scrollIntoViewIfNeeded();
+      const bounds = await table.boundingBox();
+      const session = await page.context().newCDPSession(page);
+      await session.send('Emulation.setTouchEmulationEnabled', { enabled: true });
+      const y = Math.round(bounds.y + 70);
+      const startX = Math.round(bounds.x + bounds.width - 20);
+      await session.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: startX, y }] });
+      for (let offset = 20; offset <= 200; offset += 20) {
+        await session.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: startX - offset, y }] });
+      }
+      await session.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+      await expect.poll(() => table.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
+      await session.detach();
+    }
     page.once('dialog', async (dialog) => {
       expect(dialog.message()).toContain('Test Attendee');
       expect(dialog.message()).toContain('cannot be undone');
