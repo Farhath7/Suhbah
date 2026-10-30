@@ -1196,6 +1196,78 @@ h3 {
   content: "";
 }
 
+.registration-closed-sign {
+  position: relative;
+  width: 240px;
+  max-width: 100%;
+  padding-top: 40px;
+  color: var(--navy);
+  text-align: center;
+  transform-origin: 50% 5px;
+  animation: closed-sign-swing 3.6s ease-in-out infinite;
+}
+
+.closed-sign-cord {
+  position: absolute;
+  top: 0;
+  left: 15%;
+  width: 70%;
+  height: 42px;
+  color: #b19463;
+}
+
+.closed-sign-board {
+  display: grid;
+  gap: 7px;
+  padding: 18px 16px;
+  border: 2px solid #b19463;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #fffaf2, #efe3ce);
+  box-shadow: inset 0 0 0 4px #fffaf2, inset 0 0 0 5px #b1946366, 0 8px 16px #12202e26;
+}
+
+.closed-sign-board > span {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.closed-sign-board > strong {
+  font-size: 0.78rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.event-card-media .registration-closed-sign {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  z-index: 5;
+  max-width: calc(100% - 36px);
+}
+
+.registration-closed-panel {
+  display: grid;
+  justify-items: center;
+  gap: 24px;
+  text-align: center;
+}
+
+.registration-closed-panel .lead {
+  margin: 0;
+}
+
+@keyframes closed-sign-swing {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .registration-closed-sign { animation: none; }
+}
+
 .countdown {
   grid-template-columns: repeat(4, minmax(0, 1fr));
   margin: 18px 0 20px;

@@ -678,6 +678,7 @@
   }
 
   function registrationStatus(status = 'Open') {
+    if (status === 'Closed') return closedRegistrationSign();
     const messages = {
       Open: ['Reserve your seat', 'Reserve yours before this gathering fills up.'],
       Waitlist: ['Waitlist is open', 'Join the list and we will reach out if a spot opens.'],
@@ -685,6 +686,13 @@
     };
     const [title] = messages[status] || messages.Open;
     return `<div class="registration-label" aria-label="Registration status"><span>${html(status)}</span>${html(title)}</div>`;
+  }
+
+  function closedRegistrationSign() {
+    return `<div class="registration-closed-sign" aria-label="Registration status: closed">
+      <svg class="closed-sign-cord" viewBox="0 0 160 42" aria-hidden="true"><path d="M8 41 L80 5 L152 41" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="80" cy="5" r="4" fill="currentColor"/></svg>
+      <div class="closed-sign-board"><span>Closed</span><strong>Registrations closed</strong></div>
+    </div>`;
   }
 
   // Keep stored event URLs and original artwork intact; use smaller display copies.
@@ -878,7 +886,7 @@
   }
 
   function registrationForm(event) {
-    if (!registrationIsOpen(event)) return `<div class="form-panel"><h2>Registrations closed</h2><p class="lead">Registration for ${html(event.number)}: ${html(event.theme)} is closed.</p><a class="button secondary" href="/#events">See other Suhbahs</a></div>`;
+    if (!registrationIsOpen(event)) return `<div class="form-panel registration-closed-panel">${closedRegistrationSign()}<p class="lead">Registration for ${html(event.number)}: ${html(event.theme)} is closed.</p><a class="button secondary" href="/#events">See other Suhbahs</a></div>`;
     const waitlist = event.registrationStatus === 'Waitlist';
     return `
       <form class="form-panel" id="registrationForm" aria-label="Registration for ${html(event.number)}: ${html(event.theme)}">
