@@ -418,35 +418,32 @@
   function palestineSection() {
     return `<section class="section palestine-section" id="palestine" aria-labelledby="palestineTitle">
       <div class="container">
-        <div class="palestine-heading">
-          <div><span class="eyebrow">Learn. Reflect. Remember.</span><h2 id="palestineTitle">Palestine in Suhbah</h2></div>
-          <p>Behind every number is a person, a family, and a future. Our first session explored the human cost of war in Gaza and the responsibility we share to care and act.</p>
+        <div class="palestine-layout">
+          <div class="palestine-intro">
+            <span class="palestine-kicker"><span aria-hidden="true"></span>A moment for Palestine</span>
+            <h2 id="palestineTitle">Palestine<br><em>in Suhbah.</em></h2>
+            <p>We make space to understand the human cost of war, remember its people, and turn compassion into everyday action.</p>
+            <blockquote><p>A Muslim does not abandon<br>his brother.</p><cite>Sahih al-Bukhari 2442 &middot; Sahih Muslim 2580</cite></blockquote>
+          </div>
+          <div class="palestine-evidence">
+            <div class="palestine-evidence-heading"><span>01 / The human cost</span><h3>Behind the numbers,<br>human lives.</h3></div>
+            <dl class="palestine-facts">
+              <div><dt>1.9<span>million</span></dt><dd>People displaced<small>Forced to leave their homes.</small></dd></div>
+              <div><dt>625<span>thousand+</span></dt><dd>Students without school<small>Two years without formal schooling.</small></dd></div>
+              <div><dt>1<span>million+</span></dt><dd>Children needing support<small>Urgent mental health intervention.</small></dd></div>
+            </dl>
+            <details class="palestine-sources"><summary>Source snapshot &middot; October 2026</summary><p>Figures drawn from our session reference material, which cites UN OCHA, UNRWA and UNICEF. The presentation reports 625,000+ students deprived of formal schooling and 1 million+ children needing urgent mental health intervention. These figures reflect the source material, not a live update.</p></details>
+          </div>
         </div>
-        <article class="palestine-session" aria-labelledby="palestineSessionTitle">
-          <span class="palestine-session-label">Session 01 &middot; The human cost</span>
-          <h3 id="palestineSessionTitle">Lives uprooted. Futures interrupted.</h3>
-          <dl class="palestine-facts">
-            <div><dt>1.9 million</dt><dd>civilians displaced from their homes</dd></div>
-            <div><dt>625,000+</dt><dd>students deprived of formal schooling for two consecutive years</dd></div>
-            <div><dt>1 million+</dt><dd>children requiring urgent mental health intervention</dd></div>
-          </dl>
-          <p class="palestine-source-note">Figures reported in our source material (October 2026), which cites UN OCHA, UNRWA and UNICEF. These are a snapshot from the source material, not a live update.</p>
-          <div class="palestine-impact">
-            <h4>Loss reaches beyond the numbers</h4>
-            <p>The session connected displacement with family separation, hunger, disrupted healthcare and lasting trauma. It also explored the loss of schools and cultural heritage, and the determination to keep learning and preserve identity.</p>
-          </div>
-          <div class="palestine-response">
-            <h4>Four ways to respond</h4>
-            <ol>
-              <li><strong>Make sincere dua.</strong> Remember the people of Palestine in your daily prayers.</li>
-              <li><strong>Give thoughtfully.</strong> Choose registered charities with clear, public financial reporting.</li>
-              <li><strong>Build a lasting habit.</strong> Start with one considered boycott choice and find a local alternative.</li>
-              <li><strong>Share responsibly.</strong> Check sources and dates before passing information on.</li>
-            </ol>
-          </div>
-          <p class="palestine-reflection">The believers are brothers. Let that care become action. <span>Quran 49:10 &middot; Sahih Muslim 2586</span></p>
-        </article>
-        <p class="palestine-continuing">One gathering at a time, we keep learning about Palestine and how to support its people.</p>
+        <div class="palestine-response">
+          <div class="palestine-response-heading"><span>Compassion into action</span><h3>Small steps. Lasting care.</h3></div>
+          <ol>
+            <li><span aria-hidden="true">01</span><div><h4>Remember in dua</h4><p>Keep Palestine in your daily prayers.</p></div></li>
+            <li><span aria-hidden="true">02</span><div><h4>Give with care</h4><p>Support registered, transparent charities.</p></div></li>
+            <li><span aria-hidden="true">03</span><div><h4>Choose consciously</h4><p>Start with one lasting boycott choice.</p></div></li>
+            <li><span aria-hidden="true">04</span><div><h4>Share responsibly</h4><p>Check the source. Check the date.</p></div></li>
+          </ol>
+        </div>
       </div>
     </section>`;
   }
