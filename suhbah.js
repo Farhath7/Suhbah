@@ -179,6 +179,7 @@
           <div class="nav-links" id="navLinks">
             <a class="nav-link" href="${homeAnchor('#about')}">About</a>
             <a class="nav-link" href="${homeAnchor('#events')}">Gatherings</a>
+            <a class="nav-link" href="${homeAnchor('#palestine')}">Palestine</a>
             <details class="nav-resources">
               <summary class="nav-link">Resources</summary>
               <div class="nav-resource-links">
@@ -414,6 +415,42 @@
     return `<div class="conversation-ambient" aria-hidden="true">${Array.from({ length: count }, (_, index) => `<span class="ambient-sparkle${index % 2 === 0 ? ' is-star' : ''}" style="--spark-x:${between(2, 98)}%;--spark-y:${between(5, 95)}%;--spark-size:${index % 2 === 0 ? between(9, 16) : between(3, 6)}px;--spark-duration:${between(2.2, 4.8)}s;--spark-delay:-${between(0, 10)}s;--drift-x:${between(-45, 45)}px;--drift-y:${between(-45, 45)}px;--bend-x:${between(-28, 28)}px;--bend-y:${between(-28, 28)}px"></span>`).join('')}</div>`;
   }
 
+  // Add future presentations here, newest session first.
+  const palestineSessions = [
+    {
+      number: '01',
+      title: 'A Genocide the World Watched',
+      description: 'Our first Palestine session explored the human cost of war, displacement, and the loss of homes, education, and heritage, alongside our responsibility to care and act.',
+      file: '/assets/palestine-session-01.pdf',
+      cover: '/assets/palestine-session-01.webp',
+      pages: 15,
+      size: '6.6 MB',
+    },
+  ];
+
+  function palestineSection() {
+    return `<section class="section palestine-section" id="palestine" aria-labelledby="palestineTitle">
+      <div class="container">
+        <div class="palestine-heading">
+          <div><span class="eyebrow">Learn. Reflect. Remember.</span><h2 id="palestineTitle">Palestine in Suhbah</h2></div>
+          <p>A continuing conversation about Palestine, its people, and our responsibility. Revisit the presentations shared at our gatherings as we keep learning together.</p>
+        </div>
+        <div class="palestine-sessions">${palestineSessions.map((session) => `<article class="palestine-session">
+          <a class="palestine-cover" href="${session.file}" target="_blank" rel="noopener noreferrer" aria-label="View ${html(session.title)} (PDF, opens in a new tab)"><img src="${session.cover}" alt="Cover of ${html(session.title)}" width="960" height="540" loading="lazy" decoding="async" /></a>
+          <div class="palestine-session-copy">
+            <span class="palestine-session-label">Session ${session.number} <span aria-hidden="true">&middot;</span> Presentation</span>
+            <h3>${html(session.title)}</h3>
+            <p>${html(session.description)}</p>
+            <span class="palestine-file-info">${session.pages} slides <span aria-hidden="true">&middot;</span> PDF <span aria-hidden="true">&middot;</span> ${session.size}</span>
+            <div class="palestine-actions"><a class="button primary" href="${session.file}" target="_blank" rel="noopener noreferrer">View presentation <span class="sr-only">(PDF, opens in a new tab)</span><span aria-hidden="true">&nearr;</span></a><a class="button secondary" href="${session.file}" download="palestine-in-suhbah-session-${session.number}.pdf">Download PDF</a></div>
+            <p class="palestine-archive-note">Shared at Suhbah. Figures and references reflect the original presentation.</p>
+          </div>
+        </article>`).join('')}</div>
+        <p class="palestine-continuing">One gathering at a time, we keep the conversation going. Future session presentations will be collected here.</p>
+      </div>
+    </section>`;
+  }
+
   function publicMain() {
     const event = upcomingEvent();
     const past = db.events.filter((item) => item.status === 'past').slice(0, 4);
@@ -497,6 +534,7 @@
             <div class="past-grid">${past.map(pastCard).join('')}</div>
           </div>
         </section>
+        ${palestineSection()}
         <section class="section stat-band" id="community">
           <div class="container fade-in">
             <h2>Come for the Quran.<br />Stay for the community.</h2>
