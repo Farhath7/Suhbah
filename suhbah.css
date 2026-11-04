@@ -1,47 +1,47 @@
-.palestine-section.section { padding: 88px 0 64px; background: #253b43; color: #f5efeb; }
-.palestine-layout { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(40px, 7vw, 112px); }
+.palestine-section.section { padding: 48px 0 40px; background: #253b43; color: #f5efeb; }
+.palestine-layout { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(32px, 6vw, 88px); }
 .palestine-kicker, .palestine-evidence-heading > span, .palestine-response-heading > span { font-size: .68rem; font-weight: 600; letter-spacing: .15em; text-transform: uppercase; color: #c7d5cd; }
 .palestine-kicker { display: flex; align-items: center; gap: 12px; }
 .palestine-kicker > span { width: 24px; height: 2px; background: #d7b98a; }
-.palestine-intro h2 { margin: 30px 0 24px; color: #fff8ec; font: 500 clamp(3.5rem, 6vw, 6rem)/.98 var(--font-display); letter-spacing: -.045em; }
+.palestine-intro h2 { margin: 20px 0 18px; color: #fff8ec; font: 500 clamp(3rem, 4.8vw, 4.6rem)/.98 var(--font-display); letter-spacing: -.045em; }
 .palestine-intro h2 em { color: #b5cbc4; font-weight: 400; }
-.palestine-intro > p { max-width: 360px; margin: 0; color: #d0dad8; font-size: .95rem; line-height: 1.85; }
-.palestine-intro blockquote { margin: 38px 0 0; padding: 0 0 0 18px; border-left: 2px solid #d7b98a; }
-.palestine-intro blockquote p { margin: 0 0 12px; color: #fff8ec; font: 400 1.6rem/1.25 var(--font-display); }
+.palestine-intro > p { max-width: 360px; margin: 0; color: #d0dad8; font-size: .9rem; line-height: 1.65; }
+.palestine-intro blockquote { margin: 24px 0 0; padding: 0 0 0 18px; border-left: 2px solid #d7b98a; }
+.palestine-intro blockquote p { margin: 0 0 8px; color: #fff8ec; font: 400 1.3rem/1.25 var(--font-display); }
 .palestine-intro cite { display: block; color: #bdcdca; font: normal .65rem/1.7 var(--font-body); }
 .palestine-evidence { padding-top: 4px; min-width: 0; }
-.palestine-evidence-heading h3 { margin: 18px 0 24px; color: #fff8ec; font: 400 clamp(1.9rem, 3vw, 2.6rem)/1.15 var(--font-display); letter-spacing: -.02em; }
+.palestine-evidence-heading h3 { margin: 12px 0 18px; color: #fff8ec; font: 400 clamp(1.6rem, 2.3vw, 2rem)/1.15 var(--font-display); letter-spacing: -.02em; }
 .palestine-facts { margin: 0; }
-.palestine-facts > div { display: grid; grid-template-columns: minmax(110px, .85fr) 1.2fr; align-items: center; gap: 20px; border-top: 1px solid #ffffff24; padding: 21px 0; }
-.palestine-facts dt { color: #ecd3ac; font: 400 clamp(2.5rem, 4vw, 3.5rem)/.95 var(--font-display); letter-spacing: -.04em; }
-.palestine-facts dt > span { display: block; margin-top: 7px; color: #d5c2a4; font: 400 .72rem/1.4 var(--font-body); letter-spacing: .02em; }
+.palestine-facts > div { display: grid; grid-template-columns: minmax(110px, .85fr) 1.2fr; align-items: center; gap: 20px; border-top: 1px solid #ffffff24; padding: 14px 0; }
+.palestine-facts dt { color: #ecd3ac; font: 400 clamp(2.2rem, 3vw, 2.7rem)/.95 var(--font-display); letter-spacing: -.04em; }
+.palestine-facts dt > span { display: block; margin-top: 4px; color: #d5c2a4; font: 400 .72rem/1.4 var(--font-body); letter-spacing: .02em; }
 .palestine-facts dd { margin: 0; color: #fff8ec; font-size: .86rem; font-weight: 500; }
 .palestine-facts dd small { display: block; margin-top: 6px; color: #c0ceca; font-size: .73rem; font-weight: 400; line-height: 1.6; }
-.palestine-sources { border-top: 1px solid #ffffff24; padding-top: 16px; color: #c0ceca; font-size: .7rem; line-height: 1.8; }
+.palestine-sources { border-top: 1px solid #ffffff24; padding-top: 12px; color: #c0ceca; font-size: .7rem; line-height: 1.8; }
 .palestine-sources summary { cursor: pointer; width: fit-content; }
 .palestine-sources summary:focus-visible { outline: 2px solid #ecd3ac; outline-offset: 5px; }
 .palestine-sources p { margin: 12px 0 0; max-width: 470px; }
-.palestine-response { margin-top: 58px; padding-top: 30px; border-top: 1px solid #ffffff30; }
-.palestine-response-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: 24px; }
+.palestine-response { margin-top: 30px; padding-top: 22px; border-top: 1px solid #ffffff30; }
+.palestine-response-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: 18px; }
 .palestine-response-heading h3 { margin: 0; color: #fff8ec; font: 400 1.5rem/1.3 var(--font-display); }
-.palestine-response ol { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 28px; list-style: none; margin: 0; padding: 0; }
+.palestine-response ol { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 22px; list-style: none; margin: 0; padding: 0; }
 .palestine-response li { display: flex; gap: 12px; align-items: baseline; }
 .palestine-response li > span { color: #d7b98a; font-size: .65rem; }
 .palestine-response h4 { margin: 0 0 6px; color: #fff8ec; font: 400 1.2rem/1.3 var(--font-display); }
 .palestine-response li p { margin: 0; color: #c0ceca; font-size: .73rem; line-height: 1.7; }
 @media (max-width: 850px) {
   .palestine-layout { gap: 36px; }
-  .palestine-response ol { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+  .palestine-response ol { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
 }
 @media (max-width: 600px) {
-  .palestine-section.section { padding: 52px 0 40px; }
-  .palestine-layout { grid-template-columns: minmax(0, 1fr); gap: 40px; }
-  .palestine-intro h2 { margin-top: 24px; font-size: clamp(3.5rem, 16vw, 5rem); }
-  .palestine-intro blockquote { margin-top: 26px; }
-  .palestine-intro blockquote p { font-size: 1.35rem; }
-  .palestine-response { margin-top: 36px; padding-top: 26px; }
+  .palestine-section.section { padding: 36px 0 30px; }
+  .palestine-layout { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  .palestine-intro h2 { margin-top: 18px; font-size: clamp(2.9rem, 13vw, 3.6rem); }
+  .palestine-intro blockquote { margin-top: 18px; }
+  .palestine-intro blockquote p { font-size: 1.2rem; }
+  .palestine-response { margin-top: 24px; padding-top: 20px; }
   .palestine-response-heading { display: block; }
-  .palestine-response-heading h3 { margin-top: 12px; }
+  .palestine-response-heading h3 { margin-top: 8px; }
 }
 @media (max-width: 359px) {
   .palestine-response ol { grid-template-columns: minmax(0, 1fr); }
