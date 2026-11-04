@@ -3,30 +3,30 @@
 .palestine-heading .eyebrow { color: #536a48; }
 .palestine-heading h2 { margin: 14px 0 0; }
 .palestine-heading > p { margin: 0; max-width: 520px; color: #536151; line-height: 1.7; }
-.palestine-sessions { display: grid; gap: 24px; }
-.palestine-session { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); overflow: hidden; border: 1px solid #d3dccd; border-radius: 20px; background: #fffdf7; }
-.palestine-cover { display: flex; align-items: center; background: #080e13; }
-.palestine-cover img { display: block; width: 100%; height: auto; }
-.palestine-cover:focus-visible { outline: 3px solid #7a925e; outline-offset: -4px; }
-.palestine-session-copy { min-width: 0; padding: 32px; }
+.palestine-session { padding: clamp(24px, 4vw, 48px); border: 1px solid #d3dccd; border-radius: 20px; background: #fffdf7; }
 .palestine-session-label { color: #536a48; font-size: .75rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-.palestine-session-copy h3 { margin: 14px 0; font: 600 clamp(1.7rem, 3vw, 2.3rem)/1.15 var(--font-display); color: #283e32; }
-.palestine-session-copy > p { color: #536151; line-height: 1.7; }
-.palestine-file-info { display: block; margin: 20px 0 16px; color: #61715d; font-size: .8rem; }
-.palestine-actions { display: flex; flex-wrap: wrap; gap: 10px; }
-.palestine-actions .button { gap: 8px; font-size: .85rem; }
-.palestine-actions .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
-.palestine-actions .primary { background: #344e3e; border-color: #344e3e; }
-.palestine-session-copy .palestine-archive-note { margin: 18px 0 0; font-size: .72rem; }
+.palestine-session h3 { margin: 14px 0 28px; font: 600 clamp(1.7rem, 3vw, 2.3rem)/1.15 var(--font-display); color: #283e32; }
+.palestine-facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; margin: 0; }
+.palestine-facts > div { border-top: 2px solid #a4b493; padding-top: 18px; }
+.palestine-facts dt { font: 600 clamp(2rem, 4vw, 3rem)/1.1 var(--font-display); }
+.palestine-facts dd { margin: 12px 0 0; color: #536151; line-height: 1.6; }
+.palestine-source-note { margin: 24px 0; font-size: .8rem; line-height: 1.6; color: #536151; }
+.palestine-session h4 { margin: 0 0 12px; font: 600 1.5rem/1.2 var(--font-display); }
+.palestine-impact { padding: 24px 0; border-top: 1px solid #d3dccd; }
+.palestine-impact p { margin: 0; color: #536151; line-height: 1.7; }
+.palestine-response { padding: 24px 0 0; border-top: 1px solid #d3dccd; }
+.palestine-response ol { padding-left: 24px; margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 18px 40px; color: #536151; line-height: 1.7; }
+.palestine-response li { padding-left: 4px; }
+.palestine-response strong { color: #283e32; }
+.palestine-reflection { margin: 28px 0 0; font: 600 1.3rem/1.5 var(--font-display); }
+.palestine-reflection span { display: block; margin-top: 6px; font: 400 .8rem/1.6 var(--font-body); color: #536151; }
 .palestine-continuing { margin: 24px 0 0; color: #536151; font-size: .85rem; line-height: 1.6; }
 @media (max-width: 850px) {
-  .palestine-heading, .palestine-session { grid-template-columns: minmax(0, 1fr); }
-  .palestine-heading { gap: 18px; }
-  .palestine-session-copy { padding: 24px; }
+  .palestine-heading { grid-template-columns: minmax(0, 1fr); gap: 18px; }
 }
-@media (max-width: 420px) {
-  .palestine-actions { flex-direction: column; }
-  .palestine-actions .button { justify-content: center; }
+@media (max-width: 600px) {
+  .palestine-facts, .palestine-response ol { grid-template-columns: minmax(0, 1fr); }
+  .palestine-facts { gap: 22px; }
 }
 
 .bookmark-page .section-head h1 {

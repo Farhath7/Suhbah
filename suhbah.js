@@ -415,38 +415,38 @@
     return `<div class="conversation-ambient" aria-hidden="true">${Array.from({ length: count }, (_, index) => `<span class="ambient-sparkle${index % 2 === 0 ? ' is-star' : ''}" style="--spark-x:${between(2, 98)}%;--spark-y:${between(5, 95)}%;--spark-size:${index % 2 === 0 ? between(9, 16) : between(3, 6)}px;--spark-duration:${between(2.2, 4.8)}s;--spark-delay:-${between(0, 10)}s;--drift-x:${between(-45, 45)}px;--drift-y:${between(-45, 45)}px;--bend-x:${between(-28, 28)}px;--bend-y:${between(-28, 28)}px"></span>`).join('')}</div>`;
   }
 
-  // Add future presentations here, newest session first.
-  const palestineSessions = [
-    {
-      number: '01',
-      title: 'A Genocide the World Watched',
-      description: 'Our first Palestine session explored the human cost of war, displacement, and the loss of homes, education, and heritage, alongside our responsibility to care and act.',
-      file: '/assets/palestine-session-01.pdf',
-      cover: '/assets/palestine-session-01.webp',
-      pages: 15,
-      size: '6.6 MB',
-    },
-  ];
-
   function palestineSection() {
     return `<section class="section palestine-section" id="palestine" aria-labelledby="palestineTitle">
       <div class="container">
         <div class="palestine-heading">
           <div><span class="eyebrow">Learn. Reflect. Remember.</span><h2 id="palestineTitle">Palestine in Suhbah</h2></div>
-          <p>A continuing conversation about Palestine, its people, and our responsibility. Revisit the presentations shared at our gatherings as we keep learning together.</p>
+          <p>Behind every number is a person, a family, and a future. Our first session explored the human cost of war in Gaza and the responsibility we share to care and act.</p>
         </div>
-        <div class="palestine-sessions">${palestineSessions.map((session) => `<article class="palestine-session">
-          <a class="palestine-cover" href="${session.file}" target="_blank" rel="noopener noreferrer" aria-label="View ${html(session.title)} (PDF, opens in a new tab)"><img src="${session.cover}" alt="Cover of ${html(session.title)}" width="960" height="540" loading="lazy" decoding="async" /></a>
-          <div class="palestine-session-copy">
-            <span class="palestine-session-label">Session ${session.number} <span aria-hidden="true">&middot;</span> Presentation</span>
-            <h3>${html(session.title)}</h3>
-            <p>${html(session.description)}</p>
-            <span class="palestine-file-info">${session.pages} slides <span aria-hidden="true">&middot;</span> PDF <span aria-hidden="true">&middot;</span> ${session.size}</span>
-            <div class="palestine-actions"><a class="button primary" href="${session.file}" target="_blank" rel="noopener noreferrer">View presentation <span class="sr-only">(PDF, opens in a new tab)</span><span aria-hidden="true">&nearr;</span></a><a class="button secondary" href="${session.file}" download="palestine-in-suhbah-session-${session.number}.pdf">Download PDF</a></div>
-            <p class="palestine-archive-note">Shared at Suhbah. Figures and references reflect the original presentation.</p>
+        <article class="palestine-session" aria-labelledby="palestineSessionTitle">
+          <span class="palestine-session-label">Session 01 &middot; The human cost</span>
+          <h3 id="palestineSessionTitle">Lives uprooted. Futures interrupted.</h3>
+          <dl class="palestine-facts">
+            <div><dt>1.9 million</dt><dd>civilians displaced from their homes</dd></div>
+            <div><dt>625,000+</dt><dd>students deprived of formal schooling for two consecutive years</dd></div>
+            <div><dt>1 million+</dt><dd>children requiring urgent mental health intervention</dd></div>
+          </dl>
+          <p class="palestine-source-note">Figures reported in our source material (October 2026), which cites UN OCHA, UNRWA and UNICEF. These are a snapshot from the source material, not a live update.</p>
+          <div class="palestine-impact">
+            <h4>Loss reaches beyond the numbers</h4>
+            <p>The session connected displacement with family separation, hunger, disrupted healthcare and lasting trauma. It also explored the loss of schools and cultural heritage, and the determination to keep learning and preserve identity.</p>
           </div>
-        </article>`).join('')}</div>
-        <p class="palestine-continuing">One gathering at a time, we keep the conversation going. Future session presentations will be collected here.</p>
+          <div class="palestine-response">
+            <h4>Four ways to respond</h4>
+            <ol>
+              <li><strong>Make sincere dua.</strong> Remember the people of Palestine in your daily prayers.</li>
+              <li><strong>Give thoughtfully.</strong> Choose registered charities with clear, public financial reporting.</li>
+              <li><strong>Build a lasting habit.</strong> Start with one considered boycott choice and find a local alternative.</li>
+              <li><strong>Share responsibly.</strong> Check sources and dates before passing information on.</li>
+            </ol>
+          </div>
+          <p class="palestine-reflection">The believers are brothers. Let that care become action. <span>Quran 49:10 &middot; Sahih Muslim 2586</span></p>
+        </article>
+        <p class="palestine-continuing">One gathering at a time, we keep learning about Palestine and how to support its people.</p>
       </div>
     </section>`;
   }
