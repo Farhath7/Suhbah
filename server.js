@@ -295,7 +295,23 @@ async function handleApi(req, res, url) {
   for (const task of afterCommit) waitUntil(task().catch(() => console.warn('Confirmation email processing failed')));
 }
 
+function archiveSuhbahThree(db) {
+  const migration = 'archive-suhbah-03-did-i-think';
+  if (db.contentMigrations?.includes(migration)) return;
+  const event = db.events?.find((item) => item.id === 'event-7' && /^Suhbah\s*#?0?3$/i.test(item.number));
+  if (!event) return;
+  event.theme = 'أَفَحَسِبۡتُمۡ — Did I think ?';
+  event.status = 'past';
+  event.registrationStatus = 'Closed';
+  event.description = `Topic: ${event.theme}`;
+  if (event.image === '/assets/suhbah-03-trials-that-define-us.webp') event.image = '';
+  event.updatedAt = new Date().toISOString();
+  db.contentMigrations = [...(db.contentMigrations || []), migration];
+}
+
 async function handleApiWithDb(req, res, url, db, body, afterCommit) {
+  // Apply to public reads too; the next write persists this one-time content update.
+  archiveSuhbahThree(db);
 
   if (req.method === 'GET' && url.pathname === '/api/public') {
     sendJson(res, 200, publicDb(db));
