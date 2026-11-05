@@ -323,11 +323,11 @@ function archiveSuhbahThree(db) {
 }
 
 function addSuhbahThreeImage(db) {
-  const migration = 'suhbah-03-reflection-artwork';
+  const migration = 'suhbah-03-topic-poster';
   if (db.contentMigrations?.includes(migration)) return;
   const event = db.events?.find((item) => item.id === 'event-7' && /^Suhbah\s*#?0?3$/i.test(item.number));
   if (!event) return;
-  event.image = '/assets/suhbah-03-did-i-think.webp';
+  event.image = '/assets/suhbah-03-did-i-think-poster.webp';
   event.updatedAt = new Date().toISOString();
   db.contentMigrations = [...(db.contentMigrations || []), migration];
 }

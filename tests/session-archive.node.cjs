@@ -50,7 +50,7 @@ test('adds matching artwork without resetting saved session content or later ima
   const event = { id: 'event-7', number: 'Suhbah 03', theme: 'Did I think ?', image: '', recap: 'Saved recap', speechLink: '/saved.pdf', status: 'past' };
   const db = { events: [event], contentMigrations: ['archive-suhbah-03-did-i-think-session-document'] };
   addImage(db);
-  assert.equal(event.image, '/assets/suhbah-03-did-i-think.webp');
+  assert.equal(event.image, '/assets/suhbah-03-did-i-think-poster.webp');
   assert.equal(event.recap, 'Saved recap');
   assert.equal(event.speechLink, '/saved.pdf');
   event.image = '/later-admin-upload.webp';
