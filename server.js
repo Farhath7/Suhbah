@@ -296,11 +296,11 @@ async function handleApi(req, res, url) {
 }
 
 function archiveSuhbahThree(db) {
-  const migration = 'archive-suhbah-03-did-i-think';
+  const migration = 'archive-suhbah-03-did-i-think-english';
   if (db.contentMigrations?.includes(migration)) return;
   const event = db.events?.find((item) => item.id === 'event-7' && /^Suhbah\s*#?0?3$/i.test(item.number));
   if (!event) return;
-  event.theme = 'أَفَحَسِبۡتُمۡ — Did I think ?';
+  event.theme = 'Did I think ?';
   event.status = 'past';
   event.registrationStatus = 'Closed';
   event.description = `Topic: ${event.theme}`;

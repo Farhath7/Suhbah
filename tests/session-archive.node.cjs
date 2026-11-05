@@ -15,7 +15,7 @@ test('archives the existing third session without duplicating it or changing oth
   const db = { events: [event, other], registrations: [{ eventId: 'event-7' }] };
   const before = structuredClone(db);
   archive(db);
-  assert.equal(event.theme, 'أَفَحَسِبۡتُمۡ — Did I think ?');
+  assert.equal(event.theme, 'Did I think ?');
   assert.equal(event.status, 'past');
   assert.equal(event.registrationStatus, 'Closed');
   assert.equal(event.image, '');
