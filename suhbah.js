@@ -179,7 +179,6 @@
           <div class="nav-links" id="navLinks">
             <a class="nav-link" href="${homeAnchor('#about')}">About</a>
             <a class="nav-link" href="${homeAnchor('#events')}">Gatherings</a>
-            <a class="nav-link" href="${homeAnchor('#palestine')}">Palestine</a>
             <details class="nav-resources">
               <summary class="nav-link">Resources</summary>
               <div class="nav-resource-links">
@@ -415,39 +414,6 @@
     return `<div class="conversation-ambient" aria-hidden="true">${Array.from({ length: count }, (_, index) => `<span class="ambient-sparkle${index % 2 === 0 ? ' is-star' : ''}" style="--spark-x:${between(2, 98)}%;--spark-y:${between(5, 95)}%;--spark-size:${index % 2 === 0 ? between(9, 16) : between(3, 6)}px;--spark-duration:${between(2.2, 4.8)}s;--spark-delay:-${between(0, 10)}s;--drift-x:${between(-45, 45)}px;--drift-y:${between(-45, 45)}px;--bend-x:${between(-28, 28)}px;--bend-y:${between(-28, 28)}px"></span>`).join('')}</div>`;
   }
 
-  function palestineSection() {
-    return `<section class="section palestine-section" id="palestine" aria-labelledby="palestineTitle">
-      <div class="container">
-        <div class="palestine-layout">
-          <div class="palestine-intro">
-            <span class="palestine-kicker"><span aria-hidden="true"></span>A moment for Palestine</span>
-            <h2 id="palestineTitle">Palestine<br><em>in Suhbah.</em></h2>
-            <p>We make space to understand the human cost of war, remember its people, and turn compassion into everyday action.</p>
-            <blockquote><p>A Muslim does not abandon<br>his brother.</p><cite>Sahih al-Bukhari 2442 &middot; Sahih Muslim 2580</cite></blockquote>
-          </div>
-          <div class="palestine-evidence">
-            <div class="palestine-evidence-heading"><span>01 / The human cost</span><h3>Behind the numbers,<br>human lives.</h3></div>
-            <dl class="palestine-facts">
-              <div><dt>1.9<span>million</span></dt><dd>People displaced<small>Forced to leave their homes.</small></dd></div>
-              <div><dt>625<span>thousand+</span></dt><dd>Students without school<small>Two years without formal schooling.</small></dd></div>
-              <div><dt>1<span>million+</span></dt><dd>Children needing support<small>Urgent mental health intervention.</small></dd></div>
-            </dl>
-            <details class="palestine-sources"><summary>Source snapshot &middot; October 2026</summary><p>Figures drawn from our session reference material, which cites UN OCHA, UNRWA and UNICEF. The presentation reports 625,000+ students deprived of formal schooling and 1 million+ children needing urgent mental health intervention. These figures reflect the source material, not a live update.</p></details>
-          </div>
-        </div>
-        <div class="palestine-response">
-          <div class="palestine-response-heading"><span>Compassion into action</span><h3>Small steps. Lasting care.</h3></div>
-          <ol>
-            <li><span aria-hidden="true">01</span><div><h4>Remember in dua</h4><p>Keep Palestine in your daily prayers.</p></div></li>
-            <li><span aria-hidden="true">02</span><div><h4>Give with care</h4><p>Support registered, transparent charities.</p></div></li>
-            <li><span aria-hidden="true">03</span><div><h4>Choose consciously</h4><p>Start with one lasting boycott choice.</p></div></li>
-            <li><span aria-hidden="true">04</span><div><h4>Share responsibly</h4><p>Check the source. Check the date.</p></div></li>
-          </ol>
-        </div>
-      </div>
-    </section>`;
-  }
-
   function publicMain() {
     const event = upcomingEvent();
     const past = db.events.filter((item) => item.status === 'past').slice(0, 4);
@@ -531,7 +497,6 @@
             <div class="past-grid">${past.map(pastCard).join('')}</div>
           </div>
         </section>
-        ${palestineSection()}
         <section class="section stat-band" id="community">
           <div class="container fade-in">
             <h2>Come for the Quran.<br />Stay for the community.</h2>
