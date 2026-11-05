@@ -296,14 +296,27 @@ async function handleApi(req, res, url) {
 }
 
 function archiveSuhbahThree(db) {
-  const migration = 'archive-suhbah-03-did-i-think-english';
+  const migration = 'archive-suhbah-03-did-i-think-session-document';
   if (db.contentMigrations?.includes(migration)) return;
   const event = db.events?.find((item) => item.id === 'event-7' && /^Suhbah\s*#?0?3$/i.test(item.number));
   if (!event) return;
   event.theme = 'Did I think ?';
   event.status = 'past';
   event.registrationStatus = 'Closed';
-  event.description = `Topic: ${event.theme}`;
+  event.description = 'Turn off autopilot, reflect on why you are here, and take practical steps towards a life of worship, service, and purpose.';
+  event.speechLink = '/assets/speeches/suhbah-03-did-i-think.pdf';
+  event.recap = [
+    'Switch off autopilot. Question the routines, scrolling, and crowd-following that fill your day without giving it direction.',
+    'Ask why you are here. Bring sincere questions to people who can guide you, and use reflection to deepen your faith.',
+    "Notice the signs around you. The session invites us to reflect on creation as a reminder of Allah's wisdom and purpose.",
+    'Treat life as a test. Respond to your time, talents, opportunities, and difficulties with sincere, excellent deeds.',
+    'Make everyday life worship. Alongside salah, honest work, study, family care, and service can become worship through sincere intentions.',
+    'Build for good. Use your abilities responsibly to uphold truth, solve problems, and benefit people and the world around you.',
+    "Receive mercy and share it. Keep hope in Allah's forgiveness, and show kindness to people who need support.",
+    'Find your own role. Try new things, notice your strengths, ask others for feedback, develop your craft, and connect it to a community need.',
+    'Keep going with courage, good company, and spiritual fuel. Seek supportive friends and mentors, and make room for quiet, dhikr, and daily Quran.',
+    'Start small this week. Reflect, observe creation, begin a Quran habit, explore your strengths, try something new, contact a mentor, and arrange a weekly check-in with a friend. Set one phone boundary and keep practising and serving beyond the first week.',
+  ].join('\n');
   if (event.image === '/assets/suhbah-03-trials-that-define-us.webp') event.image = '';
   event.updatedAt = new Date().toISOString();
   db.contentMigrations = [...(db.contentMigrations || []), migration];

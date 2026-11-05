@@ -20,14 +20,20 @@ test('archives the existing third session without duplicating it or changing oth
   assert.equal(event.registrationStatus, 'Closed');
   assert.equal(event.image, '');
   assert.equal(event.date, before.events[0].date);
-  assert.equal(event.speechLink, '/saved.pdf');
+  assert.equal(event.speechLink, '/assets/speeches/suhbah-03-did-i-think.pdf');
+  assert.equal(event.recap.split('\n').length, 10);
+  assert.ok(event.recap.includes('Switch off autopilot.'));
   assert.equal(db.events.length, 2);
   assert.deepEqual(other, before.events[1]);
   assert.deepEqual(db.registrations, before.registrations);
   const saved = JSON.parse(JSON.stringify(db));
   saved.events[0].theme = 'Later admin edit';
+  saved.events[0].recap = 'Later summary edit';
+  saved.events[0].speechLink = '/later.pdf';
   archive(saved);
   assert.equal(saved.events[0].theme, 'Later admin edit');
+  assert.equal(saved.events[0].recap, 'Later summary edit');
+  assert.equal(saved.events[0].speechLink, '/later.pdf');
 });
 
 test('leaves unrelated databases and a repurposed event alone', () => {
