@@ -6,7 +6,7 @@ const vm = require('node:vm');
 
 const source = fs.readFileSync(path.join(__dirname, '../server.js'), 'utf8');
 const helper = source.slice(source.indexOf('function archiveSuhbahThree('), source.indexOf('async function handleApiWithDb('));
-const archive = vm.runInNewContext(`(${helper.trim()})`);
+const { archiveSuhbahThree: archive, addSuhbahThreeImage: addImage } = vm.runInNewContext(`${helper}; ({ archiveSuhbahThree, addSuhbahThreeImage })`);
 
 test('archives the existing third session without duplicating it or changing other records', () => {
   const event = { id: 'event-7', number: 'Suhbah 03', theme: 'A Matter of Choice', status: 'upcoming', registrationStatus: 'Open',
@@ -41,6 +41,19 @@ test('leaves unrelated databases and a repurposed event alone', () => {
     const db = { events };
     const before = structuredClone(db);
     archive(db);
+    addImage(db);
     assert.deepEqual(db, before);
   }
+});
+
+test('adds matching artwork without resetting saved session content or later image edits', () => {
+  const event = { id: 'event-7', number: 'Suhbah 03', theme: 'Did I think ?', image: '', recap: 'Saved recap', speechLink: '/saved.pdf', status: 'past' };
+  const db = { events: [event], contentMigrations: ['archive-suhbah-03-did-i-think-session-document'] };
+  addImage(db);
+  assert.equal(event.image, '/assets/suhbah-03-did-i-think.webp');
+  assert.equal(event.recap, 'Saved recap');
+  assert.equal(event.speechLink, '/saved.pdf');
+  event.image = '/later-admin-upload.webp';
+  addImage(db);
+  assert.equal(event.image, '/later-admin-upload.webp');
 });

@@ -322,9 +322,20 @@ function archiveSuhbahThree(db) {
   db.contentMigrations = [...(db.contentMigrations || []), migration];
 }
 
+function addSuhbahThreeImage(db) {
+  const migration = 'suhbah-03-reflection-artwork';
+  if (db.contentMigrations?.includes(migration)) return;
+  const event = db.events?.find((item) => item.id === 'event-7' && /^Suhbah\s*#?0?3$/i.test(item.number));
+  if (!event) return;
+  event.image = '/assets/suhbah-03-did-i-think.webp';
+  event.updatedAt = new Date().toISOString();
+  db.contentMigrations = [...(db.contentMigrations || []), migration];
+}
+
 async function handleApiWithDb(req, res, url, db, body, afterCommit) {
   // Apply to public reads too; the next write persists this one-time content update.
   archiveSuhbahThree(db);
+  addSuhbahThreeImage(db);
 
   if (req.method === 'GET' && url.pathname === '/api/public') {
     sendJson(res, 200, publicDb(db));
