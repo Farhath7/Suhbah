@@ -4418,8 +4418,8 @@ td {
 .volunteer-dialog { position: fixed; inset: 0; margin: auto; box-sizing: border-box; width: min(480px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); overflow: auto; padding: 48px 24px 24px; border: 1px solid #e6dfd2; border-radius: 20px; background: var(--white); color: var(--navy); box-shadow: var(--shadow); }
 .volunteer-dialog::backdrop { background: rgba(47, 65, 86, .72); }
 .volunteer-dialog h2 { margin: 0 0 12px; font-family: var(--font-body); font-size: 1.5rem; }
-.volunteer-dialog p { font-family: var(--font-body); font-size: .9rem; line-height: 1.5; }
-.volunteer-dialog blockquote { margin: 20px 0; padding: 16px; border-left: 3px solid var(--blue); border-radius: 0 8px 8px 0; background: var(--cream); font-family: var(--font-body); font-size: .95rem; line-height: 1.55; user-select: all; }
+.volunteer-dialog p { font-family: var(--font-display); font-size: 1rem; line-height: 1.5; }
+.volunteer-dialog blockquote { margin: 20px 0; padding: 16px; border-left: 3px solid var(--blue); border-radius: 0 8px 8px 0; background: var(--cream); font-family: var(--font-display); font-size: 1.05rem; line-height: 1.5; user-select: all; }
 .volunteer-actions { display: flex; flex-wrap: wrap; gap: 10px; }
 .volunteer-actions .button { flex: 1 1 160px; font-size: .85rem; }
 .volunteer-dialog [data-volunteer-status]:empty { display: none; }
