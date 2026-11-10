@@ -18,6 +18,7 @@ test('public navigation hides admin and dashboard access requires an admin sessi
     fs.mkdirSync(path.join(temporaryRoot, 'assets'));
     fs.copyFileSync(path.join(root, 'assets', 'suhbah-logo.png'), path.join(temporaryRoot, 'assets', 'suhbah-logo.png'));
     fs.copyFileSync(path.join(root, 'assets', 'suhbah-logo-display.webp'), path.join(temporaryRoot, 'assets', 'suhbah-logo-display.webp'));
+    fs.copyFileSync(path.join(root, 'assets', 'suhbah-support-learning.png'), path.join(temporaryRoot, 'assets', 'suhbah-support-learning.png'));
     fs.writeFileSync(path.join(temporaryRoot, 'assets', 'test.txt'), 'public asset');
     const email = 'admin@example.test';
     const password = 'test-only-password';
@@ -55,7 +56,7 @@ test('public navigation hides admin and dashboard access requires an admin sessi
       await expect(page.locator('.header')).toBeVisible();
       await expect(page.locator('a[href="/admin"]')).toHaveCount(0);
     }
-    for (const endpoint of ['/api/admin', '/api/admin/events', '/api/admin/testimonials', '/api/admin/statistics', '/api/admin/social']) {
+    for (const endpoint of ['/api/admin', '/api/admin/events', '/api/admin/support', '/api/admin/orphanage-donation', '/api/admin/testimonials', '/api/admin/statistics', '/api/admin/social']) {
       const response = await request.fetch(`${base}${endpoint}`, { method: endpoint === '/api/admin' ? 'GET' : 'PUT', data: {} });
       expect(response.status()).toBe(401);
     }
@@ -90,7 +91,69 @@ test('public navigation hides admin and dashboard access requires an admin sessi
     await expect(page.locator('[name="communityGroupLink"]')).toHaveValue(communityGroupLink);
     await page.getByRole('button', { name: 'Cancel editing', exact: true }).click();
     await expect(page.locator('[name="theme"]')).toHaveValue('');
-    for (const tab of ['registrations', 'testimonials', 'statistics', 'social', 'events']) {
+    await page.locator('[data-tab="support"]').click();
+    const qrImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=';
+    expect((await page.request.put(`${base}/api/admin/orphanage-donation`, { data: { qrImage, recipient: '' } })).status()).toBe(400);
+    expect((await page.request.put(`${base}/api/admin/orphanage-donation`, { data: { qrImage: 'data:image/svg+xml;base64,PHN2Zz4=', recipient: 'Test recipient' } })).status()).toBe(400);
+    await page.locator('#orphanageDonationForm [name="qrFile"]').setInputFiles({ name: 'test-qr.png', mimeType: 'image/png', buffer: Buffer.from(qrImage.split(',')[1], 'base64') });
+    await expect(page.locator('#orphanageQrPreview img')).toHaveAttribute('src', qrImage);
+    await page.locator('#orphanageDonationForm [name="recipient"]').fill('Test orphanage recipient');
+    await page.locator('#orphanageDonationForm [name="note"]').fill('Books and meals for the children.');
+    await page.getByRole('button', { name: 'Save donation details', exact: true }).click();
+    await expect(page.locator('#orphanageDonationStatus')).toHaveText('Donation details saved.');
+    expect((await (await page.request.get(`${base}/api/public`)).json()).orphanageDonation.qrImage).toBe(qrImage);
+    await page.locator('#supportForm [name="title"]').fill('Orphanage learning support');
+    await page.locator('#supportForm [name="description"]').fill('Suhbah members help children with learning activities.');
+    await page.locator('#supportForm [name="fundingNeed"]').fill('Books and school supplies.');
+    await page.locator('#supportForm [name="volunteerNeed"]').fill('Help with weekend learning sessions.');
+    await page.getByRole('button', { name: 'Save project', exact: true }).click();
+    await expect(page.locator('#supportFormStatus')).toHaveText('Project saved.');
+    expect((await (await page.request.get(`${base}/api/public`)).json()).supportProjects).toHaveLength(0);
+    await page.locator('[data-edit-support]').click();
+    await expect(page.locator('#supportForm [name="fundingNeed"]')).toHaveValue('Books and school supplies.');
+    await page.locator('#supportForm [name="status"]').selectOption('Open');
+    await page.getByRole('button', { name: 'Save project', exact: true }).click();
+    await expect(page.locator('#supportFormStatus')).toHaveText('Project saved.');
+    const project = (await (await page.request.get(`${base}/api/public`)).json()).supportProjects[0];
+    expect(project.title).toBe('Orphanage learning support');
+    const invalidLink = await page.request.put(`${base}/api/admin/support`, { data: { ...project, donationUrl: 'javascript:alert(1)' } });
+    expect(invalidLink.status()).toBe(400);
+    const publicPage = await page.context().newPage();
+    for (const width of [1440, 390]) {
+      await publicPage.setViewportSize({ width, height: 900 });
+      await publicPage.goto(`${base}/#support`);
+      await expect(publicPage.locator('#supportTitle')).toBeVisible();
+      await expect(publicPage.locator('.orphanage-donation')).toContainText('Test orphanage recipient');
+      await expect(publicPage.locator('.orphanage-qr img')).toHaveAttribute('src', qrImage);
+      await expect(publicPage.locator('.orphanage-qr-download')).toHaveAttribute('download', 'orphanage-donation-qr');
+      await expect(publicPage.locator('.support-card')).toContainText(project.title);
+      await expect(publicPage.locator('.support-card a').first()).toHaveAttribute('href', /^https:\/\/mail\.google\.com\/mail\/.*Orphanage%20learning%20support/);
+      await expect(publicPage.getByRole('link', { name: 'Volunteer', exact: true })).toHaveAttribute('target', '_blank');
+      expect(await publicPage.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+      await publicPage.locator('#support').screenshot({ path: test.info().outputPath(`support-${width}.png`) });
+    }
+    await page.request.put(`${base}/api/admin/support`, { data: { ...project, status: 'Completed' } });
+    await publicPage.reload();
+    await expect(publicPage.locator('.support-card')).toContainText('Completed');
+    await expect(publicPage.locator('.support-actions')).toHaveCount(0);
+    await page.request.delete(`${base}/api/admin/support`, { data: { id: project.id } });
+    await publicPage.reload();
+    await expect(publicPage.locator('.support-empty')).toBeVisible();
+    await expect(publicPage.getByRole('link', { name: 'Suggest a cause' })).toHaveCount(0);
+    await expect(publicPage.locator('#support .eyebrow')).toHaveCount(0);
+    await expect(publicPage.locator('.support-empty .button')).toHaveText('Volunteer');
+    expect((await publicPage.request.get(`${base}/assets/suhbah-support-learning.png`)).status()).toBe(200);
+    for (const width of [1440, 390]) {
+      await publicPage.setViewportSize({ width, height: 900 });
+      expect(await publicPage.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+      await publicPage.locator('#support').screenshot({ path: test.info().outputPath(`support-redesign-${width}.png`) });
+    }
+    await publicPage.close();
+    await page.locator('#orphanageDonationForm [name="removeQr"]').check();
+    await page.getByRole('button', { name: 'Save donation details', exact: true }).click();
+    await expect(page.locator('#orphanageDonationStatus')).toHaveText('Donation details saved.');
+    expect((await (await page.request.get(`${base}/api/public`)).json()).orphanageDonation.qrImage).toBe('');
+    for (const tab of ['registrations', 'support', 'testimonials', 'statistics', 'social', 'events']) {
       await page.locator(`[data-tab="${tab}"]`).click();
       await expect(page.locator('.admin-content')).toHaveAttribute('aria-label', tab);
       if (tab === 'social') {

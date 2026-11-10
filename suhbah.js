@@ -179,6 +179,7 @@
           <div class="nav-links" id="navLinks">
             <a class="nav-link" href="${homeAnchor('#about')}">About</a>
             <a class="nav-link" href="${homeAnchor('#events')}">Gatherings</a>
+            <a class="nav-link" href="${homeAnchor('#support')}">Suhbah supports</a>
             <details class="nav-resources">
               <summary class="nav-link">Resources</summary>
               <div class="nav-resource-links">
@@ -507,6 +508,7 @@
             </div>
           </div>
         </section>
+        ${supportSection()}
         <section class="section cream" id="testimonials">
           <div class="container">
             <div class="section-head fade-in"><h2>What the community says</h2></div>
@@ -973,6 +975,36 @@
     `;
   }
 
+  function supportContact(title, action) {
+    return `https://mail.google.com/mail/?view=cm&fs=1&to=suhbah.connect%40gmail.com&su=${encodeURIComponent(`${action} - ${title}`)}`;
+  }
+
+  function supportSection() {
+    const projects = (db.supportProjects || []).filter((project) => project.status !== 'Draft');
+    return `<section class="section support-section" id="support" aria-labelledby="supportTitle">
+      <div class="container">
+        <div class="support-intro"><div><h2 id="supportTitle">Suhbah supports</h2><p class="support-tagline">Good company. Shared purpose.<br />A helping hand.</p></div>
+          <div class="support-intro-copy"><p>Discover community causes and opportunities to help. Find a cause close to your heart and contribute your time, skills, or support.</p><p>From supporting a Muslim orphanage to lending time and skills to a community initiative, every act of care has a place here.</p></div>
+        </div>
+        <div class="support-projects">${projects.length ? projects.map((project) => {
+          const open = project.status === 'Open';
+          return `<article class="support-card"><div class="support-card-meta"><span>${html(project.organisation || 'Community initiative')}</span><span class="support-badge">${open ? 'Get involved' : 'Completed'}</span></div><h3>${html(project.title)}</h3>${project.location ? `<p class="support-location">${html(project.location)}</p>` : ''}<p class="support-description">${html(project.description)}</p>
+            <div class="support-needs">${project.fundingNeed ? `<div><h4>${open ? 'Funds needed' : 'Funding support'}</h4><p>${html(project.fundingNeed)}</p></div>` : ''}${project.volunteerNeed ? `<div><h4>${open ? 'Volunteers needed' : 'Volunteer support'}</h4><p>${html(project.volunteerNeed)}</p></div>` : ''}</div>
+            ${open ? `<div class="support-actions">${project.fundingNeed ? `<a class="button primary" href="${html(project.donationUrl || supportContact(project.title, 'Help with funds'))}" ${project.donationUrl ? 'target="_blank" rel="noopener noreferrer"' : ''}>Help with funds <span aria-hidden="true">&#8599;</span></a>` : ''}${project.volunteerNeed ? `<a class="button secondary" href="${html(project.volunteerUrl || supportContact(project.title, 'Volunteer'))}" target="_blank" rel="noopener noreferrer">Volunteer</a>` : ''}</div>` : ''}</article>`;
+        }).join('') : `<div class="support-empty"><div><h3>Volunteer at a Muslim orphanage</h3><p>Give your time, share your skills, and lend a helping hand at a Muslim orphanage. Get in touch to learn about volunteer opportunities and how you can help.</p></div><a class="button primary" href="${supportContact('Muslim orphanage', 'Volunteer')}" target="_blank" rel="noopener noreferrer">Volunteer</a></div>`}</div>
+        ${orphanageDonationPanel()}
+      </div></section>`;
+  }
+
+  function orphanageDonationPanel() {
+    const donation = db.orphanageDonation || {};
+    if (!donation.qrImage) return '';
+    return `<aside class="orphanage-donation" aria-labelledby="orphanageDonationTitle">
+      <div class="orphanage-donation-copy"><h3 id="orphanageDonationTitle">Another way to lend a hand.</h3><p>Support the Muslim orphanage with a donation. Scan the QR code with your payment app to send your contribution.</p>${donation.note ? `<p class="orphanage-donation-note">${html(donation.note)}</p>` : ''}<p class="orphanage-donation-recipient">Payment recipient <strong>${html(donation.recipient)}</strong></p></div>
+      <figure class="orphanage-qr"><img src="${html(donation.qrImage)}" alt="Donation payment QR code for the Muslim orphanage" width="240" height="240" loading="lazy" /><figcaption>Scan to donate</figcaption><a href="${html(donation.qrImage)}" download="orphanage-donation-qr" class="orphanage-qr-download">Save QR code</a></figure>
+    </aside>`;
+  }
+
   function footer() {
     return `
       <footer class="footer">
@@ -1028,7 +1060,7 @@
             ${summaries.map(([label, value, detail]) => `<div class="admin-metric"><span>${label}</span><strong>${value}</strong><small>${detail}</small></div>`).join('')}
           </div>
           <nav class="admin-tabs" aria-label="Dashboard sections">
-            ${['events', 'registrations', 'testimonials', 'statistics', 'social'].map((tab) => `<button class="admin-tab ${adminTab === tab ? 'active' : ''}" data-tab="${tab}" aria-current="${adminTab === tab ? 'page' : 'false'}" type="button">${tab[0].toUpperCase()}${tab.slice(1)}</button>`).join('')}
+            ${['events', 'registrations', 'support', 'testimonials', 'statistics', 'social'].map((tab) => `<button class="admin-tab ${adminTab === tab ? 'active' : ''}" data-tab="${tab}" aria-current="${adminTab === tab ? 'page' : 'false'}" type="button">${tab === 'support' ? 'Suhbah supports' : tab[0].toUpperCase() + tab.slice(1)}</button>`).join('')}
           </nav>
           <section class="admin-content" aria-label="${html(adminTab)}">${adminSection()}</section>
         </main>
@@ -1037,6 +1069,7 @@
   }
 
   function adminSection() {
+    if (adminTab === 'support') return supportAdmin();
     if (adminTab === 'events') return eventsAdmin();
     if (adminTab === 'registrations') return registrationsAdmin();
     if (adminTab === 'testimonials') return testimonialsAdmin();
@@ -1137,6 +1170,30 @@
         </div>
       </div>
     `;
+  }
+
+  function supportAdmin() {
+    const projects = db.supportProjects || [];
+    const active = projects.find((project) => project.id === editing.support);
+    const donation = db.orphanageDonation || {};
+    return `<form class="form-panel orphanage-donation-admin" id="orphanageDonationForm"><h2>Orphanage donation QR code</h2><p class="muted">Upload your payment QR code to show a donation area below the orphanage panel.</p><div class="form-grid">
+      <label class="field"><span>Upload QR code (PNG, JPEG or WebP, up to 2 MB)</span><input type="file" name="qrFile" accept="image/png,image/jpeg,image/webp" /></label>
+      ${adminInput('Payment recipient name', 'recipient', donation.recipient, 'text', false)}
+      <label class="field"><span>What donations support (optional)</span><textarea name="note" maxlength="1000">${html(donation.note || '')}</textarea></label>
+      <div class="orphanage-qr-preview" id="orphanageQrPreview">${donation.qrImage ? `<img src="${html(donation.qrImage)}" alt="Current donation QR code" width="180" height="180" />` : ''}</div>
+      ${donation.qrImage ? '<label class="orphanage-remove-qr"><input type="checkbox" name="removeQr" /> Remove the QR code and hide the donation area</label>' : ''}
+      <p id="orphanageDonationStatus" role="status" aria-live="polite"></p><button class="button primary" type="submit">Save donation details</button>
+      </div></form><div class="admin-grid"><form class="form-panel" id="supportForm"><h2>${active ? 'Edit support project' : 'Add a support project'}</h2><p class="muted">Share community projects and the help they need. Drafts stay private; completed projects remain visible without appeal buttons.</p><input type="hidden" name="id" value="${html(active?.id || '')}" /><div class="form-grid">
+      ${adminInput('Project title', 'title', active?.title)}${adminInput('Organisation / orphanage', 'organisation', active?.organisation, 'text', false)}${adminInput('Location', 'location', active?.location, 'text', false)}
+      <label class="field"><span>About the project</span><textarea name="description" required>${html(active?.description || '')}</textarea></label>
+      <label class="field"><span>Funding needs (optional)</span><textarea name="fundingNeed" placeholder="What funds will cover, amount needed, and who to contact">${html(active?.fundingNeed || '')}</textarea></label>
+      ${adminInput('Donation / funding contact link (optional)', 'donationUrl', active?.donationUrl, 'url', false)}
+      <label class="field"><span>Volunteer needs (optional)</span><textarea name="volunteerNeed" placeholder="Roles, timings, location, and any requirements">${html(active?.volunteerNeed || '')}</textarea></label>
+      ${adminInput('Volunteer sign-up / contact link (optional)', 'volunteerUrl', active?.volunteerUrl, 'url', false)}
+      <p class="muted">Without a link, the help buttons open an email to the Suhbah team with the project name.</p>
+      ${adminSelect('Status', 'status', active?.status || 'Draft', ['Draft', 'Open', 'Completed'])}
+      <p id="supportFormStatus" role="status" aria-live="polite"></p><button class="button primary" type="submit">Save project</button>${active ? '<button class="button secondary" type="button" id="cancelSupportEdit">Cancel editing</button>' : ''}
+      </div></form><div class="admin-cards">${projects.length ? projects.map((project) => `<article class="admin-card"><span class="support-badge">${html(project.status)}</span><h3>${html(project.title)}</h3><p>${html(project.description)}</p><div class="row-actions"><button class="small-button" data-edit-support="${html(project.id)}" type="button">Edit</button><button class="small-button" data-delete-support="${html(project.id)}" type="button">Delete</button></div></article>`).join('') : '<p class="muted">No support projects yet. Add your first initiative here.</p>'}</div></div>`;
   }
 
   function statsAdmin() {
@@ -1537,6 +1594,42 @@
   }
 
   function bindAdmin() {
+    let pendingQrImage = '';
+    const donationForm = document.getElementById('orphanageDonationForm');
+    donationForm?.querySelector('[name="qrFile"]').addEventListener('change', async (event) => {
+      const file = event.target.files[0];
+      const status = document.getElementById('orphanageDonationStatus');
+      pendingQrImage = '';
+      status.textContent = '';
+      if (!file) return;
+      if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type) || file.size > 2 * 1024 * 1024) {
+        status.textContent = 'Choose a PNG, JPEG, or WebP image smaller than 2 MB.';
+        event.target.value = '';
+        return;
+      }
+      try {
+        pendingQrImage = await fileToDataUrl(file);
+        document.getElementById('orphanageQrPreview').innerHTML = `<img src="${html(pendingQrImage)}" alt="New donation QR preview" width="180" height="180" />`;
+        const remove = donationForm.querySelector('[name="removeQr"]');
+        if (remove) remove.checked = false;
+      } catch { status.textContent = 'Could not read that image. Please choose it again.'; }
+    });
+    donationForm?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const button = donationForm.querySelector('[type="submit"]');
+      button.disabled = true;
+      try {
+        const data = formData(donationForm);
+        delete data.qrFile;
+        data.removeQr = donationForm.querySelector('[name="removeQr"]')?.checked || false;
+        if (donationForm.querySelector('[name="qrFile"]').files.length && !pendingQrImage) throw new Error('Wait for the QR preview before saving.');
+        if (pendingQrImage) data.qrImage = pendingQrImage;
+        await api('/api/admin/orphanage-donation', { method: 'PUT', body: JSON.stringify(data) });
+        await render();
+        document.getElementById('orphanageDonationStatus').textContent = 'Donation details saved.';
+      } catch (error) { document.getElementById('orphanageDonationStatus').textContent = error.message; }
+      finally { button.disabled = false; }
+    });
     document.getElementById('cancelEventEdit')?.addEventListener('click', async () => {
       editing = {};
       await render();
@@ -1631,6 +1724,36 @@
         await render();
       });
     });
+
+    document.getElementById('supportForm')?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const form = event.target;
+      const button = form.querySelector('[type="submit"]');
+      button.disabled = true;
+      try {
+        const data = formData(form);
+        await api('/api/admin/support', { method: data.id ? 'PUT' : 'POST', body: JSON.stringify(data) });
+        editing = {};
+        await render();
+        document.getElementById('supportFormStatus').textContent = 'Project saved.';
+      } catch (error) {
+        form.querySelector('#supportFormStatus').textContent = error.message;
+      } finally { button.disabled = false; }
+    });
+    document.getElementById('cancelSupportEdit')?.addEventListener('click', async () => { editing = {}; await render(); });
+    document.querySelectorAll('[data-edit-support]').forEach((button) => button.addEventListener('click', async () => {
+      editing = { support: button.dataset.editSupport };
+      await render();
+      document.getElementById('supportForm')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }));
+    document.querySelectorAll('[data-delete-support]').forEach((button) => button.addEventListener('click', async () => {
+      if (!window.confirm('Delete this support project?')) return;
+      try {
+        await api('/api/admin/support', { method: 'DELETE', body: JSON.stringify({ id: button.dataset.deleteSupport }) });
+        editing = {};
+        await render();
+      } catch (error) { document.getElementById('supportFormStatus').textContent = error.message; }
+    }));
 
     document.getElementById('statsForm')?.addEventListener('submit', async (event) => {
       event.preventDefault();

@@ -242,6 +242,8 @@ function requireAdmin(db, req, res) {
 
 function publicDb(db) {
   return {
+    orphanageDonation: db.orphanageDonation || {},
+    supportProjects: (db.supportProjects || []).filter((project) => project.status !== 'Draft'),
     events: db.events,
     testimonials: db.testimonials,
     communityStats: db.communityStats,
@@ -484,6 +486,71 @@ async function handleApiWithDb(req, res, url, db, body, afterCommit) {
     }
     db.registrations.splice(index, 1);
     sendJson(res, 200, { deleted: true });
+    return;
+  }
+
+  if (url.pathname === '/api/admin/orphanage-donation') {
+    if (!requireAdmin(db, req, res)) return;
+    if (req.method !== 'PUT') {
+      sendJson(res, 405, { error: 'Method not allowed' });
+      return;
+    }
+    const previous = db.orphanageDonation || {};
+    const qrImage = body.removeQr ? '' : (body.qrImage ?? previous.qrImage ?? '');
+    if (typeof qrImage !== 'string' || qrImage.length > 2_800_000 || (qrImage && !/^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/]+={0,2}$/.test(qrImage))) {
+      sendJson(res, 400, { error: 'Upload a PNG, JPEG, or WebP QR image smaller than 2 MB.' });
+      return;
+    }
+    const recipient = String(body.recipient || '').trim().slice(0, 160);
+    if (qrImage && !recipient) {
+      sendJson(res, 400, { error: 'Add the payment recipient name shown when scanning the QR code.' });
+      return;
+    }
+    db.orphanageDonation = { qrImage, recipient, note: String(body.note || '').trim().slice(0, 1000), updatedAt: new Date().toISOString() };
+    sendJson(res, 200, { orphanageDonation: db.orphanageDonation });
+    return;
+  }
+
+  if (url.pathname === '/api/admin/support') {
+    if (!requireAdmin(db, req, res)) return;
+    const projects = db.supportProjects || [];
+    const existing = projects.find((project) => project.id === body.id);
+    if (!['POST', 'PUT', 'DELETE'].includes(req.method)) {
+      sendJson(res, 405, { error: 'Method not allowed' });
+      return;
+    }
+    if (req.method !== 'POST' && !existing) {
+      sendJson(res, 404, { error: 'Project not found' });
+      return;
+    }
+    if (req.method === 'DELETE') {
+      db.supportProjects = projects.filter((project) => project.id !== body.id);
+      sendJson(res, 200, { success: true });
+      return;
+    }
+    const project = {};
+    for (const key of ['title', 'organisation', 'location', 'description', 'fundingNeed', 'volunteerNeed', 'donationUrl', 'volunteerUrl', 'status']) {
+      project[key] = String(body[key] || '').trim();
+    }
+    if (!project.title || !project.description || !['Draft', 'Open', 'Completed'].includes(project.status)) {
+      sendJson(res, 400, { error: 'Add a title, description, and valid project status.' });
+      return;
+    }
+    for (const key of ['donationUrl', 'volunteerUrl']) {
+      if (!project[key]) continue;
+      try {
+        const link = new URL(project[key]);
+        if (!['https:', 'http:'].includes(link.protocol)) throw new Error();
+      } catch {
+        sendJson(res, 400, { error: 'Contact and donation links must be full http or https URLs.' });
+        return;
+      }
+    }
+    project.id = existing?.id || uid('support');
+    project.createdAt = existing?.createdAt || new Date().toISOString();
+    project.updatedAt = new Date().toISOString();
+    db.supportProjects = existing ? projects.map((item) => item.id === project.id ? project : item) : [project, ...projects];
+    sendJson(res, existing ? 200 : 201, { project });
     return;
   }
 
