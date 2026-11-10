@@ -2,6 +2,8 @@
   'use strict';
 
   const app = document.getElementById('app');
+  const volunteerWhatsapp = 'https://chat.whatsapp.com/JYrNJeVAlxjAvKLyQwDLyX?s=sw&p=i&mlu=4&ilr=4&iam=2';
+  const volunteerMessage = 'Assalamu alaikum, I would like to volunteer at the Muslim orphanage through Suhbah. Please share the next steps.';
   let db = { events: [], testimonials: [], registrations: [], communityStats: {}, socialLinks: {} };
   let adminTab = 'events';
   let editing = {};
@@ -146,6 +148,7 @@
           <div class="nav-links" id="navLinks">
             <a class="nav-link" href="${homeAnchor('#about')}">About</a>
             <a class="nav-link" href="${homeAnchor('#events')}">Gatherings</a>
+            <a class="nav-link" href="${homeAnchor('#support')}">Suhbah supports</a>
             <details class="nav-resources">
               <summary class="nav-link">Resources<svg class="nav-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m4 6 4 4 4-4" /></svg></summary>
               <div class="nav-resource-links">
@@ -169,7 +172,7 @@
     const main = registrationPath
       ? `<main class="registration-page">${event ? registrationSection(event, true) : '<section class="section white"><div class="container"><h1>Suhbah not found</h1><p>This registration link is no longer available.</p><a class="button secondary" href="/" data-route>Back to Suhbah</a></div></section>'}</main>`
       : /^\/bookmarks\/?$/.test(window.location.pathname) ? bookmarkPanel() : publicMain();
-    return `<div class="site">${header()}${main}${footer()}${donationBanner()}</div>`;
+    return `<div class="site">${header()}${main}${footer()}${donationBanner()}${volunteerDialog()}</div>`;
   }
 
   function bookmarkPanel() {
@@ -470,6 +473,7 @@
             </div>
           </div>
         </section>
+        ${supportSection()}
         <section class="section cream" id="testimonials">
           <div class="container">
             <div class="section-head fade-in"><h2>What the community says</h2></div>
@@ -875,19 +879,89 @@
     return `<label class="field"><span>${html(label)}</span><input name="${html(name)}" type="${html(type)}" value="${html(value)}" ${required ? 'required' : ''} /></label>`;
   }
 
+  function donationAppLinks() {
+    const android = /Android/i.test(navigator.userAgent);
+    const ios = /iPhone|iPad|iPod/i.test(navigator.userAgent) || (/Macintosh/i.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
+    const mobile = android || ios;
+    const query = 'pa=THEHUBFOUNDATION%40rbl&pn=THE%20HUB%20FOUN&mc=8398&cu=INR&tn=MOMoney';
+    const googlePay = android
+      ? `intent://pay?${query}#Intent;scheme=upi;package=com.google.android.apps.nbu.paisa.user;end`
+      : ios ? `gpay://upi/pay?${query}` : '#donationQr';
+    const phonePe = android
+      ? `intent://pay?${query}#Intent;scheme=upi;package=com.phonepe.app;end`
+      : ios ? `phonepe://upi/pay?${query}` : '#donationQr';
+    return `<div class="donation-apps" aria-label="Donate using a UPI app">
+      <div class="donation-app-options">
+        <a class="donation-app-choice" href="${html(googlePay)}" aria-label="Donate via Google Pay" ${!mobile ? 'data-donation-qr' : ''}><img src="/assets/google-pay-logo.png" alt="" width="100" height="40" /></a>
+        <a class="donation-app-choice" href="${html(phonePe)}" aria-label="Donate via PhonePe" ${!mobile ? 'data-donation-qr' : ''}><img src="/assets/phonepe-logo.svg" alt="" width="100" height="40" /></a>
+      </div>
+      ${android ? `<a class="button secondary" href="${html(`upi://pay?${query}`)}">Pay with any UPI app</a>` : ''}
+    </div>`;
+  }
+
   function donationBanner() {
-    const donationContact = db.socialLinks.instagram || db.socialLinks.whatsapp;
-    if (!donationContact) return '';
     return `
       <aside class="donation-banner${donationCollapsed ? ' is-collapsed' : ''}" aria-label="Support Suhbah">
         <button class="donation-toggle" type="button" aria-expanded="${!donationCollapsed}" aria-controls="donationCard" aria-label="${donationCollapsed ? 'Show donation banner' : 'Hide donation banner'}"><span>Support Suhbah</span><span class="donation-toggle-action">${donationCollapsed ? 'Show' : 'Hide'}</span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m4 6 4 4 4-4" /></svg></button>
-        <a id="donationCard" class="donation-button" ${donationCollapsed ? 'inert' : ''} href="${html(donationContact)}" target="_blank" rel="noopener noreferrer" aria-label="Support Suhbah - ${db.socialLinks.instagram ? 'DM us on Instagram' : 'message us'} to donate (opens in a new tab)">
+        <button id="donationCard" class="donation-button" type="button" ${donationCollapsed ? 'inert' : ''} aria-haspopup="dialog" aria-controls="donationDialog" aria-label="Donate to support Suhbah">
           <span class="donation-heart" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z" /></svg></span>
           <span class="donation-label"><strong>Keep Suhbah growing.</strong><small>Your generosity helps bring young hearts together around the Quran.<span class="donation-message">Help us create more moments of reflection, connection, and good company.</span><span class="donation-signoff">Every little contribution matters.</span></small></span>
-          <span class="donation-cta">DM to donate <span aria-hidden="true">&#8599;</span></span>
-        </a>
+          <span class="donation-cta">Donate <span aria-hidden="true">&#8599;</span></span>
+        </button>
       </aside>
+      <dialog class="donation-dialog" id="donationDialog" aria-labelledby="donationTitle" aria-describedby="donationInstructions">
+        <button class="recap-close" type="button" data-close-donation aria-label="Close donation QR code" autofocus>&times;</button>
+        <h2 id="donationTitle">Donate via UPI</h2>
+        <p id="donationInstructions">Choose an app or scan the QR code to donate.</p>
+        ${donationAppLinks()}
+        <img id="donationQr" class="donation-qr-image" src="/assets/donation-upi-momoney.png" alt="UPI donation QR code for THEHUBFOUNDATION@rbl" width="530" height="530" />
+        <p class="donation-recipient">UPI ID <strong>THEHUBFOUNDATION@rbl</strong></p>
+        <p class="donation-note">Payment note: <strong>MOMoney</strong><br />Add it in your UPI app if missing.</p>
+        <div class="donation-tools"><button class="button secondary" type="button" data-copy-donation-note>Copy payment note</button><a class="button primary" href="/assets/donation-upi-momoney.png" download="suhbah-donation-qr.png">Save QR code</a></div>
+        <p data-donation-note-status role="status" aria-live="polite"></p>
+      </dialog>
     `;
+  }
+
+  function volunteerDialog() {
+    return `<dialog class="volunteer-dialog" id="volunteerDialog" aria-labelledby="volunteerTitle" aria-describedby="volunteerInstructions">
+      <button class="recap-close" type="button" data-close-volunteer aria-label="Close volunteer details" autofocus>&times;</button>
+      <h2 id="volunteerTitle">Join us as a volunteer</h2>
+      <p id="volunteerInstructions">Copy this introduction, join the WhatsApp group, then paste it into the group chat and tap Send. Our team will get back to you soon.</p>
+      <blockquote>${html(volunteerMessage)}</blockquote>
+      <div class="volunteer-actions"><button class="button secondary" type="button" data-copy-volunteer>Copy message</button><a class="button primary" href="${html(db.socialLinks.volunteerWhatsapp || volunteerWhatsapp)}" target="_blank" rel="noopener noreferrer">Join WhatsApp group</a></div>
+      <p data-volunteer-status role="status" aria-live="polite"></p>
+    </dialog>`;
+  }
+
+  function supportContact(title, action) {
+    return `https://mail.google.com/mail/?view=cm&fs=1&to=suhbah.connect%40gmail.com&su=${encodeURIComponent(`${action} - ${title}`)}`;
+  }
+
+  function supportSection() {
+    const projects = (db.supportProjects || []).filter((project) => project.status !== 'Draft');
+    return `<section class="section support-section" id="support" aria-labelledby="supportTitle">
+      <div class="container">
+        <div class="support-intro"><div><h2 id="supportTitle">Suhbah supports</h2><p class="support-tagline">Good company. Shared purpose.<br />A helping hand.</p></div>
+          <div class="support-intro-copy"><p>Discover community causes and opportunities to help. Find a cause close to your heart and contribute your time, skills, or support.</p><p>From supporting a Muslim orphanage to lending time and skills to a community initiative, every act of care has a place here.</p></div>
+        </div>
+        <div class="support-projects">${projects.length ? projects.map((project) => {
+          const open = project.status === 'Open';
+          return `<article class="support-card"><div class="support-card-meta"><span>${html(project.organisation || 'Community initiative')}</span><span class="support-badge">${open ? 'Get involved' : 'Completed'}</span></div><h3>${html(project.title)}</h3>${project.location ? `<p class="support-location">${html(project.location)}</p>` : ''}<p class="support-description">${html(project.description)}</p>
+            <div class="support-needs">${project.fundingNeed ? `<div><h4>${open ? 'Funds needed' : 'Funding support'}</h4><p>${html(project.fundingNeed)}</p></div>` : ''}${project.volunteerNeed ? `<div><h4>${open ? 'Volunteers needed' : 'Volunteer support'}</h4><p>${html(project.volunteerNeed)}</p></div>` : ''}</div>
+            ${open ? `<div class="support-actions">${project.fundingNeed ? `<a class="button primary" href="${html(project.donationUrl || supportContact(project.title, 'Help with funds'))}" ${project.donationUrl ? 'target="_blank" rel="noopener noreferrer"' : ''}>Help with funds <span aria-hidden="true">&#8599;</span></a>` : ''}${project.volunteerNeed ? `<button class="button secondary" type="button" data-volunteer aria-haspopup="dialog" aria-controls="volunteerDialog">I want to Volunteer</button>` : ''}</div>` : ''}</article>`;
+        }).join('') : `<div class="support-empty"><div><h3>Volunteer at a Muslim orphanage</h3><p>Give your time, share your skills, and lend a helping hand at a Muslim orphanage. Get in touch to learn about volunteer opportunities and how you can help.</p></div><div class="orphanage-actions"><button class="button primary" type="button" data-volunteer aria-haspopup="dialog" aria-controls="volunteerDialog">I want to Volunteer</button><button class="button secondary" type="button" data-donate aria-haspopup="dialog" aria-controls="donationDialog">Donate</button></div></div>`}</div>
+        ${orphanageDonationPanel()}
+      </div></section>`;
+  }
+
+  function orphanageDonationPanel() {
+    const donation = db.orphanageDonation || {};
+    if (!donation.qrImage) return '';
+    return `<aside class="orphanage-donation" aria-labelledby="orphanageDonationTitle">
+      <div class="orphanage-donation-copy"><h3 id="orphanageDonationTitle">Another way to lend a hand.</h3><p>Support the Muslim orphanage with a donation. Scan the QR code with your payment app to send your contribution.</p>${donation.note ? `<p class="orphanage-donation-note">${html(donation.note)}</p>` : ''}<p class="orphanage-donation-recipient">Payment recipient <strong>${html(donation.recipient)}</strong></p></div>
+      <figure class="orphanage-qr"><img src="${html(donation.qrImage)}" alt="Donation payment QR code for the Muslim orphanage" width="240" height="240" loading="lazy" /><figcaption>Scan to donate</figcaption><a href="${html(donation.qrImage)}" download="orphanage-donation-qr" class="orphanage-qr-download">Save QR code</a></figure>
+    </aside>`;
   }
 
   function footer() {
@@ -945,7 +1019,7 @@
             ${summaries.map(([label, value, detail]) => `<div class="admin-metric"><span>${label}</span><strong>${value}</strong><small>${detail}</small></div>`).join('')}
           </div>
           <nav class="admin-tabs" aria-label="Dashboard sections">
-            ${['events', 'registrations', 'testimonials', 'statistics', 'social'].map((tab) => `<button class="admin-tab ${adminTab === tab ? 'active' : ''}" data-tab="${tab}" aria-current="${adminTab === tab ? 'page' : 'false'}" type="button">${tab[0].toUpperCase()}${tab.slice(1)}</button>`).join('')}
+            ${['events', 'registrations', 'support', 'testimonials', 'statistics', 'social'].map((tab) => `<button class="admin-tab ${adminTab === tab ? 'active' : ''}" data-tab="${tab}" aria-current="${adminTab === tab ? 'page' : 'false'}" type="button">${tab === 'support' ? 'Suhbah supports' : tab[0].toUpperCase() + tab.slice(1)}</button>`).join('')}
           </nav>
           <section class="admin-content" aria-label="${html(adminTab)}">${adminSection()}</section>
         </main>
@@ -954,6 +1028,7 @@
   }
 
   function adminSection() {
+    if (adminTab === 'support') return supportAdmin();
     if (adminTab === 'events') return eventsAdmin();
     if (adminTab === 'registrations') return registrationsAdmin();
     if (adminTab === 'testimonials') return testimonialsAdmin();
@@ -1055,12 +1130,36 @@
     `;
   }
 
+  function supportAdmin() {
+    const projects = db.supportProjects || [];
+    const active = projects.find((project) => project.id === editing.support);
+    const donation = db.orphanageDonation || {};
+    return `<form class="form-panel orphanage-donation-admin" id="orphanageDonationForm"><h2>Orphanage donation QR code</h2><p class="muted">Upload your payment QR code to show a donation area below the orphanage panel.</p><div class="form-grid">
+      <label class="field"><span>Upload QR code (PNG, JPEG or WebP, up to 2 MB)</span><input type="file" name="qrFile" accept="image/png,image/jpeg,image/webp" /></label>
+      ${adminInput('Payment recipient name', 'recipient', donation.recipient, 'text', false)}
+      <label class="field"><span>What donations support (optional)</span><textarea name="note" maxlength="1000">${html(donation.note || '')}</textarea></label>
+      <div class="orphanage-qr-preview" id="orphanageQrPreview">${donation.qrImage ? `<img src="${html(donation.qrImage)}" alt="Current donation QR code" width="180" height="180" />` : ''}</div>
+      ${donation.qrImage ? '<label class="orphanage-remove-qr"><input type="checkbox" name="removeQr" /> Remove the QR code and hide the donation area</label>' : ''}
+      <p id="orphanageDonationStatus" role="status" aria-live="polite"></p><button class="button primary" type="submit">Save donation details</button>
+      </div></form><div class="admin-grid"><form class="form-panel" id="supportForm"><h2>${active ? 'Edit support project' : 'Add a support project'}</h2><p class="muted">Share community projects and the help they need. Drafts stay private; completed projects remain visible without appeal buttons.</p><input type="hidden" name="id" value="${html(active?.id || '')}" /><div class="form-grid">
+      ${adminInput('Project title', 'title', active?.title)}${adminInput('Organisation / orphanage', 'organisation', active?.organisation, 'text', false)}${adminInput('Location', 'location', active?.location, 'text', false)}
+      <label class="field"><span>About the project</span><textarea name="description" required>${html(active?.description || '')}</textarea></label>
+      <label class="field"><span>Funding needs (optional)</span><textarea name="fundingNeed" placeholder="What funds will cover, amount needed, and who to contact">${html(active?.fundingNeed || '')}</textarea></label>
+      ${adminInput('Donation / funding contact link (optional)', 'donationUrl', active?.donationUrl, 'url', false)}
+      <label class="field"><span>Volunteer needs (optional)</span><textarea name="volunteerNeed" placeholder="Roles, timings, location, and any requirements">${html(active?.volunteerNeed || '')}</textarea></label>
+      <p class="muted">Volunteer buttons open the volunteer WhatsApp group configured in Social Links.</p>
+      <p class="muted">Without a funding link, the funding button opens an email to the Suhbah team with the project name.</p>
+      ${adminSelect('Status', 'status', active?.status || 'Draft', ['Draft', 'Open', 'Completed'])}
+      <p id="supportFormStatus" role="status" aria-live="polite"></p><button class="button primary" type="submit">Save project</button>${active ? '<button class="button secondary" type="button" id="cancelSupportEdit">Cancel editing</button>' : ''}
+      </div></form><div class="admin-cards">${projects.length ? projects.map((project) => `<article class="admin-card"><span class="support-badge">${html(project.status)}</span><h3>${html(project.title)}</h3><p>${html(project.description)}</p><div class="row-actions"><button class="small-button" data-edit-support="${html(project.id)}" type="button">Edit</button><button class="small-button" data-delete-support="${html(project.id)}" type="button">Delete</button></div></article>`).join('') : '<p class="muted">No support projects yet. Add your first initiative here.</p>'}</div></div>`;
+  }
+
   function statsAdmin() {
     return `<form class="form-panel" id="statsForm"><h2>Community Statistics</h2><div class="form-grid">${adminInput('Number of members', 'members', db.communityStats.members)}${adminInput('Number of gatherings', 'gatherings', db.communityStats.gatherings)}${adminInput('Community count', 'community', db.communityStats.community)}${adminInput('Other statistic label', 'other', db.communityStats.other)}<button class="button primary" type="submit">Save statistics</button></div></form>`;
   }
 
   function socialAdmin() {
-    return `<form class="form-panel" id="socialForm"><h2>Social Links</h2><p class="muted">Keep your community connected on Instagram and WhatsApp.</p><div class="form-grid">${adminInput('Instagram', 'instagram', db.socialLinks.instagram, 'url')}${adminInput('WhatsApp', 'whatsapp', db.socialLinks.whatsapp, 'url')}<button class="button primary" type="submit">Save social links</button></div></form>`;
+    return `<form class="form-panel" id="socialForm"><h2>Social Links</h2><p class="muted">Keep your community connected on Instagram and WhatsApp.</p><div class="form-grid">${adminInput('Instagram', 'instagram', db.socialLinks.instagram, 'url')}${adminInput('WhatsApp', 'whatsapp', db.socialLinks.whatsapp, 'url')}${adminInput('Volunteer WhatsApp group', 'volunteerWhatsapp', db.socialLinks.volunteerWhatsapp || volunteerWhatsapp, 'url', false)}<button class="button primary" type="submit">Save social links</button></div></form>`;
   }
 
   function adminInput(label, name, value = '', type = 'text', required = true) {
@@ -1076,6 +1175,64 @@
   function bindCommon() {
     navigationController?.abort();
     navigationController = new AbortController();
+    const volunteer = document.getElementById('volunteerDialog');
+    document.querySelectorAll('[data-volunteer]').forEach((button) => {
+      button.addEventListener('click', () => {
+        volunteer.showModal();
+        document.body.classList.add('modal-open');
+      });
+    });
+    volunteer?.querySelector('[data-copy-volunteer]').addEventListener('click', async () => {
+      const status = volunteer.querySelector('[data-volunteer-status]');
+      try {
+        await navigator.clipboard.writeText(volunteerMessage);
+        if (volunteer.open) status.textContent = 'Copied. Join the group, paste the message, and tap Send.';
+      } catch {
+        if (volunteer.open) status.textContent = 'Select and copy the introduction above, then paste it into the group chat.';
+      }
+    });
+    volunteer?.querySelector('[data-close-volunteer]').addEventListener('click', () => volunteer.close());
+    volunteer?.addEventListener('close', () => {
+      document.body.classList.remove('modal-open');
+      volunteer.querySelector('[data-volunteer-status]').textContent = '';
+    });
+    volunteer?.addEventListener('click', (event) => {
+      if (event.target !== volunteer) return;
+      const bounds = volunteer.getBoundingClientRect();
+      if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) volunteer.close();
+    });
+    const donationDialog = document.getElementById('donationDialog');
+    donationDialog?.querySelectorAll('[data-donation-qr]').forEach((link) => {
+      link.addEventListener('click', (event) => {
+        event.preventDefault();
+        donationDialog.querySelector('#donationQr').scrollIntoView({ block: 'center' });
+      });
+    });
+    document.querySelectorAll('[data-donate], #donationCard').forEach((button) => {
+      button.addEventListener('click', () => {
+        donationDialog.showModal();
+        document.body.classList.add('modal-open');
+      });
+    });
+    donationDialog?.querySelector('[data-copy-donation-note]').addEventListener('click', async () => {
+      const status = donationDialog.querySelector('[data-donation-note-status]');
+      try {
+        await navigator.clipboard.writeText('MOMoney');
+        status.textContent = 'Copied MOMoney. Paste it into the payment note in your UPI app.';
+      } catch {
+        status.textContent = 'Enter MOMoney in the payment note in your UPI app.';
+      }
+    });
+    donationDialog?.querySelector('[data-close-donation]').addEventListener('click', () => donationDialog.close());
+    donationDialog?.addEventListener('close', () => {
+      document.body.classList.remove('modal-open');
+      donationDialog.querySelector('[data-donation-note-status]').textContent = '';
+    });
+    donationDialog?.addEventListener('click', (event) => {
+      if (event.target !== donationDialog) return;
+      const bounds = donationDialog.getBoundingClientRect();
+      if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) donationDialog.close();
+    });
     const donationToggle = document.querySelector('.donation-toggle');
     donationToggle?.addEventListener('click', () => {
       donationCollapsed = !donationCollapsed;
@@ -1284,6 +1441,42 @@
   }
 
   function bindAdmin() {
+    let pendingQrImage = '';
+    const donationForm = document.getElementById('orphanageDonationForm');
+    donationForm?.querySelector('[name="qrFile"]').addEventListener('change', async (event) => {
+      const file = event.target.files[0];
+      const status = document.getElementById('orphanageDonationStatus');
+      pendingQrImage = '';
+      status.textContent = '';
+      if (!file) return;
+      if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type) || file.size > 2 * 1024 * 1024) {
+        status.textContent = 'Choose a PNG, JPEG, or WebP image smaller than 2 MB.';
+        event.target.value = '';
+        return;
+      }
+      try {
+        pendingQrImage = await fileToDataUrl(file);
+        document.getElementById('orphanageQrPreview').innerHTML = `<img src="${html(pendingQrImage)}" alt="New donation QR preview" width="180" height="180" />`;
+        const remove = donationForm.querySelector('[name="removeQr"]');
+        if (remove) remove.checked = false;
+      } catch { status.textContent = 'Could not read that image. Please choose it again.'; }
+    });
+    donationForm?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const button = donationForm.querySelector('[type="submit"]');
+      button.disabled = true;
+      try {
+        const data = formData(donationForm);
+        delete data.qrFile;
+        data.removeQr = donationForm.querySelector('[name="removeQr"]')?.checked || false;
+        if (donationForm.querySelector('[name="qrFile"]').files.length && !pendingQrImage) throw new Error('Wait for the QR preview before saving.');
+        if (pendingQrImage) data.qrImage = pendingQrImage;
+        await api('/api/admin/orphanage-donation', { method: 'PUT', body: JSON.stringify(data) });
+        await render();
+        document.getElementById('orphanageDonationStatus').textContent = 'Donation details saved.';
+      } catch (error) { document.getElementById('orphanageDonationStatus').textContent = error.message; }
+      finally { button.disabled = false; }
+    });
     document.getElementById('cancelEventEdit')?.addEventListener('click', async () => {
       editing = {};
       await render();
@@ -1366,6 +1559,36 @@
         await render();
       });
     });
+
+    document.getElementById('supportForm')?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const form = event.target;
+      const button = form.querySelector('[type="submit"]');
+      button.disabled = true;
+      try {
+        const data = formData(form);
+        await api('/api/admin/support', { method: data.id ? 'PUT' : 'POST', body: JSON.stringify(data) });
+        editing = {};
+        await render();
+        document.getElementById('supportFormStatus').textContent = 'Project saved.';
+      } catch (error) {
+        form.querySelector('#supportFormStatus').textContent = error.message;
+      } finally { button.disabled = false; }
+    });
+    document.getElementById('cancelSupportEdit')?.addEventListener('click', async () => { editing = {}; await render(); });
+    document.querySelectorAll('[data-edit-support]').forEach((button) => button.addEventListener('click', async () => {
+      editing = { support: button.dataset.editSupport };
+      await render();
+      document.getElementById('supportForm')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }));
+    document.querySelectorAll('[data-delete-support]').forEach((button) => button.addEventListener('click', async () => {
+      if (!window.confirm('Delete this support project?')) return;
+      try {
+        await api('/api/admin/support', { method: 'DELETE', body: JSON.stringify({ id: button.dataset.deleteSupport }) });
+        editing = {};
+        await render();
+      } catch (error) { document.getElementById('supportFormStatus').textContent = error.message; }
+    }));
 
     document.getElementById('statsForm')?.addEventListener('submit', async (event) => {
       event.preventDefault();
