@@ -4415,7 +4415,7 @@ td {
   .donation-dialog [data-donation-note-status] { grid-column: 1; grid-row: 6; }
 }
 .orphanage-actions { display: flex; flex-wrap: wrap; gap: 12px; }
-.volunteer-dialog { position: relative; box-sizing: border-box; width: min(480px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); overflow: auto; padding: 48px 24px 24px; border: 1px solid #e6dfd2; border-radius: 20px; background: var(--white); color: var(--navy); box-shadow: var(--shadow); }
+.volunteer-dialog { position: fixed; inset: 0; margin: auto; box-sizing: border-box; width: min(480px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); overflow: auto; padding: 48px 24px 24px; border: 1px solid #e6dfd2; border-radius: 20px; background: var(--white); color: var(--navy); box-shadow: var(--shadow); }
 .volunteer-dialog::backdrop { background: rgba(47, 65, 86, .72); }
 .volunteer-dialog h2 { margin: 0 0 12px; font-family: var(--font-body); font-size: 1.5rem; }
 .volunteer-dialog p { font-family: var(--font-body); font-size: .9rem; line-height: 1.5; }
@@ -4427,3 +4427,11 @@ td {
 .donation-dialog .recap-close svg, .volunteer-dialog .recap-close svg { width: 18px; height: 18px; }
 .donation-dialog .recap-close:hover, .volunteer-dialog .recap-close:hover { opacity: 1; }
 .donation-dialog .recap-close:focus-visible, .volunteer-dialog .recap-close:focus-visible { outline: 2px solid var(--blue); outline-offset: -5px; border-radius: 8px; opacity: 1; }
+
+@media (max-height: 650px) {
+  .volunteer-dialog { padding: 46px 16px 16px; }
+  .volunteer-dialog h2 { font-size: 1.25rem; margin-bottom: 8px; }
+  .volunteer-dialog p { font-size: .8rem; line-height: 1.4; }
+  .volunteer-dialog blockquote { margin: 12px 0; padding: 12px; font-size: .85rem; line-height: 1.4; }
+  .volunteer-actions .button { min-height: 44px; }
+}

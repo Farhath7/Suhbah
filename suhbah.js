@@ -1263,6 +1263,7 @@
     document.querySelectorAll('[data-volunteer]').forEach((button) => {
       button.addEventListener('click', () => {
         volunteer.showModal();
+        volunteer.scrollTop = 0;
         document.body.classList.add('modal-open');
       });
     });

@@ -131,6 +131,10 @@ test('public navigation hides admin and dashboard access requires an admin sessi
       await publicPage.getByRole('button', { name: 'I want to Volunteer', exact: true }).click();
       const volunteerDialog = publicPage.getByRole('dialog', { name: 'Join us as a volunteer' });
       await expect(volunteerDialog).toBeVisible();
+      expect(await volunteerDialog.getByRole('button', { name: 'Copy message', exact: true }).evaluate((button) => {
+        const bounds = button.getBoundingClientRect();
+        return bounds.top >= 0 && bounds.bottom <= window.innerHeight;
+      })).toBe(true);
       await expect(volunteerDialog.getByRole('link', { name: 'Join WhatsApp group' })).toHaveAttribute('target', '_blank');
       await expect(volunteerDialog.getByRole('link', { name: 'Join WhatsApp group' })).toHaveAttribute('href', /^https:\/\/chat\.whatsapp\.com\//);
       await volunteerDialog.getByRole('button', { name: 'Close volunteer details' }).click();
