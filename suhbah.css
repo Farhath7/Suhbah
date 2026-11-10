@@ -1,3 +1,57 @@
+.support-section { background: radial-gradient(ellipse at 100% 0%, #e4eadd66, transparent 55%), linear-gradient(180deg, #fcfaf6, #f1eee6); scroll-margin-top: 100px; }
+.support-section.section::before { display: none; }
+.support-intro { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(28px, 6vw, 88px); align-items: center; margin-bottom: 44px; }
+.support-intro h2 { margin: 0 0 18px; }
+.support-tagline { font-family: var(--font-display); font-size: clamp(1.5rem, 2.8vw, 2.1rem); line-height: 1.3; margin: 0; color: var(--blue); }
+.support-intro-copy p { font-family: var(--font-display); font-size: clamp(1.2rem, 1.65vw, 1.45rem); font-weight: 400; line-height: 1.6; letter-spacing: .005em; margin: 0 0 20px; }
+.support-intro-copy p:last-child { margin-bottom: 0; }
+.support-projects { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.support-card { padding: clamp(22px, 3vw, 36px); background: #fffdf8; border: 1px solid #d4ddd1; border-radius: 12px; display: flex; flex-direction: column; min-width: 0; }
+.support-card-meta { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: .8rem; color: var(--blue); }
+.support-card h3 { font-family: var(--font-display); font-size: 2rem; line-height: 1.15; margin: 24px 0 12px; }
+.support-badge { display: inline-block; background: #e6eddf; color: #40553c; padding: 5px 10px; border-radius: 20px; font-size: .75rem; font-weight: 600; white-space: nowrap; }
+.support-location { color: var(--blue); font-size: .9rem; margin: 0 0 12px; }
+.support-description, .support-needs p { white-space: pre-line; overflow-wrap: anywhere; }
+.support-needs { display: grid; gap: 18px; margin: 12px 0 24px; border-top: 1px solid #d4ddd1; padding-top: 20px; }
+.support-needs:empty { display: none; }
+.support-needs h4 { margin: 0 0 6px; font-size: .9rem; }
+.support-needs p { margin: 0; color: var(--blue); font-size: .95rem; }
+.support-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: auto; }
+.support-empty { grid-column: 1 / -1; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 28px; min-height: 480px; padding: clamp(28px, 5vw, 64px); border: 1px solid #e6dfd2; border-radius: 20px; background: linear-gradient(90deg, #fffaf3 0%, #fffaf3fa 27%, #fffaf3e8 38%, #fffaf3a6 49%, #fffaf300 67%), url('/assets/suhbah-support-learning.png') center / cover; color: var(--navy); box-shadow: 0 20px 48px #584d3814; overflow: hidden; }
+.support-empty > div { max-width: 440px; }
+.support-empty h3 { font-family: var(--font-display); font-size: clamp(2rem, 3.5vw, 3rem); line-height: 1.1; margin: 0 0 20px; color: var(--navy); text-wrap: balance; }
+.support-empty p { margin: 0; color: #455967; font-family: var(--font-display); font-size: clamp(1.2rem, 1.65vw, 1.45rem); line-height: 1.6; letter-spacing: .005em; font-weight: 400; }
+.support-empty .button.primary { flex-shrink: 0; min-width: 154px; padding: 14px 28px; border: 1px solid var(--navy); background: var(--navy); color: #fffaf2; border-radius: 8px; box-shadow: 0 6px 16px #253c4c1a; }
+.support-empty .button.primary:hover { background: #456375; border-color: #456375; }
+.support-empty .button:focus-visible { outline: 3px solid var(--blue); outline-offset: 5px; }
+@media (max-width: 760px) {
+  .support-intro, .support-projects { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  .support-empty { min-height: 580px; justify-content: flex-end; gap: 22px; padding-top: 230px; background-image: linear-gradient(0deg, #fffaf3 0%, #fffaf3 43%, #fffaf3f2 56%, #fffaf38c 68%, #fffaf300 84%), url('/assets/suhbah-support-learning.png'); background-position: center, 70% top; background-size: cover; }
+  .support-empty > div { max-width: 100%; }
+  .support-empty .button { width: auto; }
+  .support-card-meta { flex-wrap: wrap; }
+}
+
+.orphanage-donation { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: clamp(28px, 6vw, 80px); align-items: center; margin-top: 24px; padding: clamp(24px, 5vw, 56px); background: #fffaf3; border: 1px solid #e6dfd2; border-radius: 20px; }
+.orphanage-donation-copy { max-width: 580px; }
+.orphanage-donation h3 { font-family: var(--font-display); font-size: clamp(1.8rem, 3vw, 2.6rem); line-height: 1.15; margin: 0 0 18px; }
+.orphanage-donation p { font-family: var(--font-display); font-size: 1.25rem; line-height: 1.6; color: #455967; }
+.orphanage-donation-note { white-space: pre-line; overflow-wrap: anywhere; }
+.orphanage-donation .orphanage-donation-recipient { font-family: var(--font-body); font-size: .85rem; margin-top: 24px; }
+.orphanage-donation-recipient strong { display: block; color: var(--navy); font-size: 1rem; margin-top: 6px; overflow-wrap: anywhere; }
+.orphanage-qr { margin: 0; padding: 20px; text-align: center; border: 1px solid #e6dfd2; border-radius: 14px; background: white; }
+.orphanage-qr img { display: block; width: 240px; max-width: 100%; height: 240px; object-fit: contain; background: white; }
+.orphanage-qr figcaption { font-weight: 600; margin: 14px 0 8px; }
+.orphanage-qr-download { display: inline-block; text-decoration: underline; text-underline-offset: 4px; font-size: .85rem; color: var(--blue); padding: 6px; }
+.orphanage-donation-admin { margin-bottom: 28px; }
+.orphanage-qr-preview img { display: block; width: 180px; height: 180px; object-fit: contain; background: white; border: 1px solid var(--mist); padding: 10px; }
+.orphanage-remove-qr { display: flex; gap: 10px; align-items: center; }
+.orphanage-remove-qr input { width: auto; }
+@media (max-width: 760px) {
+  .orphanage-donation { grid-template-columns: minmax(0, 1fr); }
+  .orphanage-qr { justify-self: center; max-width: 100%; }
+}
+
 .bookmark-page .section-head h1 {
   font-family: var(--font-display);
   font-size: clamp(2.5rem, 5vw, 4rem);
@@ -105,6 +159,52 @@
 .donation-button:hover { transform: translateY(-3px); box-shadow: 0 16px 44px #253c4c30, 0 0 0 1px #2f41560d; }
 .donation-button:hover .donation-cta { background: #456375; }
 .donation-button:focus-visible { outline: 3px solid #567c8d; outline-offset: 4px; }
+.donation-button { width: 100%; cursor: pointer; }
+.donation-dialog { width: min(420px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); overflow: hidden; box-sizing: border-box; padding: 20px; border: 1px solid #e6dfd2; border-radius: 20px; background: var(--white); color: var(--navy); text-align: center; box-shadow: var(--shadow); }
+.donation-dialog::backdrop { background: rgba(47, 65, 86, .72); }
+.donation-dialog h2 { margin: 0 32px 10px; font-family: var(--font-display); font-size: 1.6rem; }
+.donation-dialog p { margin: 8px 0; font-family: var(--font-display); font-size: .95rem; line-height: 1.35; }
+.donation-dialog .recap-close { top: 10px; right: 10px; width: 32px; height: 32px; }
+.donation-qr-image { display: block; width: min(180px, 24dvh); max-width: 100%; height: auto; margin: 8px auto; }
+.donation-recipient { overflow-wrap: anywhere; }
+.donation-recipient strong { display: block; }
+.donation-apps { display: grid; gap: 8px; margin: 12px 0 4px; }
+.donation-apps p { margin: 0; }
+.donation-app-options { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+.donation-app-choice { display: flex; flex: 0 0 88px; align-items: center; justify-content: center; min-height: 52px; padding: 8px; box-sizing: border-box; border: 1px solid #d4ddd1; border-radius: 10px; background: #fff; color: var(--navy); text-decoration: none; }
+.donation-app-choice img { display: block; width: 40px; height: 16px; object-fit: contain; }
+.donation-app-choice:hover { border-color: var(--blue); background: #fafbf9; }
+.donation-app-choice:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+.donation-tools { display: flex; gap: 8px; justify-content: center; margin-top: 10px; }
+.donation-dialog .button { width: auto; min-height: 40px; padding: 8px 12px; font-size: .75rem; }
+.donation-dialog [data-donation-note-status]:empty { display: none; }
+@media (max-height: 600px) {
+  .donation-dialog { padding: 14px; }
+  .donation-qr-image { width: min(140px, 20dvh); }
+  .donation-dialog p { margin: 6px 0; font-size: .85rem; }
+  .donation-apps { margin-top: 8px; }
+  .donation-app-choice { min-height: 44px; }
+}
+@media (max-height: 450px) and (min-width: 600px) {
+  .donation-dialog[open] { display: grid; grid-template-columns: 1fr 1fr; column-gap: 20px; width: min(660px, calc(100vw - 24px)); }
+  .donation-dialog h2, .donation-dialog #donationInstructions { grid-column: 1 / -1; }
+  .donation-dialog .donation-apps { grid-column: 1; grid-row: 3; }
+  .donation-dialog .donation-qr-image { grid-column: 2; grid-row: 3 / 6; align-self: center; width: min(180px, 44dvh); }
+  .donation-dialog .donation-recipient { grid-column: 2; grid-row: 6; }
+  .donation-dialog .donation-note { grid-column: 1; grid-row: 4; }
+  .donation-dialog .donation-tools { grid-column: 1; grid-row: 5; }
+  .donation-dialog [data-donation-note-status] { grid-column: 1; grid-row: 6; }
+}
+.button.nav-donate { width: auto; flex-shrink: 0; margin-left: auto; margin-right: 12px; }
+.orphanage-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.volunteer-dialog { position: relative; box-sizing: border-box; width: min(480px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); overflow: auto; padding: 48px 24px 24px; border: 1px solid #e6dfd2; border-radius: 20px; background: var(--white); color: var(--navy); box-shadow: var(--shadow); }
+.volunteer-dialog::backdrop { background: rgba(47, 65, 86, .72); }
+.volunteer-dialog h2 { margin: 0 0 12px; font-family: var(--font-body); font-size: 1.5rem; }
+.volunteer-dialog p { font-family: var(--font-body); font-size: .9rem; line-height: 1.5; }
+.volunteer-dialog blockquote { margin: 20px 0; padding: 16px; border-left: 3px solid var(--blue); border-radius: 0 8px 8px 0; background: var(--cream); font-family: var(--font-body); font-size: .95rem; line-height: 1.55; user-select: all; }
+.volunteer-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.volunteer-actions .button { flex: 1 1 160px; font-size: .85rem; }
+.volunteer-dialog [data-volunteer-status]:empty { display: none; }
 @media (max-width: 599px) {
   .donation-banner { width: 180px; right: max(14px, env(safe-area-inset-right)); bottom: calc(14px + env(safe-area-inset-bottom)); }
   .donation-button { gap: 12px; min-height: 218px; padding: 16px 12px 12px; border-radius: 20px; }
