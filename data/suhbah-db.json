@@ -18,6 +18,7 @@
       "date": "2026-11-01",
       "time": "3:00 - 5:00 PM",
       "location": "Aspire Tutorials, #46, 4th Main “A” Cross, behind R.T. Nagar Old Police Station, Kousar Nagar, Bangalore – 560032",
+      "mapUrl": "https://www.google.com/maps/place/Al+Noor,+123%2F1,+10th+Cross+St,+Kauser+Nagar,+Dinnur,+Hebbal,+Bengaluru,+Karnataka+560032/@13.0269684,77.5953935,20.14z/data=!4m6!3m5!1s0x3bae17bb262479e3:0x31fa4b696c672705!8m2!3d13.026833!4d77.5955563!16s%2Fg%2F11y3sywh_m?entry=ttu&g_ep=EgoyMDI2MTAxOS4wIKXMDSoASAFQAw%3D%3D",
       "description": "The well, the prison, and the long waiting did not write Yusuf's (A.S) ending; Allah did, and He is writing yours too.",
       "status": "upcoming",
       "registrationStatus": "Open",
@@ -26,7 +27,7 @@
       "updatedAt": "2026-10-23T05:57:41.518Z",
       "speaker": "Zaina Malak",
       "speechLink": "",
-      "mapUrl": "https://www.google.com/maps/place/Al+Noor,+123%2F1,+10th+Cross+St,+Kauser+Nagar,+Dinnur,+Hebbal,+Bengaluru,+Karnataka+560032/@13.0269684,77.5953935,20.14z/data=!4m6!3m5!1s0x3bae17bb262479e3:0x31fa4b696c672705!8m2!3d13.026833!4d77.5955563!16s%2Fg%2F11y3sywh_m?entry=ttu&g_ep=EgoyMDI2MTAxOS4wIKXMDSoASAFQAw%3D%3D"
+      "recap": ""
     },
     {
       "id": "event-1",
@@ -63,7 +64,26 @@
       "updatedAt": "2026-10-15T16:31:53.213Z"
     }
   ],
-  "registrations": [],
+  "registrations": [
+    {
+      "id": "reg-1792564491870-1bbe915435",
+      "eventId": "event-7",
+      "eventNumber": "Suhbah 03",
+      "eventTheme": "Finding Your Way Back - Upcoming",
+      "registrationStatus": "Open",
+      "name": "Md Farhath",
+      "email": "farhath@gmail.com",
+      "phone": "78891919191",
+      "age": "26",
+      "gender": "Male",
+      "profile": "Working professional",
+      "attendedBefore": "No",
+      "receivedQuran": "No",
+      "source": "Friend",
+      "message": "ssqqsqsqs",
+      "createdAt": "2026-10-21T06:34:51.870Z"
+    }
+  ],
   "testimonials": [
     {
       "id": "test-1",
