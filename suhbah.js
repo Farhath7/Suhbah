@@ -634,7 +634,7 @@
   }
 
   function eventCard(event) {
-    if (!event) return '<article class="event-card fade-in"><div class="event-card-body"><h2>The next Suhbah is coming soon.</h2><p class="lead">Watch this space for our next gathering.</p></div></article>';
+    if (!event) return `<article class="event-card fade-in" aria-label="Next Suhbah date"><div class="event-card-body"><span class="event-section-label">The Next Suhbah</span><h2>${html(dateLabel('2026-12-06'))}</h2><p class="lead">Save the date. More details coming soon.</p></div></article>`;
     const titleParts = event.theme.match(/^(.*?)\s*-\s*(Upcoming)$/i);
     return `
       <article class="event-card fade-in" id="upcoming-banner" aria-label="Upcoming Suhbah event">
