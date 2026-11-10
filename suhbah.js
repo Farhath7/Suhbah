@@ -172,7 +172,7 @@
     const main = registrationPath
       ? `<main class="registration-page">${event ? registrationSection(event, true) : '<section class="section white"><div class="container"><h1>Suhbah not found</h1><p>This registration link is no longer available.</p><a class="button secondary" href="/" data-route>Back to Suhbah</a></div></section>'}</main>`
       : /^\/bookmarks\/?$/.test(window.location.pathname) ? bookmarkPanel() : publicMain();
-    return `<div class="site">${header()}${main}${footer()}${donationBanner()}${volunteerDialog()}</div>`;
+    return `<div class="site">${header()}${main}${footer()}${donationBanner()}${orphanageDonationDialog()}${volunteerDialog()}</div>`;
   }
 
   function bookmarkPanel() {
@@ -900,24 +900,31 @@
   }
 
   function donationBanner() {
+    const donationContact = db.socialLinks.instagram || db.socialLinks.whatsapp;
+    if (!donationContact) return '';
     return `
       <aside class="donation-banner${donationCollapsed ? ' is-collapsed' : ''}" aria-label="Support Suhbah">
         <button class="donation-toggle" type="button" aria-expanded="${!donationCollapsed}" aria-controls="donationCard" aria-label="${donationCollapsed ? 'Show donation banner' : 'Hide donation banner'}"><span>Support Suhbah</span><span class="donation-toggle-action">${donationCollapsed ? 'Show' : 'Hide'}</span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m4 6 4 4 4-4" /></svg></button>
-        <button id="donationCard" class="donation-button" type="button" ${donationCollapsed ? 'inert' : ''} aria-haspopup="dialog" aria-controls="donationDialog" aria-label="Donate to support Suhbah">
+        <a id="donationCard" class="donation-button" ${donationCollapsed ? 'inert' : ''} href="${html(donationContact)}" target="_blank" rel="noopener noreferrer" aria-label="Support Suhbah - ${db.socialLinks.instagram ? 'DM us on Instagram' : 'message us'} to donate (opens in a new tab)">
           <span class="donation-heart" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z" /></svg></span>
           <span class="donation-label"><strong>Keep Suhbah growing.</strong><small>Your generosity helps bring young hearts together around the Quran.<span class="donation-message">Help us create more moments of reflection, connection, and good company.</span><span class="donation-signoff">Every little contribution matters.</span></small></span>
-          <span class="donation-cta">Donate <span aria-hidden="true">&#8599;</span></span>
-        </button>
+          <span class="donation-cta">DM to donate <span aria-hidden="true">&#8599;</span></span>
+        </a>
       </aside>
+    `;
+  }
+
+  function orphanageDonationDialog() {
+    return `
       <dialog class="donation-dialog" id="donationDialog" aria-labelledby="donationTitle" aria-describedby="donationInstructions">
         <button class="recap-close" type="button" data-close-donation aria-label="Close donation QR code" autofocus>&times;</button>
-        <h2 id="donationTitle">Donate via UPI</h2>
-        <p id="donationInstructions">Choose an app or scan the QR code to donate.</p>
+        <h2 id="donationTitle">Donate to the Muslim orphanage</h2>
+        <p id="donationInstructions">Choose an app or scan the QR code to support the Muslim orphanage.</p>
         ${donationAppLinks()}
         <img id="donationQr" class="donation-qr-image" src="/assets/donation-upi-momoney.png" alt="UPI donation QR code for THEHUBFOUNDATION@rbl" width="530" height="530" />
         <p class="donation-recipient">UPI ID <strong>THEHUBFOUNDATION@rbl</strong></p>
         <p class="donation-note">Payment note: <strong>MOMoney</strong><br />Add it in your UPI app if missing.</p>
-        <div class="donation-tools"><button class="button secondary" type="button" data-copy-donation-note>Copy payment note</button><a class="button primary" href="/assets/donation-upi-momoney.png" download="suhbah-donation-qr.png">Save QR code</a></div>
+        <div class="donation-tools"><button class="button secondary" type="button" data-copy-donation-note>Copy payment note</button><a class="button primary" href="/assets/donation-upi-momoney.png" download="orphanage-donation-qr.png">Save QR code</a></div>
         <p data-donation-note-status role="status" aria-live="polite"></p>
       </dialog>
     `;
@@ -1208,7 +1215,7 @@
         donationDialog.querySelector('#donationQr').scrollIntoView({ block: 'center' });
       });
     });
-    document.querySelectorAll('[data-donate], #donationCard').forEach((button) => {
+    document.querySelectorAll('[data-donate]').forEach((button) => {
       button.addEventListener('click', () => {
         donationDialog.showModal();
         document.body.classList.add('modal-open');
