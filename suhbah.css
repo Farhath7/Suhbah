@@ -4423,3 +4423,7 @@ td {
 .volunteer-actions { display: flex; flex-wrap: wrap; gap: 10px; }
 .volunteer-actions .button { flex: 1 1 160px; font-size: .85rem; }
 .volunteer-dialog [data-volunteer-status]:empty { display: none; }
+.donation-dialog .recap-close, .volunteer-dialog .recap-close { top: 6px; right: 6px; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; color: var(--navy); opacity: .75; }
+.donation-dialog .recap-close svg, .volunteer-dialog .recap-close svg { width: 18px; height: 18px; }
+.donation-dialog .recap-close:hover, .volunteer-dialog .recap-close:hover { opacity: 1; }
+.donation-dialog .recap-close:focus-visible, .volunteer-dialog .recap-close:focus-visible { outline: 2px solid var(--blue); outline-offset: -5px; border-radius: 8px; opacity: 1; }

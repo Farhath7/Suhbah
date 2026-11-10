@@ -984,7 +984,7 @@
 
   function volunteerDialog() {
     return `<dialog class="volunteer-dialog" id="volunteerDialog" aria-labelledby="volunteerTitle" aria-describedby="volunteerInstructions">
-      <button class="recap-close" type="button" data-close-volunteer aria-label="Close volunteer details" autofocus>&times;</button>
+      <button class="recap-close" type="button" data-close-volunteer aria-label="Close volunteer details" autofocus><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg></button>
       <h2 id="volunteerTitle">Join us as a volunteer</h2>
       <p id="volunteerInstructions">Copy this introduction, join the WhatsApp group, then paste it into the group chat and tap Send. Our team will get back to you soon.</p>
       <blockquote>${html(volunteerMessage)}</blockquote>
@@ -1004,7 +1004,7 @@
         </button>
       </aside>
       <dialog class="donation-dialog" id="donationDialog" aria-labelledby="donationTitle" aria-describedby="donationInstructions">
-        <button class="recap-close" type="button" data-close-donation aria-label="Close donation QR code" autofocus>&times;</button>
+        <button class="recap-close" type="button" data-close-donation aria-label="Close donation QR code" autofocus><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg></button>
         <h2 id="donationTitle">Donate via UPI</h2>
         <p id="donationInstructions">Choose an app or scan the QR code to donate.</p>
         ${donationAppLinks()}
