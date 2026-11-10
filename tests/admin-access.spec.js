@@ -128,7 +128,12 @@ test('public navigation hides admin and dashboard access requires an admin sessi
       await expect(publicPage.locator('.orphanage-qr-download')).toHaveAttribute('download', 'orphanage-donation-qr');
       await expect(publicPage.locator('.support-card')).toContainText(project.title);
       await expect(publicPage.locator('.support-card a').first()).toHaveAttribute('href', /^https:\/\/mail\.google\.com\/mail\/.*Orphanage%20learning%20support/);
-      await expect(publicPage.getByRole('link', { name: 'Volunteer', exact: true })).toHaveAttribute('target', '_blank');
+      await publicPage.getByRole('button', { name: 'I want to Volunteer', exact: true }).click();
+      const volunteerDialog = publicPage.getByRole('dialog', { name: 'Join us as a volunteer' });
+      await expect(volunteerDialog).toBeVisible();
+      await expect(volunteerDialog.getByRole('link', { name: 'Join WhatsApp group' })).toHaveAttribute('target', '_blank');
+      await expect(volunteerDialog.getByRole('link', { name: 'Join WhatsApp group' })).toHaveAttribute('href', /^https:\/\/chat\.whatsapp\.com\//);
+      await volunteerDialog.getByRole('button', { name: 'Close volunteer details' }).click();
       expect(await publicPage.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
       await publicPage.locator('#support').screenshot({ path: test.info().outputPath(`support-${width}.png`) });
     }
@@ -141,7 +146,7 @@ test('public navigation hides admin and dashboard access requires an admin sessi
     await expect(publicPage.locator('.support-empty')).toBeVisible();
     await expect(publicPage.getByRole('link', { name: 'Suggest a cause' })).toHaveCount(0);
     await expect(publicPage.locator('#support .eyebrow')).toHaveCount(0);
-    await expect(publicPage.locator('.support-empty .button')).toHaveText('Volunteer');
+    await expect(publicPage.locator('.support-empty .button')).toHaveText(['I want to Volunteer', 'Donate']);
     expect((await publicPage.request.get(`${base}/assets/suhbah-support-learning.png`)).status()).toBe(200);
     for (const width of [1440, 390]) {
       await publicPage.setViewportSize({ width, height: 900 });

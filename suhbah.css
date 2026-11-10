@@ -4376,3 +4376,50 @@ td {
     transform: none;
   }
 }
+
+/* Donation and volunteer dialogs. */
+.donation-button { width: 100%; cursor: pointer; }
+.donation-dialog { width: min(420px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); overflow: hidden; box-sizing: border-box; padding: 20px; border: 1px solid #e6dfd2; border-radius: 20px; background: var(--white); color: var(--navy); text-align: center; box-shadow: var(--shadow); }
+.donation-dialog::backdrop { background: rgba(47, 65, 86, .72); }
+.donation-dialog h2 { margin: 0 32px 10px; font-family: var(--font-display); font-size: 1.6rem; }
+.donation-dialog p { margin: 8px 0; font-family: var(--font-display); font-size: .95rem; line-height: 1.35; }
+.donation-dialog .recap-close { top: 10px; right: 10px; width: 32px; height: 32px; }
+.donation-qr-image { display: block; width: min(180px, 24dvh); max-width: 100%; height: auto; margin: 8px auto; }
+.donation-recipient { overflow-wrap: anywhere; }
+.donation-recipient strong { display: block; }
+.donation-apps { display: grid; gap: 8px; margin: 12px 0 4px; }
+.donation-apps p { margin: 0; }
+.donation-app-options { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+.donation-app-choice { display: flex; flex: 0 0 88px; align-items: center; justify-content: center; min-height: 52px; padding: 8px; box-sizing: border-box; border: 1px solid #d4ddd1; border-radius: 10px; background: #fff; color: var(--navy); text-decoration: none; }
+.donation-app-choice img { display: block; width: 40px; height: 16px; object-fit: contain; }
+.donation-app-choice:hover { border-color: var(--blue); background: #fafbf9; }
+.donation-app-choice:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+.donation-tools { display: flex; gap: 8px; justify-content: center; margin-top: 10px; }
+.donation-dialog .button { width: auto; min-height: 40px; padding: 8px 12px; font-size: .75rem; }
+.donation-dialog [data-donation-note-status]:empty { display: none; }
+@media (max-height: 600px) {
+  .donation-dialog { padding: 14px; }
+  .donation-qr-image { width: min(140px, 20dvh); }
+  .donation-dialog p { margin: 6px 0; font-size: .85rem; }
+  .donation-apps { margin-top: 8px; }
+  .donation-app-choice { min-height: 44px; }
+}
+@media (max-height: 450px) and (min-width: 600px) {
+  .donation-dialog[open] { display: grid; grid-template-columns: 1fr 1fr; column-gap: 20px; width: min(660px, calc(100vw - 24px)); }
+  .donation-dialog h2, .donation-dialog #donationInstructions { grid-column: 1 / -1; }
+  .donation-dialog .donation-apps { grid-column: 1; grid-row: 3; }
+  .donation-dialog .donation-qr-image { grid-column: 2; grid-row: 3 / 6; align-self: center; width: min(180px, 44dvh); }
+  .donation-dialog .donation-recipient { grid-column: 2; grid-row: 6; }
+  .donation-dialog .donation-note { grid-column: 1; grid-row: 4; }
+  .donation-dialog .donation-tools { grid-column: 1; grid-row: 5; }
+  .donation-dialog [data-donation-note-status] { grid-column: 1; grid-row: 6; }
+}
+.orphanage-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.volunteer-dialog { position: relative; box-sizing: border-box; width: min(480px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); overflow: auto; padding: 48px 24px 24px; border: 1px solid #e6dfd2; border-radius: 20px; background: var(--white); color: var(--navy); box-shadow: var(--shadow); }
+.volunteer-dialog::backdrop { background: rgba(47, 65, 86, .72); }
+.volunteer-dialog h2 { margin: 0 0 12px; font-family: var(--font-body); font-size: 1.5rem; }
+.volunteer-dialog p { font-family: var(--font-body); font-size: .9rem; line-height: 1.5; }
+.volunteer-dialog blockquote { margin: 20px 0; padding: 16px; border-left: 3px solid var(--blue); border-radius: 0 8px 8px 0; background: var(--cream); font-family: var(--font-body); font-size: .95rem; line-height: 1.55; user-select: all; }
+.volunteer-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.volunteer-actions .button { flex: 1 1 160px; font-size: .85rem; }
+.volunteer-dialog [data-volunteer-status]:empty { display: none; }
