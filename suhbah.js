@@ -1033,7 +1033,7 @@
     return `<section class="section support-section" id="support" aria-labelledby="supportTitle">
       <div class="container">
         <div class="support-intro"><div><h2 id="supportTitle">Suhbah supports</h2><p class="support-tagline">Good company. Shared purpose.<br />A helping hand.</p></div>
-          <div class="support-intro-copy"><p>Discover community causes and opportunities to help. Find a cause close to your heart and contribute your time, skills, or support.</p><p>From supporting a Muslim orphanage to lending time and skills to a community initiative, every act of care has a place here.</p></div>
+          <div class="support-intro-copy"><p>Together, we can make kindness go further. Discover opportunities to volunteer at Muslim orphanages and be part of something meaningful.</p></div>
         </div>
         <div class="support-projects">${projects.length ? projects.map((project) => {
           const open = project.status === 'Open';
