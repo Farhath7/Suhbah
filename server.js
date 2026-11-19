@@ -334,6 +334,16 @@ function addSuhbahThreeImage(db) {
   db.contentMigrations = [...(db.contentMigrations || []), migration];
 }
 
+function formatSuhbahThreeNumber(db) {
+  const migration = 'format-suhbah-03-number-with-hash';
+  if (db.contentMigrations?.includes(migration)) return;
+  const event = db.events?.find(item => item.id === 'event-7' && /^Suhbah\s*#?0?3$/i.test(item.number));
+  if (!event) return;
+  event.number = 'Suhbah #03';
+  event.updatedAt = new Date().toISOString();
+  db.contentMigrations = [...(db.contentMigrations || []), migration];
+}
+
 function openSuhbahFour(db) {
   const migration = 'open-suhbah-04-december-6-2026';
   if (db.contentMigrations?.includes(migration)) return;
@@ -357,6 +367,7 @@ async function handleApiWithDb(req, res, url, db, body, afterCommit) {
   // Apply to public reads too; the next write persists this one-time content update.
   archiveSuhbahThree(db);
   addSuhbahThreeImage(db);
+  formatSuhbahThreeNumber(db);
   openSuhbahFour(db);
 
   if (req.method === 'GET' && url.pathname === '/api/public') {

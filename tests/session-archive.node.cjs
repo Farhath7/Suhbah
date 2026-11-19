@@ -6,7 +6,18 @@ const vm = require('node:vm');
 
 const source = fs.readFileSync(path.join(__dirname, '../server.js'), 'utf8');
 const helper = source.slice(source.indexOf('function archiveSuhbahThree('), source.indexOf('async function handleApiWithDb('));
-const { archiveSuhbahThree: archive, addSuhbahThreeImage: addImage } = vm.runInNewContext(`${helper}; ({ archiveSuhbahThree, addSuhbahThreeImage })`);
+const { archiveSuhbahThree: archive, addSuhbahThreeImage: addImage, formatSuhbahThreeNumber: formatNumber } = vm.runInNewContext(`${helper}; ({ archiveSuhbahThree, addSuhbahThreeImage, formatSuhbahThreeNumber })`);
+
+test('formats only the third gathering label and preserves later admin changes', () => {
+  const db = { events: [{ id: 'event-7', number: 'Suhbah 03', theme: 'Saved theme' }, { id: 'event-2', number: 'Suhbah #02' }] };
+  formatNumber(db);
+  assert.equal(db.events[0].number, 'Suhbah #03');
+  assert.equal(db.events[0].theme, 'Saved theme');
+  assert.equal(db.events[1].number, 'Suhbah #02');
+  db.events[0].number = 'Later admin edit';
+  formatNumber(db);
+  assert.equal(db.events[0].number, 'Later admin edit');
+});
 
 test('archives the existing third session without duplicating it or changing other records', () => {
   const event = { id: 'event-7', number: 'Suhbah 03', theme: 'A Matter of Choice', status: 'upcoming', registrationStatus: 'Open',

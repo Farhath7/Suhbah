@@ -39,6 +39,7 @@ test('Suhbah 04 is publicly visible and accepts registrations for December 6', a
       });
     });
     const data = await (await request.get(`${base}/api/public`)).json();
+    expect(data.events.find(event => event.id === 'event-7').number).toBe('Suhbah #03');
     expect(data.events.filter((event) => event.number === 'Suhbah 04')).toHaveLength(1);
     for (const width of [1440, 390]) {
       await page.setViewportSize({ width, height: 900 });
