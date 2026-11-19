@@ -1829,9 +1829,10 @@ h3 {
   overscroll-behavior-x: contain;
 }
 .past-grid::-webkit-scrollbar { display: none; }
+.past-slide { min-width: 0; display: flex; scroll-snap-align: center; }
 .section .past-grid .past-card {
+  width: 100%;
   min-width: 0;
-  scroll-snap-align: center;
   transform: perspective(1100px) translateX(var(--cover-shift, 0px)) rotateY(var(--cover-angle, 0deg)) scale(var(--cover-scale, 1));
   transform-origin: center center;
   opacity: var(--cover-opacity, 1);

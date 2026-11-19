@@ -7,7 +7,7 @@ test('coverflow centers and enlarges covers with arrows, keyboard, scrolling and
   const root = path.resolve(__dirname, '..');
   const browser = await chromium.launch();
   try {
-    for (const [width, count] of [[1440, 6], [1024, 3], [700, 3], [390, 3], [1440, 1], [390, 0]]) {
+    for (const [width, count] of [[1440, 6], [1024, 3], [700, 3], [390, 3], [1440, 2], [390, 2], [1440, 1], [390, 0]]) {
       const page = await browser.newPage({ viewport: { width, height: 900 }, reducedMotion: width === 390 ? 'no-preference' : 'reduce', hasTouch: width === 390 });
       const errors = [];
       page.on('pageerror', error => errors.push(error.message));
@@ -24,10 +24,17 @@ test('coverflow centers and enlarges covers with arrows, keyboard, scrolling and
       });
       await page.goto('https://suhbah.test/');
       const slider = page.locator('#pastSuhbahsSlider');
+      const originals = page.locator('.past-card:not([data-cover-clone])');
+      const waitCentered = (index) => page.waitForFunction(index => {
+        const grid = document.querySelector('#pastSuhbahsSlider');
+        const active = grid.querySelector('.is-centered');
+        return active?.dataset.recapId === `past-${index}` && !active.hasAttribute('data-cover-clone') && Math.abs(active.offsetLeft + active.offsetWidth / 2 - grid.scrollLeft - grid.clientWidth / 2) < 2;
+      }, index, { timeout: 5000 });
       await slider.waitFor();
-      assert.equal(await page.locator('.past-card').count(), count);
+      assert.equal(await originals.count(), count);
+      assert.equal(await page.locator('[data-cover-clone]').count(), count > 1 ? count * 2 : 0);
       const initial = Math.max(0, Math.floor((count - 1) / 2));
-      assert.equal(await page.locator('[data-past-prev]').isDisabled(), initial === 0);
+      assert.equal(await page.locator('[data-past-prev]').isDisabled(), count <= 1);
       const layout = await slider.evaluate(grid => {
         return { scrolls: grid.scrollWidth > grid.clientWidth, overflow: document.documentElement.scrollWidth > innerWidth };
       });
@@ -47,7 +54,7 @@ test('coverflow centers and enlarges covers with arrows, keyboard, scrolling and
         assert.equal(await active().getAttribute('data-recap-id'), `past-${initial}`);
         const sizes = await slider.evaluate(grid => {
           const center = grid.querySelector('.is-centered').getBoundingClientRect();
-          const side = [...grid.children].find(card => !card.classList.contains('is-centered')).getBoundingClientRect();
+          const side = grid.querySelector('.past-card:not(.is-centered)').getBoundingClientRect();
           const bounds = grid.getBoundingClientRect();
           return { center: center.width, side: side.width, offset: Math.abs(center.x + center.width / 2 - (bounds.x + bounds.width / 2)) };
         });
@@ -56,28 +63,36 @@ test('coverflow centers and enlarges covers with arrows, keyboard, scrolling and
         assert.equal(layout.scrolls, true);
         assert.equal(await page.locator('[data-past-next]').isEnabled(), true);
         await page.locator('[data-past-next]').click();
-        await page.waitForFunction(index => document.querySelector('.is-centered')?.dataset.recapId === `past-${index}`, initial + 1);
+        await waitCentered(initial + 1);
         await page.locator('[data-past-prev]').click();
-        await page.waitForFunction(index => document.querySelector('.is-centered')?.dataset.recapId === `past-${index}`, initial);
+        await waitCentered(initial);
         await slider.focus();
         await page.keyboard.press('ArrowRight');
-        await page.waitForFunction(index => document.querySelector('.is-centered')?.dataset.recapId === `past-${index}`, initial + 1);
+        await waitCentered(initial + 1);
         await page.keyboard.press('Home');
-        await page.waitForFunction(() => document.querySelector('[data-past-prev]').disabled);
+        await waitCentered(0);
+        for (let lap = 0; lap < 3; lap++) {
+          await page.locator('[data-past-prev]').click();
+          await waitCentered(count - 1);
+          assert.equal(await page.locator('[data-past-next]').isEnabled(), true);
+          await page.locator('[data-past-next]').click();
+          await waitCentered(0);
+          assert.equal(await page.locator('[data-past-prev]').isEnabled(), true);
+        }
         // A side cover comes forward on click, instead of immediately opening its recap.
-        await page.locator('.past-card').nth(1).click();
-        await page.waitForFunction(() => document.querySelector('.is-centered')?.dataset.recapId === 'past-1');
+        await originals.nth(1).click();
+        await waitCentered(1);
         assert.equal(await page.locator('.recap-dialog').count(), 0);
         await slider.evaluate(grid => { grid.scrollLeft = grid.scrollWidth; });
-        await page.waitForFunction(() => document.querySelector('[data-past-next]').disabled);
+        await waitCentered(count - 1);
         assert.equal(await active().getAttribute('data-recap-id'), `past-${count - 1}`);
-        await page.locator('.past-card').last().click();
+        await originals.last().click();
         assert.equal(await page.locator('.recap-dialog').isVisible(), true);
         await page.getByRole('button', { name: 'Close recap' }).click();
         if (width === 390) {
           await slider.focus();
-          await page.keyboard.press('Home');
-          await page.waitForFunction(() => document.querySelector('[data-past-prev]').disabled);
+          await page.keyboard.press('End');
+          await waitCentered(count - 1);
           // Exercise native touch scrolling, including the pointer-cancel path.
           await slider.scrollIntoViewIfNeeded();
           const bounds = await slider.boundingBox();
@@ -88,8 +103,11 @@ test('coverflow centers and enlarges covers with arrows, keyboard, scrolling and
             await client.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: 320 - step * 30, y }] });
             await page.waitForTimeout(20);
           }
+          await page.waitForTimeout(120);
           await client.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
-          await page.waitForFunction(() => document.querySelector('.is-centered')?.dataset.recapId !== 'past-0');
+          await waitCentered(0);
+          assert.equal(await page.locator('[data-past-prev]').isEnabled(), true);
+          assert.equal(await page.locator('[data-past-next]').isEnabled(), true);
           assert.equal(await page.locator('.recap-dialog').count(), 0);
           await client.detach();
         }

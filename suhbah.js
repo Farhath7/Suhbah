@@ -421,6 +421,7 @@
   function publicMain() {
     const event = upcomingEvent();
     const past = db.events.filter((item) => item.status === 'past');
+    const covers = past.length > 1 ? [...past, ...past, ...past] : past;
     const stats = db.communityStats;
 
     return `
@@ -500,7 +501,7 @@
             <div class="section-head past-slider-heading fade-in"><div><h2 id="pastSuhbahsTitle">Previous Suhbahs</h2><p class="past-swipe-hint">Swipe to bring a gathering into focus &rarr;</p></div></div>
             <div class="past-coverflow">
               <button class="past-slider-arrow" type="button" data-past-prev aria-label="Previous Suhbahs" aria-controls="pastSuhbahsSlider" disabled>&larr;</button>
-              <div class="past-grid" id="pastSuhbahsSlider" role="region" aria-roledescription="carousel" aria-labelledby="pastSuhbahsTitle" tabindex="0">${past.map(pastCard).join('')}</div>
+              <div class="past-grid" id="pastSuhbahsSlider" role="region" aria-roledescription="carousel" aria-labelledby="pastSuhbahsTitle" tabindex="0">${covers.map((event, index) => `<div class="past-slide">${pastCard(event, covers.length > past.length && (index < past.length || index >= past.length * 2))}</div>`).join('')}</div>
               <button class="past-slider-arrow" type="button" data-past-next aria-label="Next Suhbahs" aria-controls="pastSuhbahsSlider" disabled>&rarr;</button>
             </div>
           </div>
@@ -786,9 +787,9 @@
     return `<article class="timeline-item fade-in"><div class="timeline-number">${number}</div><div class="timeline-content"><h3>${html(title)}</h3><p class="muted">${html(text)}</p></div></article>`;
   }
 
-  function pastCard(event) {
+  function pastCard(event, clone = false) {
     return `
-      <article class="past-card" data-recap-id="${html(event.id)}" role="button" tabindex="0" aria-label="View recap for ${html(event.number)}: ${html(event.theme)}">
+      <article class="past-card" data-recap-id="${html(event.id)}" ${clone ? 'data-cover-clone aria-hidden="true"' : ''} role="button" tabindex="${clone ? '-1' : '0'}" aria-label="View recap for ${html(event.number)}: ${html(event.theme)}">
         <div class="past-image">${event.image ? `<img src="${html(displayImage(event.image))}" alt="${html(event.number)}: ${html(event.theme)}" loading="lazy" decoding="async" />` : ''}</div>
         <div class="past-body">
           <span class="event-kicker">${html(event.number)}</span>
@@ -1601,13 +1602,24 @@
       const previous = document.querySelector('[data-past-prev]');
       const next = document.querySelector('[data-past-next]');
       const cards = [...slider.querySelectorAll('.past-card')];
-      let activeIndex = Math.floor((cards.length - 1) / 2);
+      const realCount = cards.filter(card => !card.hasAttribute('data-cover-clone')).length;
+      const looping = realCount > 1;
+      const firstIndex = looping ? realCount : 0;
+      const lastIndex = firstIndex + realCount - 1;
+      let activeIndex = firstIndex + Math.floor((realCount - 1) / 2);
       let pointerWasSide = false;
       let pointerIsDown = false;
       const targetFor = (index) => cards[index].offsetLeft + cards[index].offsetWidth / 2 - slider.clientWidth / 2;
       const update = () => {
         if (!cards.length) return;
         activeIndex = cards.reduce((best, card, index) => Math.abs(targetFor(index) - slider.scrollLeft) < Math.abs(targetFor(best) - slider.scrollLeft) ? index : best, 0);
+        // Identical covers on each side keep swipes continuous. Recenter on the
+        // matching real cover only once snapping has finished, without animation.
+        if (looping && (activeIndex < firstIndex || activeIndex > lastIndex) && Math.abs(targetFor(activeIndex) - slider.scrollLeft) < 1) {
+          const matchingIndex = firstIndex + activeIndex % realCount;
+          slider.scrollTo({ left: targetFor(matchingIndex), behavior: 'instant' });
+          activeIndex = matchingIndex;
+        }
         cards.forEach((card, index) => {
           const distance = Math.max(-2, Math.min(2, (targetFor(index) - slider.scrollLeft) / card.offsetWidth));
           card.style.setProperty('--cover-shift', `${distance * -60}px`);
@@ -1618,8 +1630,8 @@
           card.classList.toggle('is-centered', index === activeIndex);
           card.setAttribute('aria-current', String(index === activeIndex));
         });
-        previous.disabled = activeIndex === 0;
-        next.disabled = activeIndex === cards.length - 1;
+        previous.disabled = !looping;
+        next.disabled = !looping;
       };
       const center = (index, instant = false) => {
         if (!cards.length) return;
@@ -1658,8 +1670,8 @@
       slider.addEventListener('keydown', (event) => {
         if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
         event.preventDefault();
-        if (event.key === 'Home') center(0);
-        else if (event.key === 'End') center(cards.length - 1);
+        if (event.key === 'Home') center(firstIndex);
+        else if (event.key === 'End') center(lastIndex);
         else move(event.key === 'ArrowLeft' ? -1 : 1);
       }, options);
       center(activeIndex, true);
