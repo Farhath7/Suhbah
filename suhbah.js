@@ -1020,7 +1020,7 @@
     const query = new URLSearchParams({ pa: payment.upiId, pn: payment.recipient, cu: 'INR', tn: payment.note }).toString();
     const waitlist = registration.registrationStatus === 'Waitlist';
     mount.innerHTML = `<section class="contribution-panel" aria-labelledby="contributionTitle" tabindex="-1">
-      <ol class="contribution-progress" aria-label="Registration progress"><li>1. Registered</li><li aria-current="step">2. Contribute</li><li>3. All set</li></ol>
+      <ol class="contribution-progress" aria-label="Registration progress"><li class="is-complete" aria-label="Registered (complete)"><span class="contribution-step" aria-hidden="true">✓</span><span>Registered</span></li><li aria-current="step"><span class="contribution-step" aria-hidden="true">2</span><span>Contribute</span></li><li><span class="contribution-step" aria-hidden="true">3</span><span>All set</span></li></ol>
       <p class="contribution-confirmed">${waitlist ? "You're on the waitlist" : 'Your registration is confirmed'}</p>
       <h2 id="contributionTitle">A little support.<br />More Suhbah.</h2>
       <p class="contribution-event">${html(registration.eventNumber)} &middot; ${html(registration.eventTheme)}</p>
@@ -1032,7 +1032,6 @@
       ${ready ? `<div class="contribution-payment"><p>Choose a payment app or scan the QR code.</p>
         ${donationAppLinks(query, 'suhbahContributionQr')}
         <img id="suhbahContributionQr" class="contribution-qr" src="${html(payment.qrImage)}" alt="Suhbah contribution payment QR code" width="240" height="240" />
-        <p class="donation-recipient">${html(payment.recipient)}<strong>${html(payment.upiId)}</strong></p>
         <p>Payment note: <strong>${html(payment.note)}</strong></p>
         <a class="contribution-save" href="${html(payment.qrImage)}" download="suhbah-contribution-qr.png">Save QR code</a>
         <p class="contribution-payment-note">After paying in your app, return here to continue.</p></div>

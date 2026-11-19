@@ -28,7 +28,7 @@ for (const width of [390, 1440]) test(`registration offers a skippable contribut
   await expect(page.locator('.contribution-confirmed')).toHaveText('Your registration is confirmed');
   await expect(page.locator('.contribution-optional')).toContainText('Your spot is reserved');
   await expect(page.getByRole('button', { name: 'Skip for now' })).toBeVisible();
-  await expect(page.locator('.contribution-payment')).toContainText('farhathcr7@oksbi');
+  await expect(page.locator('.contribution-payment .donation-recipient')).toHaveCount(0);
   await expect(page.locator('#suhbahContributionQr')).toHaveAttribute('src', '/assets/suhbah-contribution-qr.png');
   await expect(page.locator('.donation-banner')).toHaveCount(0);
   expect(page.url()).toContain('/register/preview');
@@ -58,7 +58,7 @@ for (const mobile of [false, true]) test(`configured payments use Suhbah details
   const context = await browser.newContext(mobile ? { userAgent: 'Android', viewport: { width: 390, height: 844 } } : {});
   const page = await context.newPage();
   await register(page);
-  await expect(page.locator('.contribution-payment')).toContainText('farhathcr7@oksbi');
+  await expect(page.locator('.contribution-payment .donation-recipient')).toHaveCount(0);
   await expect(page.locator('.contribution-panel')).not.toContainText('THEHUBFOUNDATION');
   const google = page.locator('.contribution-panel [aria-label="Donate via Google Pay"]');
   if (mobile) {
