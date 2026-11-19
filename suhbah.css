@@ -4394,7 +4394,8 @@ td {
   }
 }
 
-.venue-pending { font-family: var(--font-body); font-size: 1rem; font-weight: 500; line-height: 1.5; letter-spacing: normal; }
+.venue-pending,
+.registration-event-strip .venue-pending { font-family: var(--font-body); font-size: 1rem; font-weight: 500; line-height: 1.5; letter-spacing: normal; }
 
 .registration-actions { display: flex; flex-wrap: wrap; gap: 10px; }
 .registration-actions button:disabled { opacity: .45; cursor: not-allowed; }
