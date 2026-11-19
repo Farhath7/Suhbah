@@ -760,19 +760,19 @@
             <div class="quran-juz-title"><h3 class="quran-juz-label" id="quran-title-${number}">Chapter ${label}</h3><strong lang="ar" dir="rtl">${paraNames[index]}</strong><span class="quran-juz-meta">${surahs.length} surah${surahs.length === 1 ? '' : 's'}</span></div>
           </header>
           <div class="quran-juz-content">
-            <div class="quran-list-heading"><span>Surahs</span><a class="quran-open-juz" href="${QuranLibrary.pdfUrl(number)}" target="_blank" rel="noreferrer" aria-label="Open full Chapter ${label} (opens in a new tab)">Open full chapter <span aria-hidden="true">↗</span></a></div>
             <ul class="quran-surahs" tabindex="0" aria-label="Surahs in Chapter ${number}">
               ${surahs.map((surah) => `
                 <li>
                   <a class="quran-surah-link" href="${QuranLibrary.pdfUrl(surah.juz, surah.page)}" target="_blank" rel="noreferrer" aria-label="Open Surah ${html(surah.name)} from the beginning, Chapter ${surah.juz}, PDF page ${surah.page}">
                     <span class="quran-surah-number">${surah.number}</span>
                     <span><strong>${html(surah.name)}</strong></span>
-                    <small class="quran-surah-page">${surah.juz < number ? `Ch. ${surah.juz} · ` : ''}PDF p. ${surah.page}</small>
+                    <small class="quran-surah-page">${surah.juz < number ? `Ch. ${surah.juz} · ` : ''}p. ${surah.page}<span aria-hidden="true">↗</span></small>
                   </a>
                   ${surah.juz < number ? `<a class="quran-surah-continue" href="${QuranLibrary.pdfUrl(number)}" target="_blank" rel="noreferrer" aria-label="Continue Surah ${html(surah.name)} in Chapter ${number}">Continue in this Chapter</a>` : ''}
                 </li>
               `).join('')}
             </ul>
+            <a class="quran-open-juz" href="${QuranLibrary.pdfUrl(number)}" target="_blank" rel="noreferrer" aria-label="Open full Chapter ${label} (opens in a new tab)">Read full chapter <span aria-hidden="true">↗</span></a>
           </div>
         </article>
       `;

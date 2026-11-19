@@ -2175,22 +2175,24 @@ body.modal-open {
 .quran-juz-button:hover { background: #edf2f4; border-color: var(--blue); }
 .quran-juz-button[aria-pressed="true"] { background: var(--navy); border-color: var(--navy); color: var(--white); }
 .quran-reading-panel { min-width: 0; padding: 28px; background: #edf2f3; border-left: 1px solid #d7dfe1; }
-.quran-card { margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid #d4dfe3; }
+.quran-juz { padding: 20px; border: 1px solid #d7e0e3; border-radius: 16px; background: #fff; box-shadow: 0 8px 24px #2f415606; }
+.quran-card { margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #e5ebed; }
 .quran-juz-title { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; min-width: 0; gap: 4px 16px; }
-.quran-juz-label { margin: 0; font-family: "Figtree", var(--font-body); font-size: 1.1rem; font-weight: 600; line-height: 1.3; }
-.quran-juz-title strong { grid-column: 2; grid-row: 1 / 3; min-width: 0; font-family: "Uthmanic Hafs", "PageQ3", serif; font-size: 1.8rem; font-weight: 400; line-height: 1.5; text-align: right; overflow-wrap: anywhere; }
+.quran-juz-label { margin: 0; font-family: "Figtree", var(--font-body); font-size: 1.25rem; font-weight: 600; line-height: 1.3; }
+.quran-juz-title strong { grid-column: 2; grid-row: 1 / 3; min-width: 0; font-family: "Uthmanic Hafs", "PageQ3", serif; font-size: 2rem; font-weight: 400; line-height: 1.5; text-align: right; overflow-wrap: anywhere; color: var(--blue); }
 .quran-juz-meta { grid-column: 1; grid-row: 2; color: var(--blue); font-size: .75rem; }
-.quran-list-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 4px; font: 600 .72rem "Figtree", var(--font-body); color: var(--blue); }
-.quran-open-juz { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 4px 0 4px 8px; color: var(--navy); font-size: .75rem; font-weight: 600; }
-.quran-open-juz:hover { text-decoration: underline; text-underline-offset: 3px; }
+.quran-open-juz { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 44px; margin-top: 16px; padding: 10px; border-radius: 9px; background: var(--navy); color: #fff; font: 600 .8rem/1.4 "Figtree", var(--font-body); }
+.quran-open-juz:hover { background: var(--blue); }
 .quran-surahs { list-style: none; max-height: 244px; overflow-y: auto; overscroll-behavior-y: contain; scrollbar-width: thin; scrollbar-color: #a2b7c2 transparent; padding: 0 8px 0 0; margin: 0; }
-.quran-surahs li + li { border-top: 1px solid #d4dfe3; }
-.quran-surah-link { display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 8px 0; }
-.quran-surah-number { display: grid; place-items: center; flex: 0 0 26px; height: 26px; border-radius: 8px; background: #dfe8eb; color: var(--blue); font-size: .7rem; }
+.quran-surahs li + li { margin-top: 8px; }
+.quran-surah-link { display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 10px; border: 1px solid #e5ebed; border-radius: 10px; background: #f6f8f8; }
+.quran-surah-link:hover { border-color: #a9bec7; background: #edf3f5; }
+.quran-surah-number { display: grid; place-items: center; flex: 0 0 26px; height: 26px; border-radius: 50%; background: #e0e9ed; color: var(--navy); font-size: .7rem; font-weight: 600; }
 .quran-surah-link > span:nth-child(2) { flex: 1; min-width: 0; }
 .quran-surah-link strong { display: block; font-size: .85rem; font-weight: 600; }
-.quran-surah-page { flex-shrink: 0; color: var(--blue); font-size: .65rem; white-space: nowrap; }
-.quran-surah-continue { display: block; padding: 0 0 12px 34px; color: var(--blue); font-size: .72rem; }
+.quran-surah-page { display: flex; align-items: center; gap: 8px; flex-shrink: 0; color: var(--blue); font-size: .65rem; white-space: nowrap; }
+.quran-surah-page > span { font-size: .9rem; }
+.quran-surah-continue { display: block; padding: 8px 0 4px 12px; color: var(--blue); font-size: .72rem; }
 .quran-surah-link:hover strong, .quran-surah-continue:hover { text-decoration: underline; }
 .quran-library :is(a, button, summary, .quran-surahs):focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
 .quran-empty { padding: 12px 0; }

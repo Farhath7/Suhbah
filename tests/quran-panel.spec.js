@@ -13,7 +13,7 @@ for (const width of [360, 390, 1440]) test(`compact Quran panel preserves naviga
   await page.evaluate(() => document.fonts.ready);
   const first = page.locator('#quran-juz-1');
   await expect(first).toBeVisible();
-  expect((await first.boundingBox()).height).toBeLessThan(270);
+  expect((await first.boundingBox()).height).toBeLessThan(310);
   await expect(first.locator('.quran-surah-link')).toHaveCount(2);
   const beginning = await first.locator('.quran-surah-link').nth(1).getAttribute('href');
   await page.locator('[data-juz="2"]').click();
