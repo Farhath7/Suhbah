@@ -4438,3 +4438,6 @@ td {
 .site .event-map-link { display: flex; margin-top: 16px; font-family: "Figtree", var(--font-body); font-size: .85rem; }
 .site .venue-inline { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
 .site .venue-inline .event-map-link { margin-top: 0; }
+
+.contribution-step-note { display: block; margin-top: 3px; color: var(--blue); font-size: .7rem; font-weight: 400; }
+.site .contribution-panel :is(.contribution-optional, .contribution-privacy) { color: var(--navy); }

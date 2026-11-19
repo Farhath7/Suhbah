@@ -1020,7 +1020,7 @@
     const query = new URLSearchParams({ pa: payment.upiId, pn: payment.recipient, cu: 'INR', tn: payment.note }).toString();
     const waitlist = registration.registrationStatus === 'Waitlist';
     mount.innerHTML = `<section class="contribution-panel" aria-labelledby="contributionTitle" tabindex="-1">
-      <ol class="contribution-progress" aria-label="Registration progress"><li class="is-complete" aria-label="Registered (complete)"><span class="contribution-step" aria-hidden="true">✓</span><span>Registered</span></li><li aria-current="step"><span class="contribution-step" aria-hidden="true">2</span><span>Contribute</span></li><li><span class="contribution-step" aria-hidden="true">3</span><span>All set</span></li></ol>
+      <ol class="contribution-progress" aria-label="Registration progress"><li class="is-complete" aria-label="Registered (complete)"><span class="contribution-step" aria-hidden="true">✓</span><span>Registered</span></li><li aria-current="step"><span class="contribution-step" aria-hidden="true">2</span><span>Contribute<small class="contribution-step-note">(optional)</small></span></li><li><span class="contribution-step" aria-hidden="true">3</span><span>All set</span></li></ol>
       <p class="contribution-confirmed">${waitlist ? "You're on the waitlist" : 'Your registration is confirmed'}</p>
       <h2 id="contributionTitle">A little support.<br />More Suhbah.</h2>
       <p class="contribution-copy">Help us bring young hearts together around the Quran. Your contribution helps make future gatherings possible.</p>
