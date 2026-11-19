@@ -475,6 +475,29 @@ async function handleApiWithDb(req, res, url, db, body, afterCommit) {
       sendJson(res, 405, { error: 'Method not allowed' });
       return;
     }
+    if (Object.hasOwn(body, 'eventId')) {
+      if (typeof body.eventId !== 'string' || !body.eventId.trim() || Object.hasOwn(body, 'id')) {
+        sendJson(res, 400, { error: 'Select one Suhbah to delete registrations.' });
+        return;
+      }
+      const event = db.events.find((item) => item.id === body.eventId);
+      const registrations = db.registrations.filter((item) => item.eventId === body.eventId);
+      if (!event && !registrations.length) {
+        sendJson(res, 404, { error: 'Suhbah not found' });
+        return;
+      }
+      if (event && event.status !== 'past') {
+        sendJson(res, 409, { error: 'Mark this Suhbah as past before deleting all its registrations.' });
+        return;
+      }
+      if (body.exportConfirmed !== true) {
+        sendJson(res, 400, { error: 'Confirm you have saved an export before deleting registrations.' });
+        return;
+      }
+      db.registrations = db.registrations.filter((item) => item.eventId !== body.eventId);
+      sendJson(res, 200, { deleted: true, deletedCount: registrations.length });
+      return;
+    }
     if (typeof body.id !== 'string' || !body.id.trim()) {
       sendJson(res, 400, { error: 'Registration ID is required' });
       return;

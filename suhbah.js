@@ -1169,16 +1169,19 @@
 
   function registrationsAdmin() {
     const registrations = filteredRegistrations();
+    const selectedEvent = db.events.find((event) => event.id === registrationEventId);
+    const canDeleteAll = registrationEventId && registrations.length && (!selectedEvent || selectedEvent.status === 'past');
     const eventIds = [...new Set([...db.events.map((event) => event.id), ...db.registrations.map((reg) => reg.eventId)])];
     return `
       <div class="table-panel admin-card">
-        <div class="admin-top"><div><h2>Registrations</h2><p class="muted">${registrations.length} people registered${registrationEventId ? ' for this Suhbah' : ' across all Suhbahs'}.</p></div><button class="button secondary" id="exportCsv" type="button">Export CSV</button></div>
+        <div class="admin-top"><div><h2>Registrations</h2><p class="muted">${registrations.length} people registered${registrationEventId ? ' for this Suhbah' : ' across all Suhbahs'}.</p></div><div class="registration-actions"><button class="button secondary" id="exportCsv" type="button">Export CSV (Excel)</button><button class="button secondary admin-delete" id="deleteEventRegistrations" type="button" ${canDeleteAll ? '' : 'disabled'}>Delete all registrations</button></div></div>
         <label class="field registration-filter"><span>Filter by Suhbah</span><select id="registrationEventFilter"><option value="">All Suhbahs</option>${eventIds.map((id) => {
           const event = db.events.find((item) => item.id === id);
           const reg = db.registrations.find((item) => item.eventId === id);
           const count = db.registrations.filter((item) => item.eventId === id).length;
           return `<option value="${html(id)}" ${registrationEventId === id ? 'selected' : ''}>${html(event ? `${event.number}: ${event.theme}` : `${registrationEventLabel(reg)} (archived)`)} (${count})</option>`;
         }).join('')}</select></label>
+        <p class="muted">To delete a completed Suhbah’s registrations, select it above and export a copy first. The Suhbah must be marked as past.</p>
         <p class="admin-table-hint" id="registrationScrollHint">Scroll sideways to see all registration details and actions.</p>
         <div class="table-wrap" role="region" aria-label="Registration details" aria-describedby="registrationScrollHint" tabindex="0">
           <table>
@@ -1897,10 +1900,65 @@
     });
 
     document.getElementById('exportCsv')?.addEventListener('click', exportCsv);
+    document.getElementById('deleteEventRegistrations')?.addEventListener('click', showDeleteRegistrationsDialog);
     document.getElementById('registrationEventFilter')?.addEventListener('change', async (event) => {
       registrationEventId = event.target.value;
       await render();
     });
+  }
+
+  function showDeleteRegistrationsDialog() {
+    const registrations = filteredRegistrations();
+    const eventId = registrationEventId;
+    if (!eventId || !registrations.length) return;
+    const label = registrationEventLabel(registrations[0]);
+    const dialog = document.createElement('dialog');
+    dialog.className = 'registration-delete-dialog';
+    dialog.setAttribute('aria-labelledby', 'deleteRegistrationsTitle');
+    dialog.setAttribute('aria-describedby', 'deleteRegistrationsWarning');
+    dialog.innerHTML = `
+      <h2 id="deleteRegistrationsTitle">Delete registrations?</h2>
+      <p><strong>${html(label)}</strong> · ${registrations.length} registrations</p>
+      <p id="deleteRegistrationsWarning">Export these registrations and save the file before deleting. The CSV opens in Excel. This permanently removes all registrations for this Suhbah from the database and cannot be undone.</p>
+      <button class="button secondary" type="button" data-export-registrations>Export CSV (Excel)</button>
+      <label class="registration-export-confirm"><input type="checkbox" data-export-confirmed> I have saved an export of these registrations.</label>
+      <p role="alert" data-delete-status></p>
+      <div class="registration-actions"><button class="button secondary" type="button" data-cancel-delete autofocus>Cancel</button><button class="button secondary admin-delete" type="button" data-confirm-delete disabled>Delete ${registrations.length} registrations permanently</button></div>`;
+    document.body.append(dialog);
+    const confirm = dialog.querySelector('[data-confirm-delete]');
+    const checkbox = dialog.querySelector('[data-export-confirmed]');
+    const cancel = dialog.querySelector('[data-cancel-delete]');
+    let deleting = false;
+    dialog.querySelector('[data-export-registrations]').addEventListener('click', exportCsv);
+    checkbox.addEventListener('change', () => { confirm.disabled = !checkbox.checked; });
+    cancel.addEventListener('click', () => dialog.close());
+    dialog.addEventListener('cancel', (event) => { if (deleting) event.preventDefault(); });
+    dialog.addEventListener('close', () => {
+      dialog.remove();
+      document.getElementById('deleteEventRegistrations')?.focus();
+    }, { once: true });
+    confirm.addEventListener('click', async () => {
+      if (deleting || !checkbox.checked) return;
+      deleting = true;
+      confirm.disabled = true;
+      checkbox.disabled = true;
+      cancel.disabled = true;
+      const status = dialog.querySelector('[data-delete-status]');
+      status.textContent = 'Deleting registrations…';
+      try {
+        await api('/api/admin/registrations', { method: 'DELETE', body: JSON.stringify({ eventId, exportConfirmed: true }) });
+      } catch (error) {
+        status.textContent = error.message || 'Could not delete registrations. Please try again.';
+        deleting = false;
+        confirm.disabled = false;
+        checkbox.disabled = false;
+        cancel.disabled = false;
+        return;
+      }
+      dialog.close();
+      await render();
+    });
+    dialog.showModal();
   }
 
   function fileToDataUrl(file) {
