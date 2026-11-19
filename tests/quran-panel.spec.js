@@ -25,12 +25,10 @@ for (const width of [360, 390, 1440]) test(`compact Quran panel preserves naviga
   await expect(page.locator('#quran-juz-30')).toBeVisible();
   const list = page.locator('#quran-juz-30 .quran-surahs');
   const bounds = await list.evaluate(el => ({ height: el.clientHeight, content: el.scrollHeight, columns: getComputedStyle(el).gridTemplateColumns.split(' ').length }));
-  expect(bounds.height).toBeLessThanOrEqual(212);
-  expect(bounds.content).toBeGreaterThan(bounds.height);
+  expect(bounds.content).toBeLessThanOrEqual(bounds.height + 1);
   expect(bounds.columns).toBe(2);
-  await expect(page.locator('#quran-juz-30 .quran-list-hint')).toBeVisible();
+  await expect(page.locator('#quran-juz-30 .quran-surah-link')).toHaveCount(37);
   await expect(page.locator('#quran-juz-30 .quran-surah-page')).toHaveCount(0);
-  await page.locator('#quran-juz-30 .quran-surahs').evaluate(el => { el.scrollTop = el.scrollHeight; });
   await expect(page.locator('#quran-juz-30 .quran-surah-link').last()).toContainText('An-Nas');
   const arabic = await page.locator('#quran-juz-30 [lang="ar"]').evaluate(el => ({ size: parseFloat(getComputedStyle(el).fontSize), alignment: getComputedStyle(el).textAlign }));
   expect(arabic.size).toBeGreaterThanOrEqual(40);

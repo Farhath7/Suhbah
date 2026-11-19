@@ -770,7 +770,6 @@
                 </li>
               `).join('')}
             </ul>
-            <p class="quran-list-hint" ${surahs.length > 8 ? '' : 'hidden'}>Scroll for more surahs</p>
             <a class="quran-open-juz" href="${QuranLibrary.pdfUrl(number)}" target="_blank" rel="noreferrer" aria-label="Open full Chapter ${label} (opens in a new tab)">Read full chapter <span aria-hidden="true">↗</span></a>
           </div>
         </article>
@@ -1717,11 +1716,9 @@
           const selected = index + 1 === number;
           card.hidden = !selected;
           if (selected) {
-            card.querySelector('.quran-surahs').scrollTop = 0;
             card.querySelectorAll('.quran-surahs li').forEach((row, rowIndex) => {
               row.hidden = !!surahQuery && !normalizeSearch(QuranLibrary.juz[index].surahs[rowIndex].name).includes(surahQuery);
             });
-            card.querySelector('.quran-list-hint').hidden = card.querySelectorAll('.quran-surahs li:not([hidden])').length <= 8;
           }
         });
         buttons.forEach((button) => button.setAttribute('aria-pressed', String(Number(button.dataset.juz) === number)));
