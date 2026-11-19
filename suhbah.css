@@ -4427,3 +4427,6 @@ td {
 .contribution-skip-link { padding: 4px 0; border: 0; background: transparent; color: var(--navy); font: 600 .85rem var(--font-body); text-decoration: underline; text-underline-offset: 4px; cursor: pointer; }
 .contribution-skip-link:focus-visible { outline: 2px solid var(--blue); outline-offset: 4px; }
 .contribution-panel:focus, .success-panel:focus { outline: none; }
+
+.site .venue-short { display: block; font: 500 1.05rem/1.5 "Figtree", var(--font-body); letter-spacing: normal; }
+.site .event-map-link { display: flex; margin-top: 16px; font-family: "Figtree", var(--font-body); font-size: .85rem; }
