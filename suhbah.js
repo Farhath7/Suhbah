@@ -497,8 +497,12 @@
         <section class="section white" id="events">
           <div class="container">
             ${upcomingEventCards()}
-            <div class="section-head past-slider-heading fade-in"><div><h2 id="pastSuhbahsTitle">Previous Suhbahs</h2><p class="past-swipe-hint">Swipe to bring a gathering into focus &rarr;</p></div><div class="past-slider-controls"><button class="past-slider-arrow" type="button" data-past-prev aria-label="Previous Suhbahs" aria-controls="pastSuhbahsSlider" disabled>&larr;</button><button class="past-slider-arrow" type="button" data-past-next aria-label="Next Suhbahs" aria-controls="pastSuhbahsSlider" disabled>&rarr;</button></div></div>
-            <div class="past-grid" id="pastSuhbahsSlider" role="region" aria-roledescription="carousel" aria-labelledby="pastSuhbahsTitle" tabindex="0">${past.map(pastCard).join('')}</div>
+            <div class="section-head past-slider-heading fade-in"><div><h2 id="pastSuhbahsTitle">Previous Suhbahs</h2><p class="past-swipe-hint">Swipe to bring a gathering into focus &rarr;</p></div></div>
+            <div class="past-coverflow">
+              <button class="past-slider-arrow" type="button" data-past-prev aria-label="Previous Suhbahs" aria-controls="pastSuhbahsSlider" disabled>&larr;</button>
+              <div class="past-grid" id="pastSuhbahsSlider" role="region" aria-roledescription="carousel" aria-labelledby="pastSuhbahsTitle" tabindex="0">${past.map(pastCard).join('')}</div>
+              <button class="past-slider-arrow" type="button" data-past-next aria-label="Next Suhbahs" aria-controls="pastSuhbahsSlider" disabled>&rarr;</button>
+            </div>
           </div>
         </section>
         <section class="section stat-band" id="community">

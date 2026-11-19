@@ -33,6 +33,16 @@ test('coverflow centers and enlarges covers with arrows, keyboard, scrolling and
       });
       assert.equal(layout.overflow, false);
       if (count > 1) {
+        const arrowPositions = await page.locator('.past-coverflow').evaluate(wrapper => {
+          const left = wrapper.querySelector('[data-past-prev]').getBoundingClientRect();
+          const right = wrapper.querySelector('[data-past-next]').getBoundingClientRect();
+          const bounds = wrapper.getBoundingClientRect();
+          return { left: left.left - bounds.left, right: bounds.right - right.right, middle: Math.abs(left.top + left.height / 2 - (bounds.top + bounds.height / 2)), size: left.width };
+        });
+        assert.ok(arrowPositions.left >= 0 && arrowPositions.left <= 12);
+        assert.ok(arrowPositions.right >= 0 && arrowPositions.right <= 12);
+        assert.ok(arrowPositions.middle < 1);
+        assert.ok(arrowPositions.size >= 44);
         const active = () => page.locator('.past-card.is-centered');
         assert.equal(await active().getAttribute('data-recap-id'), `past-${initial}`);
         const sizes = await slider.evaluate(grid => {
