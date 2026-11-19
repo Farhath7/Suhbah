@@ -658,6 +658,7 @@
   }
 
   function locationDetails(location, mapUrl) {
+    if (/to be (announced|decided)/i.test(location || '')) return `<span class="venue-pending">${html(location)}</span>`;
     const parts = String(location || '').split(',').map((part) => part.trim());
     if (parts.length < 3) return `${html(location)}${mapLink(location, mapUrl)}`;
     const venue = parts.shift();

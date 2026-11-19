@@ -4377,6 +4377,8 @@ td {
   }
 }
 
+.venue-pending { font-family: var(--font-body); font-size: 1rem; font-weight: 500; line-height: 1.5; letter-spacing: normal; }
+
 .registration-actions { display: flex; flex-wrap: wrap; gap: 10px; }
 .registration-actions button:disabled { opacity: .45; cursor: not-allowed; }
 .registration-delete-dialog { width: min(560px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); overflow: auto; box-sizing: border-box; padding: 28px; border: 0; border-radius: 16px; background: var(--white); color: var(--navy); box-shadow: var(--shadow); }
