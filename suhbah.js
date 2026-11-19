@@ -1023,9 +1023,8 @@
       <ol class="contribution-progress" aria-label="Registration progress"><li class="is-complete" aria-label="Registered (complete)"><span class="contribution-step" aria-hidden="true">✓</span><span>Registered</span></li><li aria-current="step"><span class="contribution-step" aria-hidden="true">2</span><span>Contribute</span></li><li><span class="contribution-step" aria-hidden="true">3</span><span>All set</span></li></ol>
       <p class="contribution-confirmed">${waitlist ? "You're on the waitlist" : 'Your registration is confirmed'}</p>
       <h2 id="contributionTitle">A little support.<br />More Suhbah.</h2>
-      <p class="contribution-event">${html(registration.eventNumber)} &middot; ${html(registration.eventTheme)}</p>
-      <div class="contribution-summary"><span>Contribution to Suhbah</span><strong>Any amount</strong></div>
       <p class="contribution-copy">Help us bring young hearts together around the Quran. Your contribution helps make future gatherings possible.</p>
+      <div class="contribution-summary"><span>Contribution to Suhbah</span><strong>Any amount</strong></div>
       <p class="contribution-optional">This contribution is optional.${waitlist ? ' Skipping keeps your place on the waitlist.' : ' Your spot is reserved whether you contribute or skip.'}</p>
       <p class="muted contribution-privacy">Contributions are anonymous on Suhbah. Your UPI recipient can still see payment details.</p>
       <button class="contribution-skip-link" type="button" data-contribution-skip>Skip contribution &rarr;</button>
