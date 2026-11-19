@@ -30,6 +30,11 @@ for (const width of [390, 1440]) test(`registration offers a skippable contribut
   await expect(page.getByRole('button', { name: 'Skip for now' })).toBeVisible();
   await expect(page.locator('.contribution-payment .donation-recipient')).toHaveCount(0);
   await expect(page.locator('#suhbahContributionQr')).toHaveAttribute('src', '/assets/suhbah-contribution-qr.png');
+  await expect(page.locator('#suhbahContributionQr')).toBeHidden();
+  expect((await page.locator('.contribution-panel').boundingBox()).height).toBeLessThan(760);
+  await page.getByText('Scan QR code', { exact: true }).click();
+  await expect(page.locator('#suhbahContributionQr')).toBeVisible();
+  await page.getByText('Scan QR code', { exact: true }).click();
   await expect(page.locator('.donation-banner')).toHaveCount(0);
   expect(page.url()).toContain('/register/preview');
   expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(false);
@@ -67,6 +72,7 @@ for (const mobile of [false, true]) test(`configured payments use Suhbah details
   } else {
     await expect(google).toHaveAttribute('href', '#suhbahContributionQr');
     await google.click();
+    await expect(page.locator('#suhbahContributionQr')).toBeVisible();
     expect(page.url()).not.toContain('#suhbahContributionQr');
   }
   await page.getByRole('button', { name: 'Continue after payment' }).click();

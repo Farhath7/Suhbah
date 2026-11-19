@@ -1024,22 +1024,22 @@
       <p class="contribution-confirmed">${waitlist ? "You're on the waitlist" : 'Your registration is confirmed'}</p>
       <h2 id="contributionTitle">A little support.<br />More Suhbah.</h2>
       <p class="contribution-copy">Help us bring young hearts together around the Quran. Your contribution helps make future gatherings possible.</p>
-      <div class="contribution-summary"><span>Contribution to Suhbah</span><strong>Any amount</strong></div>
       <p class="contribution-optional">This contribution is optional.${waitlist ? ' Skipping keeps your place on the waitlist.' : ' Your spot is reserved whether you contribute or skip.'}</p>
-      <p class="muted contribution-privacy">Contributions are anonymous on Suhbah. Your UPI recipient can still see payment details.</p>
-      <button class="contribution-skip-link" type="button" data-contribution-skip>Skip contribution &rarr;</button>
-      ${ready ? `<div class="contribution-payment"><p>Choose a payment app or scan the QR code.</p>
+      ${ready ? `<div class="contribution-payment"><p class="contribution-amount">Contribute any amount</p>
         ${donationAppLinks(query, 'suhbahContributionQr')}
+        <details class="contribution-qr-details"><summary>Scan QR code</summary>
         <img id="suhbahContributionQr" class="contribution-qr" src="${html(payment.qrImage)}" alt="Suhbah contribution payment QR code" width="240" height="240" />
         <p>Payment note: <strong>${html(payment.note)}</strong></p>
         <a class="contribution-save" href="${html(payment.qrImage)}" download="suhbah-contribution-qr.png">Save QR code</a>
-        <p class="contribution-payment-note">After paying in your app, return here to continue.</p></div>
+        </details></div>
+        <p class="muted contribution-privacy">Anonymous on Suhbah. Your UPI recipient can still see payment details.</p>
         <button class="button primary" type="button" data-contribution-continue>Continue after payment</button>`
         : '<div class="contribution-pending"><strong>Payment details coming soon</strong><p>You can continue with your registration below.</p></div>'}
       <button class="button secondary contribution-skip" type="button" data-contribution-skip>Skip for now</button>
     </section>`;
     mount.querySelectorAll('[data-donation-qr]').forEach((link) => link.addEventListener('click', (event) => {
       event.preventDefault();
+      mount.querySelector('.contribution-qr-details').open = true;
       mount.querySelector('#suhbahContributionQr').scrollIntoView({ block: 'center' });
     }));
     mount.querySelectorAll('[data-contribution-continue], [data-contribution-skip]').forEach((button) => {
