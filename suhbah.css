@@ -1788,7 +1788,7 @@ h3 {
 .section-head.past-slider-heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; max-width: none; width: 100%; }
 .past-slider-heading::after { display: none; }
 .past-coverflow { --cover-width: clamp(240px, 32vw, 380px); position: relative; isolation: isolate; width: 100%; max-width: calc(var(--cover-width) * 2.5 + 140px); margin-inline: auto; }
-.past-slider-arrow { position: absolute; top: 50%; z-index: 20; transform: translateY(-50%); display: grid; place-items: center; width: 52px; height: 52px; border: 0; border-radius: 0; background: transparent; color: var(--blue); box-shadow: none; font: 500 1.5rem var(--font-body); cursor: pointer; }
+.past-slider-arrow { position: absolute; top: 50%; z-index: 20; transform: translateY(-50%); display: grid; place-items: center; width: 52px; height: 52px; border: 0; border-radius: 0; background: transparent; color: var(--blue); box-shadow: none; font: 800 1.75rem var(--font-body); cursor: pointer; }
 .past-slider-arrow[data-past-prev] { left: 12px; }
 .past-slider-arrow[data-past-next] { right: 12px; }
 .past-slider-arrow:hover:not(:disabled) { color: var(--navy); }
