@@ -1027,6 +1027,7 @@
       <div class="contribution-summary"><span>Contribution to Suhbah</span><strong>Any amount</strong></div>
       <p class="contribution-copy">Help us bring young hearts together around the Quran. Your contribution helps make future gatherings possible.</p>
       <p class="contribution-optional">This contribution is optional.${waitlist ? ' Skipping keeps your place on the waitlist.' : ' Your spot is reserved whether you contribute or skip.'}</p>
+      <p class="muted contribution-privacy"><strong>Your contribution stays private.</strong> Suhbah does not record who contributes or how much. Your UPI app may show your name and payment amount to the recipient.</p>
       <button class="contribution-skip-link" type="button" data-contribution-skip>Skip contribution &rarr;</button>
       ${ready ? `<div class="contribution-payment"><p>Choose a payment app or scan the QR code.</p>
         ${donationAppLinks(query, 'suhbahContributionQr')}
