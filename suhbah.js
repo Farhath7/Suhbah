@@ -764,7 +764,6 @@
               ${surahs.map((surah) => `
                 <li>
                   <a class="quran-surah-link" href="${QuranLibrary.pdfUrl(surah.juz, surah.page)}" target="_blank" rel="noreferrer" aria-label="Open Surah ${html(surah.name)} from the beginning, Chapter ${surah.juz}, PDF page ${surah.page}">
-                    <span class="quran-surah-number">${surah.number}</span>
                     <span><strong>${html(surah.name)}</strong></span>
                   </a>
                   ${surah.juz < number ? `<a class="quran-surah-continue" href="${QuranLibrary.pdfUrl(number)}" target="_blank" rel="noreferrer" aria-label="Continue Surah ${html(surah.name)} in Chapter ${number}">Continue in this Chapter</a>` : ''}

@@ -2185,14 +2185,13 @@ body.modal-open {
 .quran-open-juz:hover { background: var(--blue); }
 .quran-surahs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: start; gap: 8px; list-style: none; max-height: 208px; overflow-y: auto; overscroll-behavior-y: contain; scrollbar-width: thin; scrollbar-color: #789aa9 transparent; padding: 2px 6px 2px 2px; margin: 0; }
 .quran-surahs li { min-width: 0; }
-.quran-surah-link { display: flex; align-items: center; gap: 6px; min-height: 44px; padding: 8px; border: 1px solid #d8e2e6; border-radius: 8px; background: #f6f8f8; }
-.quran-surah-link:hover { border-color: #a9bec7; background: #edf3f5; }
-.quran-surah-number { flex: 0 0 20px; color: var(--blue); font-size: .65rem; font-weight: 500; }
-.quran-surah-link > span:nth-child(2) { flex: 1; min-width: 0; }
-.quran-surah-link strong { display: block; font-size: .78rem; font-weight: 600; overflow-wrap: anywhere; }
+.quran-surah-link { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-width: 0; min-height: 44px; padding: 6px 2px; border: 1px solid #dde4e7; border-radius: 7px; background: transparent; color: var(--navy); font: 800 .95rem "Inter", Arial, sans-serif; transition: background 150ms, border-color 150ms; text-align: center; }
+.quran-surah-link:hover { background: #edf2f4; border-color: var(--blue); }
+.quran-surah-link > span { min-width: 0; }
+.quran-surah-link strong { display: block; padding: 0 4px; font-size: .8rem; font-weight: 800; overflow-wrap: anywhere; }
 .quran-list-hint { margin: 8px 0 0; color: var(--blue); font: 400 .7rem/1.4 "Figtree", var(--font-body); text-align: center; }
 .quran-surah-continue { display: block; padding: 8px 0 4px 12px; color: var(--blue); font-size: .72rem; }
-.quran-surah-link:hover strong, .quran-surah-continue:hover { text-decoration: underline; }
+.quran-surah-continue:hover { text-decoration: underline; }
 .quran-library :is(a, button, summary, .quran-surahs):focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
 .quran-empty { padding: 12px 0; }
 .quran-empty p { color: var(--blue); font-size: .85rem; }
