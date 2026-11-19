@@ -766,12 +766,12 @@
                   <a class="quran-surah-link" href="${QuranLibrary.pdfUrl(surah.juz, surah.page)}" target="_blank" rel="noreferrer" aria-label="Open Surah ${html(surah.name)} from the beginning, Chapter ${surah.juz}, PDF page ${surah.page}">
                     <span class="quran-surah-number">${surah.number}</span>
                     <span><strong>${html(surah.name)}</strong></span>
-                    <small class="quran-surah-page">${surah.juz < number ? `Ch. ${surah.juz} · ` : ''}p. ${surah.page}<span aria-hidden="true">↗</span></small>
                   </a>
                   ${surah.juz < number ? `<a class="quran-surah-continue" href="${QuranLibrary.pdfUrl(number)}" target="_blank" rel="noreferrer" aria-label="Continue Surah ${html(surah.name)} in Chapter ${number}">Continue in this Chapter</a>` : ''}
                 </li>
               `).join('')}
             </ul>
+            <p class="quran-list-hint" ${surahs.length > 8 ? '' : 'hidden'}>Scroll for more surahs</p>
             <a class="quran-open-juz" href="${QuranLibrary.pdfUrl(number)}" target="_blank" rel="noreferrer" aria-label="Open full Chapter ${label} (opens in a new tab)">Read full chapter <span aria-hidden="true">↗</span></a>
           </div>
         </article>
@@ -1722,6 +1722,7 @@
             card.querySelectorAll('.quran-surahs li').forEach((row, rowIndex) => {
               row.hidden = !!surahQuery && !normalizeSearch(QuranLibrary.juz[index].surahs[rowIndex].name).includes(surahQuery);
             });
+            card.querySelector('.quran-list-hint').hidden = card.querySelectorAll('.quran-surahs li:not([hidden])').length <= 8;
           }
         });
         buttons.forEach((button) => button.setAttribute('aria-pressed', String(Number(button.dataset.juz) === number)));
