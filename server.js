@@ -363,12 +363,25 @@ function openSuhbahFour(db) {
   db.contentMigrations = [...(db.contentMigrations || []), migration];
 }
 
+function addSuhbahFourWhatsapp(db) {
+  const migration = 'add-suhbah-04-whatsapp-group';
+  if (db.contentMigrations?.includes(migration)) return;
+  const event = db.events?.find((item) => item.id === 'event-suhbah-04' && /^Suhbah\s*#?0?4$/i.test(item.number));
+  if (!event) return;
+  if (!String(event.communityGroupLink || '').trim()) {
+    event.communityGroupLink = 'https://chat.whatsapp.com/KPxySuH09vEGCReEI8F22r?s=cl&p=i&iam=2';
+    event.updatedAt = new Date().toISOString();
+  }
+  db.contentMigrations = [...(db.contentMigrations || []), migration];
+}
+
 async function handleApiWithDb(req, res, url, db, body, afterCommit) {
   // Apply to public reads too; the next write persists this one-time content update.
   archiveSuhbahThree(db);
   addSuhbahThreeImage(db);
   formatSuhbahThreeNumber(db);
   openSuhbahFour(db);
+  addSuhbahFourWhatsapp(db);
 
   if (req.method === 'GET' && url.pathname === '/api/public') {
     sendJson(res, 200, publicDb(db));
