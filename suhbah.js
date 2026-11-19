@@ -11,8 +11,8 @@
   let pastSliderController;
   let registrationEventId = '';
   let renderedPath = window.location.pathname;
-  let donationCollapsed = false;
-  try { donationCollapsed = localStorage.getItem('suhbah-donation-collapsed') === 'true'; } catch {}
+  // Recipient and UPI ID decoded from the supplied Suhbah QR code.
+  const suhbahContribution = { qrImage: '/assets/suhbah-contribution-qr.png', upiId: 'farhathcr7@oksbi', recipient: 'Farhath', note: 'Suhbah' };
 
   // Arabic and The Clear Quran translations verified against the linked Quran.com verses.
   const weeklyVerses = [
@@ -206,7 +206,7 @@
     const main = registrationPath
       ? `<main class="registration-page">${event ? registrationSection(event, true) : '<section class="section white"><div class="container"><h1>Suhbah not found</h1><p>This registration link is no longer available.</p><a class="button secondary" href="/" data-route>Back to Suhbah</a></div></section>'}</main>`
       : /^\/bookmarks\/?$/.test(window.location.pathname) ? bookmarkPanel() : publicMain();
-    return `<div class="site">${header()}${main}${footer()}${donationBanner()}${orphanageDonationDialog()}${volunteerDialog()}</div>`;
+    return `<div class="site">${header()}${main}${footer()}${orphanageDonationDialog()}${volunteerDialog()}</div>`;
   }
 
   function bookmarkPanel() {
@@ -959,7 +959,7 @@
             <button class="button primary" type="submit">${waitlist ? 'Join Waitlist' : 'Reserve My Spot'}</button>
             ${eventCalendarOption(event)}
           </div>
-          ${communityGroupUrl(event) ? '<p class="muted">After registration, you will be taken to the WhatsApp group for this month\'s Suhbah gathering.</p>' : ''}
+          <p class="muted">Next: an optional contribution to Suhbah. You can skip it.${communityGroupUrl(event) ? ' Then join this month\'s WhatsApp group.' : ''}</p>
         </div>
       </form>
     `;
@@ -969,17 +969,16 @@
     return `<label class="field"><span>${html(label)}</span><input name="${html(name)}" type="${html(type)}" value="${html(value)}" ${required ? 'required' : ''} /></label>`;
   }
 
-  function donationAppLinks() {
+  function donationAppLinks(query = 'pa=THEHUBFOUNDATION%40rbl&pn=THE%20HUB%20FOUN&mc=8398&cu=INR&tn=MOMoney', qrId = 'donationQr') {
     const android = /Android/i.test(navigator.userAgent);
     const ios = /iPhone|iPad|iPod/i.test(navigator.userAgent) || (/Macintosh/i.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
     const mobile = android || ios;
-    const query = 'pa=THEHUBFOUNDATION%40rbl&pn=THE%20HUB%20FOUN&mc=8398&cu=INR&tn=MOMoney';
     const googlePay = android
       ? `intent://pay?${query}#Intent;scheme=upi;package=com.google.android.apps.nbu.paisa.user;end`
-      : ios ? `gpay://upi/pay?${query}` : '#donationQr';
+      : ios ? `gpay://upi/pay?${query}` : `#${qrId}`;
     const phonePe = android
       ? `intent://pay?${query}#Intent;scheme=upi;package=com.phonepe.app;end`
-      : ios ? `phonepe://upi/pay?${query}` : '#donationQr';
+      : ios ? `phonepe://upi/pay?${query}` : `#${qrId}`;
     return `<div class="donation-apps" aria-label="Donate using a UPI app">
       <div class="donation-app-options">
         <a class="donation-app-choice" href="${html(googlePay)}" aria-label="Donate via Google Pay" ${!mobile ? 'data-donation-qr' : ''}><img src="/assets/google-pay-logo.png" alt="" width="100" height="40" /></a>
@@ -1000,19 +999,55 @@
     </dialog>`;
   }
 
-  function donationBanner() {
-    const donationContact = db.socialLinks.instagram || db.socialLinks.whatsapp;
-    if (!donationContact) return '';
-    return `
-      <aside class="donation-banner${donationCollapsed ? ' is-collapsed' : ''}" aria-label="Support Suhbah">
-        <button class="donation-toggle" type="button" aria-expanded="${!donationCollapsed}" aria-controls="donationCard" aria-label="${donationCollapsed ? 'Show donation banner' : 'Hide donation banner'}"><span>Support Suhbah</span><span class="donation-toggle-action">${donationCollapsed ? 'Show' : 'Hide'}</span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m4 6 4 4 4-4" /></svg></button>
-        <a id="donationCard" class="donation-button" ${donationCollapsed ? 'inert' : ''} href="${html(donationContact)}" target="_blank" rel="noopener noreferrer" aria-label="Support Suhbah - ${db.socialLinks.instagram ? 'DM us on Instagram' : 'message us'} to donate (opens in a new tab)">
-          <span class="donation-heart" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z" /></svg></span>
-          <span class="donation-label"><strong>Keep Suhbah growing.</strong><small>Your generosity helps bring young hearts together around the Quran.<span class="donation-message">Help us create more moments of reflection, connection, and good company.</span><span class="donation-signoff">Every little contribution matters.</span></small></span>
-          <span class="donation-cta">DM to donate <span aria-hidden="true">&#8599;</span></span>
-        </a>
-      </aside>
-    `;
+  function showRegistrationConfirmation(registration) {
+    const event = db.events.find((item) => item.id === registration.eventId);
+    const waitlist = registration.registrationStatus === 'Waitlist';
+    const mount = document.getElementById('registrationMount');
+    mount.innerHTML = `<div class="success-panel" tabindex="-1">
+      <div><h3>${waitlist ? "You're on the waitlist." : "You're in."}</h3>
+        <p class="lead">${waitlist ? 'You joined the waitlist for' : 'Your spot is reserved for'} ${html(registration.eventNumber)}: ${html(registration.eventTheme)}.${waitlist ? ' We will contact you if a spot opens.' : ' We look forward to seeing you there.'}</p>
+        ${communityGroupLink(event)}
+        <div class="success-actions">${eventCalendarOption(event)}<a class="button secondary" href="/">Back to Suhbah</a></div>
+      </div></div>`;
+    mount.querySelector('.success-panel').focus({ preventScroll: true });
+    mount.scrollIntoView({ block: 'start', behavior: 'instant' });
+  }
+
+  function showRegistrationContribution(registration) {
+    const mount = document.getElementById('registrationMount');
+    const payment = suhbahContribution;
+    const ready = !!(payment.qrImage && payment.upiId && payment.recipient);
+    const query = new URLSearchParams({ pa: payment.upiId, pn: payment.recipient, cu: 'INR', tn: payment.note }).toString();
+    const waitlist = registration.registrationStatus === 'Waitlist';
+    mount.innerHTML = `<section class="contribution-panel" aria-labelledby="contributionTitle" tabindex="-1">
+      <ol class="contribution-progress" aria-label="Registration progress"><li>1. Registered</li><li aria-current="step">2. Contribute</li><li>3. All set</li></ol>
+      <p class="contribution-confirmed">${waitlist ? "You're on the waitlist" : 'Your registration is confirmed'}</p>
+      <h2 id="contributionTitle">A little support.<br />More Suhbah.</h2>
+      <p class="contribution-event">${html(registration.eventNumber)} &middot; ${html(registration.eventTheme)}</p>
+      <div class="contribution-summary"><span>Contribution to Suhbah</span><strong>Any amount</strong></div>
+      <p class="contribution-copy">Help us bring young hearts together around the Quran. Your contribution helps make future gatherings possible.</p>
+      <p class="contribution-optional">This contribution is optional.${waitlist ? ' Skipping keeps your place on the waitlist.' : ' Your spot is reserved whether you contribute or skip.'}</p>
+      <button class="contribution-skip-link" type="button" data-contribution-skip>Skip contribution &rarr;</button>
+      ${ready ? `<div class="contribution-payment"><p>Choose a payment app or scan the QR code.</p>
+        ${donationAppLinks(query, 'suhbahContributionQr')}
+        <img id="suhbahContributionQr" class="contribution-qr" src="${html(payment.qrImage)}" alt="Suhbah contribution payment QR code" width="240" height="240" />
+        <p class="donation-recipient">${html(payment.recipient)}<strong>${html(payment.upiId)}</strong></p>
+        <p>Payment note: <strong>${html(payment.note)}</strong></p>
+        <a class="contribution-save" href="${html(payment.qrImage)}" download="suhbah-contribution-qr.png">Save QR code</a>
+        <p class="contribution-payment-note">After paying in your app, return here to continue.</p></div>
+        <button class="button primary" type="button" data-contribution-continue>Continue after payment</button>`
+        : '<div class="contribution-pending"><strong>Payment details coming soon</strong><p>You can continue with your registration below.</p></div>'}
+      <button class="button secondary contribution-skip" type="button" data-contribution-skip>Skip for now</button>
+    </section>`;
+    mount.querySelectorAll('[data-donation-qr]').forEach((link) => link.addEventListener('click', (event) => {
+      event.preventDefault();
+      mount.querySelector('#suhbahContributionQr').scrollIntoView({ block: 'center' });
+    }));
+    mount.querySelectorAll('[data-contribution-continue], [data-contribution-skip]').forEach((button) => {
+      button.addEventListener('click', () => showRegistrationConfirmation(registration));
+    });
+    mount.querySelector('.contribution-panel').focus({ preventScroll: true });
+    mount.scrollIntoView({ block: 'start', behavior: 'instant' });
   }
 
   function orphanageDonationDialog() {
@@ -1334,16 +1369,6 @@
       if (event.target !== donationDialog) return;
       const bounds = donationDialog.getBoundingClientRect();
       if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) donationDialog.close();
-    });
-    const donationToggle = document.querySelector('.donation-toggle');
-    donationToggle?.addEventListener('click', () => {
-      donationCollapsed = !donationCollapsed;
-      document.querySelector('.donation-banner').classList.toggle('is-collapsed', donationCollapsed);
-      donationToggle.setAttribute('aria-expanded', String(!donationCollapsed));
-      donationToggle.setAttribute('aria-label', donationCollapsed ? 'Show donation banner' : 'Hide donation banner');
-      donationToggle.querySelector('.donation-toggle-action').textContent = donationCollapsed ? 'Show' : 'Hide';
-      document.getElementById('donationCard').inert = donationCollapsed;
-      try { localStorage.setItem('suhbah-donation-collapsed', String(donationCollapsed)); } catch {}
     });
     const resources = document.querySelector('.nav-resources');
     document.addEventListener('click', (event) => {
@@ -1766,23 +1791,7 @@
       try {
         const { registration } = await api('/api/registrations', { method: 'POST', body: JSON.stringify(data) });
         if (!form.isConnected) return;
-        const waitlist = registration.registrationStatus === 'Waitlist';
-        document.getElementById('registrationMount').innerHTML = `
-          <div class="success-panel" role="status">
-            <div>
-              <h3>${waitlist ? "You're on the waitlist." : "You're in."}</h3>
-              <p class="lead">${waitlist ? 'You joined the waitlist for' : 'Your spot is reserved for'} ${html(registration.eventNumber)}: ${html(registration.eventTheme)}.${waitlist ? ' We will contact you if a spot opens.' : ' We look forward to seeing you there.'}</p>
-              ${communityGroupLink(db.events.find((item) => item.id === registration.eventId))}
-              <div class="success-actions">
-                ${eventCalendarOption(db.events.find((item) => item.id === registration.eventId))}
-                <a class="button secondary" href="/">Back to Suhbah</a>
-              </div>
-            </div>
-          </div>
-        `;
-        reveal();
-        const groupUrl = communityGroupUrl(db.events.find((item) => item.id === registration.eventId));
-        if (groupUrl) window.location.assign(groupUrl);
+        showRegistrationContribution(registration);
       } catch (error) {
         button.disabled = false;
         button.textContent = originalLabel;
