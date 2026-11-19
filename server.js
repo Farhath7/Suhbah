@@ -334,10 +334,30 @@ function addSuhbahThreeImage(db) {
   db.contentMigrations = [...(db.contentMigrations || []), migration];
 }
 
+function openSuhbahFour(db) {
+  const migration = 'open-suhbah-04-december-6-2026';
+  if (db.contentMigrations?.includes(migration)) return;
+  // Only update the established Suhbah dataset, leaving isolated databases alone.
+  if (!db.events?.some((event) => event.id === 'event-7' && /^Suhbah\s*#?0?3$/i.test(event.number))) return;
+  if (!db.events.some((event) => /^Suhbah\s*#?0?4$/i.test(event.number))) {
+    const now = new Date().toISOString();
+    db.events.unshift({
+      id: 'event-suhbah-04', number: 'Suhbah 04', theme: 'Theme to be announced',
+      date: '2026-12-06', time: '3:00 - 5:00 PM', location: 'Venue to be announced',
+      description: 'Join us for an afternoon of Quranic reflection and good company. The theme and venue will be announced soon.',
+      speaker: 'To be announced', status: 'upcoming', registrationStatus: 'Open',
+      image: '', mapUrl: '', communityGroupLink: '', speechLink: '',
+      createdAt: now, updatedAt: now,
+    });
+  }
+  db.contentMigrations = [...(db.contentMigrations || []), migration];
+}
+
 async function handleApiWithDb(req, res, url, db, body, afterCommit) {
   // Apply to public reads too; the next write persists this one-time content update.
   archiveSuhbahThree(db);
   addSuhbahThreeImage(db);
+  openSuhbahFour(db);
 
   if (req.method === 'GET' && url.pathname === '/api/public') {
     sendJson(res, 200, publicDb(db));

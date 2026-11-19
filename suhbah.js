@@ -668,7 +668,7 @@
   }
 
   function mapLink(location, mapUrl) {
-    if (!location) return '';
+    if (!location || /to be (announced|decided)/i.test(location)) return '';
     let url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`;
     try {
       const exact = new URL(mapUrl);

@@ -56,3 +56,15 @@ test('email is disabled without credentials and rejects unaccepted mail', async 
   const sender = createConfirmationSender({}, { sendMail: async () => ({ accepted: [] }) });
   await expect(sender(registration, event)).rejects.toThrow('not accepted');
 });
+
+test('unannounced venues do not produce misleading Google Maps links', async () => {
+  let message;
+  const sender = createConfirmationSender({}, { sendMail: async (mail) => {
+    message = mail;
+    return { accepted: [registration.email], messageId: 'pending-venue' };
+  } });
+  await sender(registration, { ...event, location: 'Venue to be announced', communityGroupLink: '' });
+  expect(message.text).toContain('Location: Venue to be announced');
+  expect(message.text).not.toContain('Google Maps:');
+  expect(message.html).not.toContain('View location on Google Maps');
+});

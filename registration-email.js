@@ -23,7 +23,7 @@ function createConfirmationSender(env = process.env, transport) {
       const url = new URL(event.communityGroupLink);
       if (['https:', 'http:'].includes(url.protocol)) groupLink = url.href;
     } catch {}
-    let mapUrl = event.location ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}` : '';
+    let mapUrl = event.location && !/to be (announced|decided)/i.test(event.location) ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}` : '';
     try {
       const exact = new URL(event.mapUrl);
       if (['https:', 'http:'].includes(exact.protocol)) mapUrl = exact.href;
