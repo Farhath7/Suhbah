@@ -497,7 +497,7 @@
         <section class="section white" id="events">
           <div class="container">
             ${upcomingEventCards()}
-            <div class="section-head past-slider-heading fade-in"><div><h2 id="pastSuhbahsTitle">Previous Suhbahs</h2><p class="past-swipe-hint">Swipe to explore previous gatherings &rarr;</p></div><div class="past-slider-controls"><button class="past-slider-arrow" type="button" data-past-prev aria-label="Previous Suhbahs" aria-controls="pastSuhbahsSlider" disabled>&larr;</button><button class="past-slider-arrow" type="button" data-past-next aria-label="Next Suhbahs" aria-controls="pastSuhbahsSlider" disabled>&rarr;</button></div></div>
+            <div class="section-head past-slider-heading fade-in"><div><h2 id="pastSuhbahsTitle">Previous Suhbahs</h2><p class="past-swipe-hint">Swipe to bring a gathering into focus &rarr;</p></div><div class="past-slider-controls"><button class="past-slider-arrow" type="button" data-past-prev aria-label="Previous Suhbahs" aria-controls="pastSuhbahsSlider" disabled>&larr;</button><button class="past-slider-arrow" type="button" data-past-next aria-label="Next Suhbahs" aria-controls="pastSuhbahsSlider" disabled>&rarr;</button></div></div>
             <div class="past-grid" id="pastSuhbahsSlider" role="region" aria-roledescription="carousel" aria-labelledby="pastSuhbahsTitle" tabindex="0">${past.map(pastCard).join('')}</div>
           </div>
         </section>
@@ -784,7 +784,7 @@
 
   function pastCard(event) {
     return `
-      <article class="past-card fade-in" data-recap-id="${html(event.id)}" role="button" tabindex="0" aria-label="View recap for ${html(event.number)}: ${html(event.theme)}">
+      <article class="past-card" data-recap-id="${html(event.id)}" role="button" tabindex="0" aria-label="View recap for ${html(event.number)}: ${html(event.theme)}">
         <div class="past-image">${event.image ? `<img src="${html(displayImage(event.image))}" alt="${html(event.number)}: ${html(event.theme)}" loading="lazy" decoding="async" />` : ''}</div>
         <div class="past-body">
           <span class="event-kicker">${html(event.number)}</span>
@@ -1596,26 +1596,69 @@
       const options = { signal: pastSliderController.signal };
       const previous = document.querySelector('[data-past-prev]');
       const next = document.querySelector('[data-past-next]');
+      const cards = [...slider.querySelectorAll('.past-card')];
+      let activeIndex = Math.floor((cards.length - 1) / 2);
+      let pointerWasSide = false;
+      let pointerIsDown = false;
+      const targetFor = (index) => cards[index].offsetLeft + cards[index].offsetWidth / 2 - slider.clientWidth / 2;
       const update = () => {
-        previous.disabled = slider.scrollLeft <= 2;
-        next.disabled = slider.scrollLeft >= slider.scrollWidth - slider.clientWidth - 2;
+        if (!cards.length) return;
+        activeIndex = cards.reduce((best, card, index) => Math.abs(targetFor(index) - slider.scrollLeft) < Math.abs(targetFor(best) - slider.scrollLeft) ? index : best, 0);
+        cards.forEach((card, index) => {
+          const distance = Math.max(-2, Math.min(2, (targetFor(index) - slider.scrollLeft) / card.offsetWidth));
+          card.style.setProperty('--cover-shift', `${distance * -60}px`);
+          card.style.setProperty('--cover-angle', `${distance * -28}deg`);
+          card.style.setProperty('--cover-scale', String(1 - Math.min(Math.abs(distance), 2) * .2));
+          card.style.setProperty('--cover-opacity', String(1 - Math.min(Math.abs(distance), 2) * .18));
+          card.style.zIndex = String(10 - Math.round(Math.abs(distance) * 3));
+          card.classList.toggle('is-centered', index === activeIndex);
+          card.setAttribute('aria-current', String(index === activeIndex));
+        });
+        previous.disabled = activeIndex === 0;
+        next.disabled = activeIndex === cards.length - 1;
+      };
+      const center = (index, instant = false) => {
+        if (!cards.length) return;
+        index = Math.max(0, Math.min(cards.length - 1, index));
+        slider.scrollTo({ left: targetFor(index), behavior: instant || matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+        update();
       };
       const move = (direction) => {
-        const card = slider.querySelector('.past-card');
-        if (!card) return;
-        const step = card.getBoundingClientRect().width + parseFloat(getComputedStyle(slider).columnGap || 0);
-        slider.scrollBy({ left: direction * step, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+        center(activeIndex + direction);
       };
       previous.addEventListener('click', () => move(-1), options);
       next.addEventListener('click', () => move(1), options);
       slider.addEventListener('scroll', update, { ...options, passive: true });
-      window.addEventListener('resize', update, options);
-      slider.addEventListener('keydown', (event) => {
-        if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
-        event.preventDefault();
-        move(event.key === 'ArrowLeft' ? -1 : 1);
+      window.addEventListener('resize', () => center(activeIndex, true), options);
+      cards.forEach((card, index) => {
+        card.addEventListener('focus', () => { if (!pointerIsDown) center(index); }, options);
+      });
+      slider.addEventListener('pointerdown', (event) => {
+        pointerIsDown = true;
+        const card = event.target.closest('.past-card');
+        pointerWasSide = !!card && !card.classList.contains('is-centered');
       }, options);
-      update();
+      slider.addEventListener('pointercancel', () => { pointerWasSide = false; pointerIsDown = false; }, options);
+      window.addEventListener('pointerup', () => { pointerIsDown = false; }, options);
+      slider.addEventListener('click', (event) => {
+        const card = event.target.closest('.past-card');
+        const shouldCenter = pointerWasSide || (card && !card.classList.contains('is-centered'));
+        pointerWasSide = false;
+        pointerIsDown = false;
+        if (card && shouldCenter) {
+          event.stopPropagation();
+          event.preventDefault();
+          center(cards.indexOf(card));
+        }
+      }, { ...options, capture: true });
+      slider.addEventListener('keydown', (event) => {
+        if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+        event.preventDefault();
+        if (event.key === 'Home') center(0);
+        else if (event.key === 'End') center(cards.length - 1);
+        else move(event.key === 'ArrowLeft' ? -1 : 1);
+      }, options);
+      center(activeIndex, true);
     }
     document.getElementById('shareWeeklyVerse')?.addEventListener('click', (event) => openVerseShare(event.currentTarget));
 
