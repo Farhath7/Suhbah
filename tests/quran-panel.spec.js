@@ -26,7 +26,8 @@ for (const width of [360, 390, 1440]) test(`compact Quran panel preserves naviga
   const list = page.locator('#quran-juz-30 .quran-surahs');
   const bounds = await list.evaluate(el => ({ height: el.clientHeight, content: el.scrollHeight, columns: getComputedStyle(el).gridTemplateColumns.split(' ').length }));
   expect(bounds.content).toBeLessThanOrEqual(bounds.height + 1);
-  expect(bounds.columns).toBe(2);
+  expect(bounds.columns).toBe(width >= 900 ? 5 : 3);
+  expect(bounds.height).toBeLessThan(width >= 900 ? 360 : 560);
   await expect(page.locator('#quran-juz-30 .quran-surah-link')).toHaveCount(37);
   await expect(page.locator('#quran-juz-30 .quran-surah-page')).toHaveCount(0);
   await expect(page.locator('#quran-juz-30 .quran-surah-link').last()).toContainText('An-Nas');
