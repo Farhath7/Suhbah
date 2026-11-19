@@ -1,0 +1,38 @@
+const { test, expect } = require('playwright/test');
+const { createPreviewServer } = require('./helpers/contribution-preview.cjs');
+let server, base;
+test.beforeAll(async () => {
+  server = createPreviewServer();
+  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+  base = `http://127.0.0.1:${server.address().port}`;
+});
+test.afterAll(async () => { await new Promise(resolve => server.close(resolve)); });
+for (const width of [360, 390, 1440]) test(`compact Quran panel preserves navigation and search at ${width}px`, async ({ page }) => {
+  await page.setViewportSize({ width, height: 1000 });
+  await page.goto(`${base}/#quran-library`);
+  await page.evaluate(() => document.fonts.ready);
+  const first = page.locator('#quran-juz-1');
+  await expect(first).toBeVisible();
+  expect((await first.boundingBox()).height).toBeLessThan(270);
+  await expect(first.locator('.quran-surah-link')).toHaveCount(2);
+  const beginning = await first.locator('.quran-surah-link').nth(1).getAttribute('href');
+  await page.locator('[data-juz="2"]').click();
+  const second = page.locator('#quran-juz-2');
+  await expect(second).toBeVisible();
+  await expect(second.locator('.quran-surah-link').first()).toHaveAttribute('href', beginning);
+  await expect(second.locator('.quran-surah-continue').first()).toHaveAttribute('href', await second.locator('.quran-open-juz').getAttribute('href'));
+  await page.locator('[data-juz="30"]').click();
+  await expect(page.locator('#quran-juz-30')).toBeVisible();
+  await page.locator('#quran-juz-30 .quran-surahs').evaluate(el => { el.scrollTop = el.scrollHeight; });
+  await expect(page.locator('#quran-juz-30 .quran-surah-link').last()).toContainText('An-Nas');
+  await page.locator('#quranSearch').fill('fatihah');
+  await expect(first).toBeVisible();
+  await expect(first.locator('li:visible')).toHaveCount(1);
+  await expect(first.locator('li:visible')).toContainText('Al-Fatihah');
+  await page.locator('#quranSearch').fill('no-such-surah');
+  await expect(page.locator('#quranEmpty')).toBeVisible();
+  await page.locator('#quranClear').click();
+  await expect(page.locator('.quran-juz-button:visible')).toHaveCount(30);
+  await page.locator('[data-juz="23"]').click();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(false);
+});

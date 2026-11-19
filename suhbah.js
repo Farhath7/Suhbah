@@ -543,7 +543,7 @@
             </div>
                 <p class="quran-results" id="quranResults" role="status" aria-live="polite" aria-atomic="true">Choose from 30 Chapters</p>
                 <div class="quran-juz-selector" role="group" aria-label="Choose a Chapter">
-                  ${QuranLibrary.juz.map(({ number }) => `<button type="button" class="quran-juz-button" data-juz="${number}" aria-controls="quran-juz-${number}" aria-pressed="${number === 1}"><span>Chapter</span> ${String(number)}</button>`).join('')}
+                  ${QuranLibrary.juz.map(({ number }) => `<button type="button" class="quran-juz-button" data-juz="${number}" aria-label="Chapter ${number}" aria-controls="quran-juz-${number}" aria-pressed="${number === 1}"><span>Chapter</span> ${String(number)}</button>`).join('')}
                 </div>
                 <div class="quran-empty" id="quranEmpty" hidden><p>No matching Chapter or surah.</p><button type="button" id="quranClear">Clear search</button></div>
               </div>
@@ -757,17 +757,17 @@
       return `
         <article class="quran-juz" id="quran-juz-${number}" aria-labelledby="quran-title-${number}" ${number === 1 ? '' : 'hidden'}>
           <header class="quran-card">
-            <span class="quran-card-number" aria-hidden="true">${label}</span>
             <div class="quran-juz-title"><h3 class="quran-juz-label" id="quran-title-${number}">Chapter ${label}</h3><strong lang="ar" dir="rtl">${paraNames[index]}</strong><span class="quran-juz-meta">${surahs.length} surah${surahs.length === 1 ? '' : 's'}</span></div>
           </header>
           <div class="quran-juz-content">
-            <a class="quran-open-juz" href="${QuranLibrary.pdfUrl(number)}" target="_blank" rel="noreferrer">Open full Chapter ${label}</a>
+            <div class="quran-list-heading"><span>Surahs</span><a class="quran-open-juz" href="${QuranLibrary.pdfUrl(number)}" target="_blank" rel="noreferrer" aria-label="Open full Chapter ${label} (opens in a new tab)">Open full chapter <span aria-hidden="true">↗</span></a></div>
             <ul class="quran-surahs" tabindex="0" aria-label="Surahs in Chapter ${number}">
               ${surahs.map((surah) => `
                 <li>
                   <a class="quran-surah-link" href="${QuranLibrary.pdfUrl(surah.juz, surah.page)}" target="_blank" rel="noreferrer" aria-label="Open Surah ${html(surah.name)} from the beginning, Chapter ${surah.juz}, PDF page ${surah.page}">
                     <span class="quran-surah-number">${surah.number}</span>
-                    <span><strong>${html(surah.name)}</strong><small>Starts in Chapter ${surah.juz} · PDF page ${surah.page}</small></span>
+                    <span><strong>${html(surah.name)}</strong></span>
+                    <small class="quran-surah-page">${surah.juz < number ? `Ch. ${surah.juz} · ` : ''}PDF p. ${surah.page}</small>
                   </a>
                   ${surah.juz < number ? `<a class="quran-surah-continue" href="${QuranLibrary.pdfUrl(number)}" target="_blank" rel="noreferrer" aria-label="Continue Surah ${html(surah.name)} in Chapter ${number}">Continue in this Chapter</a>` : ''}
                 </li>
