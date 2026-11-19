@@ -1815,29 +1815,33 @@ h3 {
   line-height: 1.28;
 }
 
-.past-grid {
-  grid-template-columns: 1fr;
+.section .past-grid {
+  grid-template-columns: none;
+  grid-auto-flow: column;
+  grid-auto-columns: calc((100% - 36px) / 2.4);
+  gap: 18px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 6px 4px 20px;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: #8da4b5 #e8eef3;
 }
-
+.past-grid .past-card { min-width: 0; scroll-snap-align: start; }
+.past-slider-heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; max-width: none; width: 100%; }
+.past-slider-controls { display: flex; gap: 10px; flex-shrink: 0; }
+.past-slider-arrow { display: grid; place-items: center; width: 46px; height: 46px; border: 1px solid #c5d2dc; border-radius: 50%; background: var(--white); color: var(--navy); font: 500 1.4rem var(--font-body); cursor: pointer; }
+.past-slider-arrow:hover:not(:disabled) { background: var(--navy); border-color: var(--navy); color: var(--white); }
+.past-slider-arrow:disabled { opacity: .35; cursor: default; }
+.past-slider-arrow:focus-visible, .past-grid:focus-visible { outline: 3px solid var(--blue); outline-offset: 4px; }
 .past-swipe-hint { display: none; }
-
 @media (max-width: 899px) {
-  .section .past-grid {
-    grid-template-columns: none;
-    grid-auto-flow: column;
-    grid-auto-columns: min(82vw, 340px);
-    gap: 16px;
-    overflow-x: auto;
-    overflow-y: hidden;
-    padding: 6px 4px 20px;
-    scroll-snap-type: x mandatory;
-    scroll-padding-inline: 4px;
-    scrollbar-width: thin;
-    scrollbar-color: #8da4b5 #e8eef3;
-  }
-
-  .past-grid .past-card { scroll-snap-align: start; }
+  .section .past-grid { grid-auto-columns: min(82vw, 340px); gap: 16px; }
   .past-swipe-hint { display: block; margin: 10px 0 0; color: #526879; font-size: .9rem; }
+  .past-slider-heading { align-items: flex-start; gap: 12px; }
+  .past-slider-controls { gap: 6px; }
+  .past-slider-arrow { width: 42px; height: 42px; }
 }
 
 .past-card {
@@ -3248,10 +3252,6 @@ td {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .past-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
 
   .registration-grid,
   .admin-grid {
@@ -3369,10 +3369,6 @@ td {
     border-bottom: 0;
     border-top: 2px solid var(--mist);
     padding: 20px 6px 0;
-  }
-
-  .past-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .footer-grid {

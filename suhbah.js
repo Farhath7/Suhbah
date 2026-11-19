@@ -8,6 +8,7 @@
   let adminTab = 'events';
   let editing = {};
   let countdownTimer;
+  let pastSliderController;
   let registrationEventId = '';
   let renderedPath = window.location.pathname;
   let donationCollapsed = false;
@@ -419,7 +420,7 @@
 
   function publicMain() {
     const event = upcomingEvent();
-    const past = db.events.filter((item) => item.status === 'past').slice(0, 4);
+    const past = db.events.filter((item) => item.status === 'past');
     const stats = db.communityStats;
 
     return `
@@ -496,8 +497,8 @@
         <section class="section white" id="events">
           <div class="container">
             ${upcomingEventCards()}
-            <div class="section-head fade-in"><h2>Previous Suhbahs</h2><p class="past-swipe-hint">Swipe to explore previous gatherings &rarr;</p></div>
-            <div class="past-grid">${past.map(pastCard).join('')}</div>
+            <div class="section-head past-slider-heading fade-in"><div><h2 id="pastSuhbahsTitle">Previous Suhbahs</h2><p class="past-swipe-hint">Swipe to explore previous gatherings &rarr;</p></div><div class="past-slider-controls"><button class="past-slider-arrow" type="button" data-past-prev aria-label="Previous Suhbahs" aria-controls="pastSuhbahsSlider" disabled>&larr;</button><button class="past-slider-arrow" type="button" data-past-next aria-label="Next Suhbahs" aria-controls="pastSuhbahsSlider" disabled>&rarr;</button></div></div>
+            <div class="past-grid" id="pastSuhbahsSlider" role="region" aria-roledescription="carousel" aria-labelledby="pastSuhbahsTitle" tabindex="0">${past.map(pastCard).join('')}</div>
           </div>
         </section>
         <section class="section stat-band" id="community">
@@ -1589,6 +1590,33 @@
   }
 
   function bindPublic() {
+    const slider = document.getElementById('pastSuhbahsSlider');
+    if (slider) {
+      pastSliderController = new AbortController();
+      const options = { signal: pastSliderController.signal };
+      const previous = document.querySelector('[data-past-prev]');
+      const next = document.querySelector('[data-past-next]');
+      const update = () => {
+        previous.disabled = slider.scrollLeft <= 2;
+        next.disabled = slider.scrollLeft >= slider.scrollWidth - slider.clientWidth - 2;
+      };
+      const move = (direction) => {
+        const card = slider.querySelector('.past-card');
+        if (!card) return;
+        const step = card.getBoundingClientRect().width + parseFloat(getComputedStyle(slider).columnGap || 0);
+        slider.scrollBy({ left: direction * step, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+      };
+      previous.addEventListener('click', () => move(-1), options);
+      next.addEventListener('click', () => move(1), options);
+      slider.addEventListener('scroll', update, { ...options, passive: true });
+      window.addEventListener('resize', update, options);
+      slider.addEventListener('keydown', (event) => {
+        if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+        event.preventDefault();
+        move(event.key === 'ArrowLeft' ? -1 : 1);
+      }, options);
+      update();
+    }
     document.getElementById('shareWeeklyVerse')?.addEventListener('click', (event) => openVerseShare(event.currentTarget));
 
     bindBookmark();
@@ -2055,6 +2083,7 @@
   }
 
   async function render() {
+    pastSliderController?.abort();
     stopRegistrationScroll();
     renderedPath = window.location.pathname;
     try {
