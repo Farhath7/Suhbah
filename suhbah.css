@@ -4430,3 +4430,5 @@ td {
 
 .site .venue-short { display: block; font: 500 1.05rem/1.5 "Figtree", var(--font-body); letter-spacing: normal; }
 .site .event-map-link { display: flex; margin-top: 16px; font-family: "Figtree", var(--font-body); font-size: .85rem; }
+.site .venue-inline { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
+.site .venue-inline .event-map-link { margin-top: 0; }

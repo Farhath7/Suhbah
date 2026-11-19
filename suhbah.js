@@ -666,7 +666,7 @@
   function locationDetails(location, mapUrl) {
     if (/to be (announced|decided)/i.test(location || '')) return `<span class="venue-pending">${html(location)}</span>`;
     const parts = String(location || '').split(',').map((part) => part.trim());
-    if (parts.length < 3) return `<span class="venue-short">${html(location)}</span>${mapLink(location, mapUrl)}`;
+    if (parts.length < 3) return `<span class="venue-inline"><span class="venue-short">${html(location)}</span>${mapLink(location, mapUrl)}</span>`;
     const venue = parts.shift();
     const street = parts.splice(0, 2).join(', ');
     const landmark = /^behind\b/i.test(parts[0] || '') ? parts.shift() : '';
