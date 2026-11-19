@@ -500,9 +500,9 @@
             ${upcomingEventCards()}
             <div class="section-head past-slider-heading fade-in"><div><h2 id="pastSuhbahsTitle">Previous Suhbahs</h2><p class="past-swipe-hint">Swipe to bring a gathering into focus &rarr;</p></div></div>
             <div class="past-coverflow">
-              <button class="past-slider-arrow" type="button" data-past-prev aria-label="Previous Suhbahs" aria-controls="pastSuhbahsSlider" disabled>&larr;</button>
+              <button class="past-slider-arrow" type="button" data-past-prev aria-label="Previous Suhbahs" aria-controls="pastSuhbahsSlider" disabled>&lt;&lt;</button>
               <div class="past-grid" id="pastSuhbahsSlider" role="region" aria-roledescription="carousel" aria-labelledby="pastSuhbahsTitle" tabindex="0">${covers.map((event, index) => `<div class="past-slide">${pastCard(event, covers.length > past.length && (index < past.length || index >= past.length * 2))}</div>`).join('')}</div>
-              <button class="past-slider-arrow" type="button" data-past-next aria-label="Next Suhbahs" aria-controls="pastSuhbahsSlider" disabled>&rarr;</button>
+              <button class="past-slider-arrow" type="button" data-past-next aria-label="Next Suhbahs" aria-controls="pastSuhbahsSlider" disabled>&gt;&gt;</button>
             </div>
           </div>
         </section>

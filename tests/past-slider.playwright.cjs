@@ -80,7 +80,14 @@ test('coverflow centers and enlarges covers with arrows, keyboard, scrolling and
           assert.equal(await page.locator('[data-past-prev]').isEnabled(), true);
         }
         // A side cover comes forward on click, instead of immediately opening its recap.
-        await originals.nth(1).click();
+        // Click the visible part directly: locator.click() may first scroll an
+        // off-center cover into view, changing which cover is active before input.
+        const sidePoint = await originals.nth(1).evaluate(card => {
+          const bounds = card.getBoundingClientRect();
+          const track = card.closest('.past-grid').getBoundingClientRect();
+          return { x: (Math.max(bounds.left, track.left) + Math.min(bounds.right, track.right)) / 2, y: bounds.top + Math.min(80, bounds.height / 4) };
+        });
+        await page.mouse.click(sidePoint.x, sidePoint.y);
         await waitCentered(1);
         assert.equal(await page.locator('.recap-dialog').count(), 0);
         await slider.evaluate(grid => { grid.scrollLeft = grid.scrollWidth; });
